@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -11,6 +12,10 @@ Route::get('/', function () {
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::view('quotation', 'quotation')
+    ->middleware(['auth', 'verified'])
+    ->name('quotation');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
