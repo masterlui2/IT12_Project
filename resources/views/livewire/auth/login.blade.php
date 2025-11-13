@@ -48,6 +48,30 @@
             </div>
         </form>
 
+        <div class="flex flex-col gap-3 mt-4">
+            <div class="flex items-center">
+                <hr class="flex-grow border-zinc-300 dark:border-zinc-600">
+                <span class="mx-2 text-sm text-zinc-500">{{ __('or') }}</span>
+                <hr class="flex-grow border-zinc-300 dark:border-zinc-600">
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <!-- Google Login -->
+                <a href="{{ route('auth.google.redirect') }}"
+                class="flex items-center justify-center gap-2 w-full px-4 py-2 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 transition">
+                    <img src="/images/google.svg" alt="Google" class="w-5 h-5">
+                    {{ __('Continue with Google') }}
+                </a>
+
+                <!-- Facebook Login -->
+                <a href="{{ route('auth.facebook.redirect') }}"
+                class="flex items-center justify-center gap-2 w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition">
+                    <img src="/images/facebook.svg" alt="Facebook" class="w-5 h-5">
+                    {{ __('Continue with Facebook') }}
+                </a>
+            </div>
+        </div>
+
         @if (Route::has('register'))
             <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
                 <span>{{ __('Don\'t have an account?') }}</span>
