@@ -46,3 +46,6 @@ Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleC
 Route::get('/auth/facebook/redirect', [SocialAuthController::class, 'redirectToFacebook'])->name('auth.facebook.redirect');
 Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
 
+// Legal pages
+Route::get('/terms-of-service', [SocialAuthController::class, 'terms'])->name('terms.service');
+Route::get('/privacy-policy', [SocialAuthController::class, 'privacy'])->name('privacy.policy');

@@ -19,7 +19,6 @@ class SocialAuthController extends Controller
 
     public function handleGoogleCallback()
     {
-        {
         try {
             $googleUser = Socialite::driver('google')->user();
 
@@ -40,7 +39,6 @@ class SocialAuthController extends Controller
                 ->with('error', 'Failed to authenticate with Google. Please try again.');
         }
     }
-    }
 
     // FACEBOOK
     public function redirectToFacebook()
@@ -50,18 +48,34 @@ class SocialAuthController extends Controller
 
     public function handleFacebookCallback()
     {
-        $fbUser = Socialite::driver('facebook')->user();
+        try {
+            $fbUser = Socialite::driver('facebook')->user();
 
-        $user = User::firstOrCreate([
-            'email' => $fbUser->getEmail(),
-        ], [
-            'name' => $fbUser->getName(),
-            'password' => bcrypt(Str::random(16)),
-            'email_verified_at' => now(),
-        ]);
+            $user = User::firstOrCreate([
+                'email' => $fbUser->getEmail(),
+            ], [
+                'name' => $fbUser->getName(),
+                'password' => bcrypt(Str::random(16)),
+                'email_verified_at' => now(),
+            ]);
 
-        Auth::login($user);
+            Auth::login($user);
 
-        return redirect()->route('dashboard'); // adjust as needed
+            return redirect()->route('dashboard');
+            
+        } catch (Exception $e) {
+            return redirect()->route('login')
+                ->with('error', 'Failed to authenticate with Facebook. Please try again.');
+        }
+    }
+
+    public function terms()
+    {
+        //return view('legal.terms');
+    }
+
+    public function privacy()
+    {
+        //return view('legal.privacy');
     }
 }
