@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('inquiry', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("Customer_ID");
+            $table->unsignedBigInteger("Service_ID");
+            $table->string("Inquiry_Details");
+            $table->string("Preferred_Schedule");
+            $table->string("Status");
             $table->timestamps();
         });
     }

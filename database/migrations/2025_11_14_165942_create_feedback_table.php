@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('feedback', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("Customer_ID");
+            $table->unsignedBigInteger("Job_ID");
+            $table->integer("Rating");
+            $table->string("Comments");
+            $table->date("Date_Submitted");
             $table->timestamps();
         });
     }

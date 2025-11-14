@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('repair_job', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("Quotation_ID");
+            $table->unsignedBigInteger("Technician_ID");
+            $table->date("Start_Date");
+            $table->date("Completion_Date");
+            $table->string("Job_Status");
+            $table->decimal("Total_Cost",2,0);
             $table->timestamps();
         });
     }

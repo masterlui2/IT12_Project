@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('job_parts', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("Job_ID");
+            $table->unsignedBigInteger("Part_ID");
+            $table->integer("Quantity_Used");
+            $table->decimal("Subtotal",2,0);
             $table->timestamps();
         });
     }

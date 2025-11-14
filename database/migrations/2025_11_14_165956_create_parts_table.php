@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('parts', function (Blueprint $table) {
             $table->id();
+            $table->string("Part_Name");
+            $table->decimal("Limit_Cost",2,0);
+            $table->integer("Quantity_In_Stock");
             $table->timestamps();
         });
     }

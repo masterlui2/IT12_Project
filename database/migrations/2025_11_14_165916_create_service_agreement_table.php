@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('service_agreement', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("Quotation_ID");
+            $table->unsignedBigInteger("Job_ID");
+            $table->string("Customer_Signature");
+            $table->date("Technician_Date");
+            $table->date("Warranty_Period");
+            $table->string("Terms_Notes");
             $table->timestamps();
         });
     }

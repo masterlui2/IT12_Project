@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('manager', function (Blueprint $table) {
             $table->id();
+            $table->string("First_Name");
+            $table->string("Last_Name");
+            $table->string("Email");
+            $table->string("Phone_Number");
+            $table->string("Role");
             $table->timestamps();
         });
     }

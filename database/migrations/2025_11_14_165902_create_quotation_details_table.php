@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('quotation_details', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("Quotation_ID");
+            $table->string("Item_Name");
+            $table->string("Description");
+            $table->string("Quantity");
+            $table->decimal("Unit_Price", 2,0);
+            $table->decimal("Total", 2,0);
             $table->timestamps();
         });
     }
