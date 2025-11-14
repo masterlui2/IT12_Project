@@ -14,5 +14,10 @@ export default defineConfig({
     ],
     server: {
         cors: true,
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: 'localhost', // Change this to your ngrok domain when testing
+        },
     },
 });
