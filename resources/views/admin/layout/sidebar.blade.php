@@ -11,7 +11,7 @@
 
                 <!-- Text on the right -->
                 <div class="flex flex-col">
-                    <h2 class="text-xl font-bold">Admin Panel</h2>
+                    <h2 class="text-xl font-bold">Administrator Panel</h2>
                     <p class="text-gray-500 text-sm">Business Operations</p>
                 </div>
             </div>
@@ -19,17 +19,32 @@
         <div class="border-b border-gray-300"></div>
         <!-- Menu Items -->
         <nav class="flex-1 px-6 py-4">
-            <ul class="space-y-8">
-                <li class="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-blue-50 cursor-pointer">
-                    <span class="text-xl font-medium"><i class="fas fa-gauge"></i> Dashboard</span>
-                </li>
-                <li class="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-blue-50 cursor-pointer">
-                    <span class="text-xl font-medium"><i class="fas fa-user"></i>Employee</span>
-                </li>
-                <li class="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-blue-50 cursor-pointer">
-                    <span class="text-xl font-medium"><i class="fas fa-book"></i>Logs</span>
-                </li>
+            <ul class="space-y-2 text-gray-700">
+
+            <li><a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                <i class="fas fa-gauge text-blue-500"></i> <span>Dashboard</span></a></li>
+
+            <li><a href="{{ route('admin.systemManagement') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                <i class="fas fa-cogs text-blue-500"></i> <span>System&nbsp;Management</span></a></li>
+
+            <li><a href="{{ route('admin.userAccess') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                <i class="fas fa-users text-blue-500"></i> <span>User&nbsp;&amp;&nbsp;Access</span></a></li>
+
+            <li><a href="{{ route('admin.activity') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                <i class="fas fa-clipboard-list text-blue-500"></i> <span>Activity&nbsp;Logs</span></a></li>
+
+            <li><a href="{{ route('admin.analytics') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                <i class="fas fa-chart-bar text-blue-500"></i> <span>Analytics</span></a></li>
+
+            <li><a href="{{ route('admin.developerTools') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                <i class="fas fa-terminal text-blue-500"></i> <span>Developer&nbsp;Tools</span></a></li>
+
+            <li><a href="{{ route('admin.documentation') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                <i class="fas fa-book text-blue-500"></i> <span>Documentation</span></a></li>
+
             </ul>
+
+
         </nav>
 
         <!-- Bottom Section: User Info -->
