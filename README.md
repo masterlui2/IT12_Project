@@ -20,18 +20,21 @@
 
 2. composer install
 
-3. npm install && npm run dev
+3. npm install
 
-4. cp .env.example .env
-    php artisan key:generate
+4. npm run dev
 
-5. DB_DATABASE=your_db
+5. cp .env.example .env
+
+6. php artisan key:generate
+
+7. DB_DATABASE=your_db
     DB_USERNAME=your_user
     DB_PASSWORD=your_password
 
-6. php artisan migrate
+8. php artisan migrate
 
-7. php artisan serve
+9. php artisan serve
 
 ### Usage
 Once the server is running, visit [http://127.0.0.1:8000] in your browser.
