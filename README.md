@@ -5,7 +5,7 @@
 
 ### Requirements
 
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer
 - Node.js and NPM
 - MySQL or other supported DB
