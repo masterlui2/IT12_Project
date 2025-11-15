@@ -117,7 +117,7 @@
             @auth
               <a href="{{ url('/dashboard') }}" class="px-4 py-2 bg-white text-[var(--header-bg)] rounded">Dashboard</a>
             @else
-              <a href="{{ route('login') }}" class="px-4 py-2 rounded border border-transparent bg-white/10 hover:bg-white/20">Log in</a>
+              <a href="{{ route('login') }}" class="px-4 py-2 rounded border border-white/10 hover:bg-white/10">Log in</a>
               @if (Route::has('register'))
                 <a href="{{ route('register') }}" class="px-4 py-2 rounded border border-white/10 hover:bg-white/10">Register</a>
               @endif
