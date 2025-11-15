@@ -1,21 +1,5 @@
-<x-layouts.app :title="__('Attendance')">
+<x-layouts.app :title="__('Inquiries')">
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-            <!-- Inquiries -->
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-start justify-between">
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">New Inquiries</p>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">Today</span>
-                </div>
-                <p class="mt-2 text-2xl font-semibold tracking-tight">{{ number_format($stats['inquiries']['today'] ?? 0) }}</p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{{ number_format($stats['inquiries']['week'] ?? 0) }} this week • Conv. {{ $stats['inquiries']['conversion_rate'] ?? '—' }}</p>
-
-                <!-- progress -->
-                <div class="mt-4 progress h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <div class="progress__bar h-full bg-neutral-900 dark:bg-neutral-100"
-                         style="--progress: {{ $stats['inquiries']['progress'] ?? 0 }};">
-                    </div>
-                </div>
-            </div>
         <div class="grid auto-rows-min gap-7 md:grid-cols-3">
             <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
                 <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />

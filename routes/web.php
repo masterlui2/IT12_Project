@@ -19,6 +19,10 @@ Route::view('quotation', 'quotation')
     ->middleware(['auth', 'verified'])
     ->name('quotation');
 
+ Route::view('inquiries', 'inquiries')
+    ->middleware(['auth', 'verified'])
+    ->name('inquiries');
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
