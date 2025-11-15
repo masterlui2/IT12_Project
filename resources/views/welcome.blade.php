@@ -15,7 +15,6 @@
   @endif
 
   <style>
-    /* Theme colors modeled after your reference */
     :root{
       --header-bg: #232628;
       --hero-blue-a: #1672b7;
@@ -27,7 +26,6 @@
 
     html,body { height:100%; }
 
-    /* full background that you can replace by public/images/background.jpg */
     .page-bg {
       background-image: url('{{ asset("images/background.jpg") }}');
       background-size: cover;
@@ -35,12 +33,10 @@
       background-repeat: no-repeat;
     }
 
-    /* hero banner area (blue) fallback if hero-banner.png not present */
     .hero-blue {
       background: linear-gradient(90deg, var(--hero-blue-a), var(--hero-blue-b));
     }
 
-    /* larger service circle to match screenshot */
     .svc-circle {
       width: 180px;
       height: 180px;
@@ -52,14 +48,12 @@
       overflow:hidden;
     }
 
-    /* maximize container width (very wide screens) */
     .max-site {
-      max-width: 1800px; /* increase for "maximize" feel */
+      max-width: 1800px;
       margin-left: auto;
       margin-right: auto;
     }
 
-    /* small arrow button */
     .svc-arrow {
       width:44px; height:44px; border-radius:8px;
       display:inline-flex; align-items:center; justify-content:center;
@@ -68,29 +62,26 @@
       backdrop-filter: blur(3px);
     }
 
-    /* subtle inner glow for main band */
     .main-band {
       background: linear-gradient(180deg, rgba(0,0,0,0.85), rgba(16,16,16,0.95));
     }
 
-    /* keep the hero content readable */
     .hero-content { color: white; text-shadow: 0 6px 18px rgba(0,0,0,0.6); }
 
-    /* services title like screenshot */
     .services-title {
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       text-align:center;
       color: #ffffff;
-      font-size: 2.25rem; /* ~36px */
+      font-size: 2.25rem;
       text-shadow: 0 4px 18px rgba(0,0,0,0.6);
     }
   </style>
 </head>
 <body class="min-h-screen page-bg text-gray-200">
 
-  {{-- Header: full-width dark bar --}}
+  {{-- Header --}}
   <header class="w-full bg-[var(--header-bg)] text-white">
     <div class="max-site w-full flex items-center justify-between px-6 py-4">
       <a href="{{ url('/') }}" class="flex items-center gap-3">
@@ -101,7 +92,6 @@
         </div>
       </a>
 
-      {{-- nav + auth --}}
       <div class="flex items-center gap-6">
         <nav class="hidden lg:flex items-center gap-6 text-sm text-gray-300">
           <a href="#" class="hover:text-white">Home</a>
@@ -111,7 +101,6 @@
           <a href="#" class="hover:text-white">Contacts</a>
         </nav>
 
-        {{-- auth (Breeze-friendly) --}}
         @if (Route::has('login'))
           <div class="flex items-center gap-3 text-sm">
             @auth
@@ -128,10 +117,9 @@
     </div>
   </header>
 
-  {{-- HERO: big blue banner (full width). You can replace hero image with hero-banner.png --}}
+  {{-- HERO --}}
   <section class="w-full hero-blue relative">
     <div class="max-site flex flex-col lg:flex-row items-center gap-8 px-6 py-10 lg:py-20">
-      {{-- left text block --}}
       <div class="lg:flex-1 hero-content">
         <h3 class="uppercase tracking-widest text-sm mb-3">Tablets & Phones</h3>
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4">REPAIR SERVICE</h1>
@@ -143,7 +131,6 @@
         </div>
       </div>
 
-      {{-- right hero visual --}}
       <div class="w-full lg:w-[560px] shrink-0">
         @if (file_exists(public_path('images/hero-banner.png')))
           <img src="{{ asset('images/hero-banner.png') }}" alt="Hero" class="w-full h-full object-contain">
@@ -153,7 +140,6 @@
       </div>
     </div>
 
-    {{-- curved dark plane under hero (main band) --}}
     <div class="w-full main-band mt-6 py-14">
       <div class="max-site text-center px-6">
         <h2 class="text-2xl md:text-3xl font-bold text-white">PROFESSIONAL COMPUTER REPAIR SERVICE</h2>
@@ -162,38 +148,36 @@
     </div>
   </section>
 
-  {{-- SERVICES section: centered title and grouped/centered cards --}}
+  {{-- SERVICES --}}
+  
   <section id="services" class="w-full py-12">
     <div class="max-site px-6">
-      {{-- Title centered like screenshot --}}
       <div class="mb-10">
         <h3 class="services-title">Our Services</h3>
       </div>
 
-      {{-- Services viewport (relative for arrows) --}}
       <div class="relative">
-        {{-- left arrow (vertically centered) --}}
         <button id="svc-prev" class="absolute left-2 -translate-y-1/2 top-1/2 svc-arrow z-20" aria-label="Previous">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
 
-        {{-- right arrow --}}
         <button id="svc-next" class="absolute right-2 -translate-y-1/2 top-1/2 svc-arrow z-20" aria-label="Next">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
 
-        {{-- viewport and sliding track: center the items and add small gaps --}}
         <div class="overflow-hidden">
           <div class="flex transition-transform duration-500 ease-in-out services-track items-start justify-center gap-6">
-            @php
-              $services = [
-                ['title'=>'Notebook','img'=>'images/svc-notebook.png','subtitle'=>'increase speed'],
-                ['title'=>'Macbook Pro','img'=>'images/svc-macbook.png','subtitle'=>'setup & repair'],
-                ['title'=>'Laptop','img'=>'images/svc-laptop.png','subtitle'=>'diagnostic'],
-                ['title'=>'Cartridge','img'=>'images/svc-printer.png','subtitle'=>'replacement'],
-                ['title'=>'Hard Disk','img'=>'images/svc-hdd.png','subtitle'=>'restoration'],
-              ];
-            @endphp
+      @php
+        $services = [
+          ['title'=>'Performance Optimization','img'=>'images/upgrades-speed.png','subtitle'=>'Upgrades & Speed Improvement'],
+          ['title'=>'Setup & Repair','img'=>'images/mobile-ac-cctv.png','subtitle'=>'Mobile, AC, CCTV & Appliance Repair'],
+          ['title'=>'Diagnostic','img'=>'images/diagnostic.png','subtitle'=>'Fault Finding & Troubleshooting'],
+          ['title'=>'Parts Replacement','img'=>'images/printer-swap.png','subtitle'=>'Printer Cartridges & Component Swap'],
+          ['title'=>'Restoration','img'=>'images/data-recovery.png','subtitle'=>'Data Recovery & Hard Disk Restoration'],
+        ];
+      @endphp
+
+
 
             @foreach($services as $svc)
               <div class="flex-shrink-0 px-3 py-6 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
@@ -209,8 +193,6 @@
                   <h4 class="mt-5 text-xl font-semibold text-white">{{ $svc['title'] }}</h4>
                   <p class="text-sm text-gray-400 mt-1">{{ $svc['subtitle'] }}</p>
 
-                  <p class="text-xs text-gray-400 mt-4 hidden lg:block">Donec purus velit, vehicula in consectetur id, sagittis id velit.</p>
-
                   <a href="#" class="mt-6 px-4 py-2 bg-gray-800 text-white rounded text-sm">more</a>
                 </div>
               </div>
@@ -219,13 +201,13 @@
           </div>
         </div>
 
-        {{-- dots (kept for visual paging) --}}
         <div id="svc-dots" class="mt-6 flex justify-center gap-2"></div>
       </div>
     </div>
   </section>
+  
 
-  {{-- Carousel JS: responsive paging with prev/next and dots --}}
+  {{-- Carousel JS --}}
   <script>
     (function() {
       const track = document.querySelector('.services-track');
@@ -242,17 +224,16 @@
 
       function calcPerView(){
         const w = window.innerWidth;
-        if (w >= 1280) return 5; // xl
-        if (w >= 1024) return 4; // lg
-        if (w >= 768)  return 3; // md
-        if (w >= 640)  return 2; // sm
-        return 1;                 // xs
+        if (w >= 1280) return 5;
+        if (w >= 1024) return 4;
+        if (w >= 768)  return 3;
+        if (w >= 640)  return 2;
+        return 1;
       }
 
       function layout(){
         perView = calcPerView();
         const container = document.querySelector('.max-site') || document.body;
-        // viewport width inside container minus some padding
         const viewportWidth = (container.clientWidth || document.body.clientWidth) - 96;
         items.forEach(it => it.style.width = (viewportWidth / perView) + 'px');
         pages = Math.max(1, Math.ceil(items.length / perView));
@@ -297,11 +278,62 @@
     })();
   </script>
 
-  {{-- Livewire assets if available --}}
   @if (class_exists(\Livewire\Livewire::class))
     @livewireScripts
     @livewireStyles
   @endif
+
+
+
+  <!-- ✅ FOOTER ADDED HERE -->
+  <footer class="w-full bg-black text-gray-300 mt-20">
+  <div class="max-site px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
+
+    <div>
+      <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10 w-auto mb-4">
+      <p class="text-sm leading-6">
+        Techne-Fixer Computer and Technologies<br>
+        007 Manga Street 8000<br>
+        Toril<br>
+        Davao Del Sur, Davao City<br>
+        Philippines
+      </p>
+
+      <div class="mt-6 text-sm">
+        <p class="text-gray-400">Phone number</p>
+        <p class="font-medium">0966 240 6825</p>
+
+        <p class="mt-4 text-gray-400">Email</p>
+        <p class="font-medium">petemobilefixer2015@gmail.com</p>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-white font-semibold mb-4">Social</h3>
+      <ul class="space-y-2 text-sm">
+        <li><a href="https://www.facebook.com/profile.php?id=61577111409420" class="hover:text-white">Facebook</a></li>
+
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-white font-semibold mb-4">Legal</h3>
+      <ul class="space-y-2 text-sm">
+        <li><a href="#" class="hover:text-white">Terms of service</a></li>
+        <li><a href="#" class="hover:text-white">Privacy policy</a></li>
+        <li><a href="#" class="hover:text-white">Cookie policy</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="border-t border-white/10 py-6 text-center text-sm text-gray-400">
+    © 2025 TechneFixer. All rights reserved.
+  </div>
+</footer>
+
+
+
 
 </body>
 </html>
