@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Exception;
 
@@ -47,27 +48,30 @@ class SocialAuthController extends Controller
     }
 
     public function handleFacebookCallback()
-    {
-        try {
-            $fbUser = Socialite::driver('facebook')->user();
+{
+    try {
+        $fbUser = Socialite::driver('facebook')->user();
 
-            $user = User::firstOrCreate([
-                'email' => $fbUser->getEmail(),
-            ], [
-                'name' => $fbUser->getName(),
-                'password' => bcrypt(Str::random(16)),
-                'email_verified_at' => now(),
-            ]);
+        // Use Facebook ID instead of email
+        $user = User::updateOrCreate([
+            'facebook_id' => $fbUser->getId(),
+        ], [
+            'name' => $fbUser->getName(),
+            'email' => $fbUser->getEmail() ?? $fbUser->getId() . '@facebook.com', // Fallback email
+            'password' => bcrypt(Str::random(16)),
+            'email_verified_at' => now(),
+        ]);
 
-            Auth::login($user);
+        Auth::login($user);
 
-            return redirect()->route('dashboard');
-            
-        } catch (Exception $e) {
-            return redirect()->route('login')
-                ->with('error', 'Failed to authenticate with Facebook. Please try again.');
-        }
+        return redirect()->route('dashboard');
+        
+    } catch (Exception $e) {
+        Log::error('Facebook Login Error: ' . $e->getMessage());
+        return redirect()->route('login')
+            ->with('error', 'Failed to authenticate with Facebook. Please try again.');
     }
+}
 
     public function terms()
     {

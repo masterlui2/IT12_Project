@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
 
 Route::get('/', function () {
@@ -64,9 +65,13 @@ Route::prefix('/admin')->group(function (){
 
 Route::prefix('/technician')->group(function () {
     Route::get('/dashboard', [TechnicianController::class, 'dashboard'])->name('technician.dashboard');
-    Route::get('/quotation', [TechnicianController::class, 'quotation'])->name('technician.quotation');
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
     Route::get('/inquire', [TechnicianController::class, 'inquire'])->name('technician.inquire');
     Route::get('/history', [TechnicianController::class, 'history'])->name('technician.history');
+    Route::prefix('/quotation')->group(function (){
+        Route::get('/index', [TechnicianController::class, 'quotation'])->name('technician.quotation');
+        Route::get('/new',[QuotationController::class, 'newQuotation'])->name('quotation.new');
+    });
+    
 });
