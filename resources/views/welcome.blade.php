@@ -271,5 +271,57 @@
   @livewireStyles
 @endif
 
+
+
+  <!-- ✅ FOOTER ADDED HERE -->
+  <footer class="w-full bg-black text-gray-300 mt-20">
+  <div class="max-site px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
+
+    <div>
+      <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10 w-auto mb-4">
+      <p class="text-sm leading-6">
+        Techne-Fixer Computer and Technologies<br>
+        007 Manga Street 8000<br>
+        Toril<br>
+        Davao Del Sur, Davao City<br>
+        Philippines
+      </p>
+
+      <div class="mt-6 text-sm">
+        <p class="text-gray-400">Phone number</p>
+        <p class="font-medium">0966 240 6825</p>
+
+        <p class="mt-4 text-gray-400">Email</p>
+        <p class="font-medium">petemobilefixer2015@gmail.com</p>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-white font-semibold mb-4">Social</h3>
+      <ul class="space-y-2 text-sm">
+        <li><a href="https://www.facebook.com/profile.php?id=61577111409420" class="hover:text-white">Facebook</a></li>
+
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-white font-semibold mb-4">Legal</h3>
+      <ul class="space-y-2 text-sm">
+        <li><a href="#" class="hover:text-white">Terms of service</a></li>
+        <li><a href="#" class="hover:text-white">Privacy policy</a></li>
+        <li><a href="#" class="hover:text-white">Cookie policy</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="border-t border-white/10 py-6 text-center text-sm text-gray-400">
+    © 2025 TechneFixer. All rights reserved.
+  </div>
+</footer>
+
+
+
+
 </body>
 </html>
