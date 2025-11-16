@@ -14,3 +14,6 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
+<style>
+  .services-title{font-weight:800;text-transform:uppercase;letter-spacing:.12em;text-align:center;font-size:2rem;background:linear-gradient(90deg,#1672b7,#2aa1e8);-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
