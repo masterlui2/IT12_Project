@@ -7,8 +7,16 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
+    if (Auth::check() && Auth::user()->role === 'technician') {
+        return redirect()->route('technician.dashboard');
+    }elseif(Auth::check() && Auth::user()->role === 'manager'){
+        return redirect()->route('dashboard');
+    }
+
     return view('customer.welcome');
 })->name('home');
 
@@ -69,7 +77,7 @@ Route::prefix('/admin')->group(function (){
     Route::get('/documentation',[AdminController::class, 'documentation'])->name('admin.documentation');
 });
 
-Route::prefix('/technician')->group(function () {
+Route::middleware(['auth','verified','technician'])->prefix('/technician')->group(function () {
     Route::get('/dashboard', [TechnicianController::class, 'dashboard'])->name('technician.dashboard');
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');

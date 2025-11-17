@@ -22,66 +22,79 @@
 
                 <!-- Name Section (Two Columns) -->
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-                        <input id="first_name" name="first_name" type="text" required autocomplete="given-name" placeholder="John"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    </div>
-
-                    <div>
-                        <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-                        <input id="last_name" name="last_name" type="text" required autocomplete="family-name" placeholder="Doe"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    </div>
+                    <!-- First Name -->
+                    <flux:input
+                        name="first_name"
+                        :label="__('First name')"
+                        type="text"
+                        required
+                        autocomplete="given-name"
+                        placeholder="John"
+                    />
+                    <!-- Last Name -->
+                    <flux:input
+                        name="last_name"
+                        :label="__('Last name')"
+                        type="text"
+                        required
+                        autocomplete="family-name"
+                        placeholder="Doe"
+                    />
                 </div>
 
                 <!-- Birthday -->
-                <div>
-                    <label for="birthday" class="block text-sm font-medium text-gray-700">Birthday</label>
-                    <input id="birthday" name="birthday" type="date" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                </div>
+                <flux:input
+                    name="birthday"
+                    :label="__('Birthday')"
+                    type="date"
+                    required
+                />
 
                 <!-- Email -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input id="email" name="email" type="email" required autocomplete="email" placeholder="email@example.com"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                </div>
+                <flux:input
+                    name="email"
+                    :label="__('Email address')"
+                    type="email"
+                    required
+                    autocomplete="email"
+                    placeholder="email@example.com"
+                />
 
                 <!-- Password -->
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input id="password" name="password" type="password" required autocomplete="new-password" placeholder="Password"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                </div>
+                <flux:input
+                    name="password"
+                    :label="__('Password')"
+                    type="password"
+                    required
+                    autocomplete="new-password"
+                    placeholder="Password"
+                    viewable
+                />
 
                 <!-- Confirm Password -->
-                <div>
-                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                    <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password" placeholder="Confirm Password"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                </div>
-
-                <!-- Role Selector (Customer / Technician) -->
-                <div>
-                    <label for="role" class="block text-sm font-medium text-gray-700">Select Role</label>
-                    <select id="role" name="role" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="Customer">Customer</option>
-                        <option value="Technician">Technician</option>
-                    </select>
-                </div>
+                <flux:input
+                    name="password_confirmation"
+                    :label="__('Confirm password')"
+                    type="password"
+                    required
+                    autocomplete="new-password"
+                    placeholder="Confirm password"
+                    viewable
+                />
 
                 <!-- Submit Button -->
-                <button type="submit"
-                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md">
+                <flux:button 
+                    type="submit" 
+                    variant="primary" 
+                    class="w-full py-3 text-base font-semibold" 
+                    data-test="register-user-button"
+                >
                     {{ __('Create account') }}
-                </button>
+                </flux:button>
             </form>
 
             <!-- Divider -->
-            <div class="flex items-center justify-center mt-6">
+            <div class="flex items-center justify-center">
                 <hr class="flex-grow border-zinc-300 dark:border-zinc-600">
                 <span class="mx-2 text-sm text-zinc-500">{{ __('or') }}</span>
                 <hr class="flex-grow border-zinc-300 dark:border-zinc-600">
@@ -90,11 +103,10 @@
             <!-- Existing User Link -->
             <div class="space-x-1 text-sm text-center text-zinc-600 dark:text-zinc-400 mt-2">
                 <span>{{ __('Already have an account?') }}</span>
-                <a href="{{ route('login') }}" class="text-indigo-600 hover:underline">
+                <flux:link :href="route('login')" wire:navigate>
                     {{ __('Log in') }}
-                </a>
+                </flux:link>
             </div>
-
         </div>
     </div>
 </x-layouts.auth>
