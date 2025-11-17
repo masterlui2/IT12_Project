@@ -1,98 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Repair Service</title>
-
-  {{-- Tailwind / Vite --}}
-  @if (file_exists(public_path('mix-manifest.json')))
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-  @else
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-  @endif
-
-  <style>
-    :root {
-      --header-bg: #232628;
-      --hero-blue-a: #1672b7;
-      --hero-blue-b: #2aa1e8;
-      --panel-dark: #111315;
-      --accent: #ef2b2b;
-      --muted: #9a9a9a;
-    }
-
-    .services-title {
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      text-align: center;
-      font-size: 2.4rem;
-      background: linear-gradient(90deg, var(--hero-blue-a), var(--hero-blue-b));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
-    }
- 
-
-  </style>
+  @include('partials.head', ['title' => 'Repair Service'])
 </head>
-<body id="top" class="min-h-screen page-bg text-gray-200">
+<body class="min-h-screen bg-black text-gray-200">
 
-<header class="bg-black shadow-md">
-    <nav class="mx-auto max-w-7xl flex items-center justify-between px-6 lg:px-2 py-2">
-      <a href="{{ url('/') }}" class="flex items-center gap-4">
-    <img src="{{ asset('images/logo.png') }}" 
-         alt="Logo" 
-         class="h-20 w-auto object-contain" />
-
-    <span class="text-white font-extrabold uppercase tracking-wide text-2xl leading-none">
-        TECHNE FIXER
-    </span>
-</a>
-
-
-        <!-- Desktop Navigation -->
-        <div class="hidden lg:flex items-center gap-8">
-        <a href="#home" class="nav-link">Home</a>
-        <a href="#about" class="nav-link">About Us</a>
-        <a href="#track" class="nav-link">Track Repair</a>
-        <a href="#feedback" class="nav-link">Feedback</a>
-        <a href="#contact" class="nav-link">Contact</a>
-        </div>
-
-    <!-- Authentication -->
-    <div class="hidden lg:flex items-center gap-4">
-      @if (Route::has('login'))
-          @auth
-              <a href="{{ url('/dashboard') }}" 
-                 class="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition">
-                 Dashboard
-              </a>
-          @else
-              <a href="{{ route('login') }}" 
-                 class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white hover:text-black transition">
-                 Log in
-              </a>
-
-              <a href="{{ route('register') }}" 
-                 class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                 Register
-              </a>
-          @endauth
-      @endif
-    </div>
-
-    <!-- Mobile Menu Button -->
-    <button class="lg:hidden text-gray-300 p-2 rounded-md hover:bg-white/10 transition">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-7 h-7">
-        <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round" />
-      </svg>
-    </button>
-
-  </nav>
-</header>
+@include('partials.header')
 
 
 <!-- Hero Section -->
@@ -114,227 +27,56 @@
         We provide professional and reliable services for computers, laptops, gadgets, air-conditioning units, printers, and more. From troubleshooting to full installation, we ensure your devices run at their best.
       </p>
       <div class="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
-        <a href="#services" class="px-6 py-3 bg-white text-[var(--hero-blue-a)] rounded font-semibold uppercase">Explore Services</a>
-        <a href="#contact" class="px-6 py-3 border border-white text-white rounded font-semibold uppercase">Contact Us</a>
+        <a href="#services" class="px-6 py-3 bg-white text-blue-700 rounded font-semibold uppercase">Explore Services</a>
+        <a href="{{ route('login') }}" class="px-6 py-3 border border-white text-white rounded font-semibold uppercase">Inquire</a>
       </div>
     </div>
   </div>
 </section>
-<!-- Services / Icon Blocks -->
-<section id="services" class="bg-black py-16">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-10 text-center">
-      <h3 class="services-title">Our Services</h3>
-    </div>
+ 
+@include('partials.services')
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 items-stretch gap-6">
-      <!-- Card: Computer & Laptop Repair -->
-      <a
-        href="#contact"
-        class="group flex size-full rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 focus:outline-hidden focus:bg-gray-800 transition-colors"
-      >
-        <svg
-          class="shrink-0 size-8 text-blue-400 mt-0.5 me-6"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24" height="24" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round"
-        >
-          <rect x="3" y="4" width="18" height="12" rx="2" ry="2" />
-          <path d="M8 20h8" />
-          <path d="M12 16v4" />
-        </svg>
+ 
 
+ 
+
+<section id="contact" class="bg-black py-12">
+  <div class="max-w-7xl mx-auto px-6">
+    <h3 class="services-title">Contact Us</h3>
+    <div class="mt-6 grid sm:grid-cols-3 gap-6">
+      <a href="tel:09662406825" class="group flex items-center gap-4 rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 transition-colors">
+        <span class="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500/15">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5 text-blue-400"><path d="M22 16l-4 4a16 16 0 0 1-12-12l4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
         <div>
-          <div>
-            <h3 class="block font-bold text-gray-100">
-              Computer &amp; Laptop Repair
-            </h3>
-            <p class="text-gray-400 text-sm">
-              Diagnostics, OS issues, virus removal, and hardware replacement
-              for desktops and laptops.
-            </p>
-          </div>
-
-          <p class="mt-3 inline-flex items-center gap-x-1 text-sm font-semibold text-blue-300">
-            Book a repair
-            <svg
-              class="shrink-0 size-4 transition-transform ease-in-out group-hover:translate-x-1 group-focus:translate-x-1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </p>
+          <div class="text-white font-semibold">Phone</div>
+          <div class="text-sm text-gray-300">0966 240 6825</div>
         </div>
       </a>
-      <!-- End Card -->
-
-      <!-- Card: Phone & Gadget Support -->
-      <a
-        href="#contact"
-        class="group flex size-full rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 focus:outline-hidden focus:bg-gray-800 transition-colors"
-      >
-        <svg
-          class="shrink-0 size-8 text-emerald-400 mt-0.5 me-6"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24" height="24" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round"
-        >
-          <rect x="7" y="2" width="10" height="20" rx="2" ry="2" />
-          <line x1="12" y1="18" x2="12.01" y2="18" />
-        </svg>
-
+      <a href="mailto:petemobilefixer2015@gmail.com" class="group flex items-center gap-4 rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 transition-colors">
+        <span class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-500/15">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5 text-emerald-400"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        </span>
         <div>
-          <div>
-            <h3 class="block font-bold text-gray-100">
-              Phone &amp; Gadget Support
-            </h3>
-            <p class="text-gray-400 text-sm">
-              Screen and battery replacement, setup, and troubleshooting
-              for phones, tablets, and small gadgets.
-            </p>
-          </div>
-
-          <p class="mt-3 inline-flex items-center gap-x-1 text-sm font-semibold text-emerald-300">
-            Talk to a technician
-            <svg
-              class="shrink-0 size-4 transition-transform ease-in-out group-hover:translate-x-1 group-focus:translate-x-1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </p>
+          <div class="text-white font-semibold">Email</div>
+          <div class="text-sm text-gray-300">petemobilefixer2015@gmail.com</div>
         </div>
       </a>
-      <!-- End Card -->
-
-      <!-- Card: Appliances & AC Service -->
-      <a
-        href="#contact"
-        class="group flex size-full rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 focus:outline-hidden focus:bg-gray-800 transition-colors"
-      >
-        <svg
-          class="shrink-0 size-8 text-orange-400 mt-0.5 me-6"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24" height="24" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round"
-        >
-          <rect x="3" y="5" width="18" height="10" rx="2" ry="2" />
-          <line x1="7" y1="9" x2="7.01" y2="9" />
-          <line x1="11" y1="9" x2="11.01" y2="9" />
-          <line x1="15" y1="9" x2="15.01" y2="9" />
-          <path d="M5 19h14" />
-        </svg>
-
+      <a href="https://www.facebook.com/profile.php?id=61577111409420" class="group flex items-center gap-4 rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 transition-colors">
+        <span class="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500/15">
+          <svg viewBox="0 0 24 24" class="size-5 text-blue-500"><path d="M18 2h-3a4 4 0 0 0-4 4v3H8v4h3v9h4v-9h3l1-4h-4V6a1 1 0 0 1 1-1h3z" fill="currentColor"/></svg>
+        </span>
         <div>
-          <div>
-            <h3 class="block font-bold text-gray-100">
-              AC, Printer &amp; Appliance Service
-            </h3>
-            <p class="text-gray-400 text-sm">
-              Installation, cleaning, and repair for air-conditioning units,
-              printers, and washing machines.
-            </p>
-          </div>
-
-          <p class="mt-3 inline-flex items-center gap-x-1 text-sm font-semibold text-orange-300">
-            Schedule a visit
-            <svg
-              class="shrink-0 size-4 transition-transform ease-in-out group-hover:translate-x-1 group-focus:translate-x-1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </p>
+          <div class="text-white font-semibold">Facebook</div>
+          <div class="text-sm text-gray-300">Visit our page</div>
         </div>
       </a>
-      <!-- End Card -->
     </div>
   </div>
 </section>
 
-</div>
-
-@if (class_exists(\Livewire\Livewire::class))
-  @livewireScripts
-  @livewireStyles
-@endif
-
-
-
-  <!-- ✅ REVISED FOOTER: LOGO ON LEFT -->
-<footer class="w-full bg-black text-gray-300 mt-20">
-  <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row md:justify-between md:items-start">
-
-    <div class="flex items-center gap-4 text-left">
-      <!-- Logo -->
-      <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-16 w-16 object-contain">
-
-      <!-- Company Name + Address -->
-      <div>
-        <h3 class="text-white font-semibold mb-1">Techne-Fixer Computer & Technologies</h3>
-        <p class="text-sm leading-5 text-gray-300">
-          007 Manga Street 8000, Toril<br>
-          Davao City, Davao Del Sur<br>
-          Philippines
-        </p>
-      </div>
-    </div>
-
-    <!-- Right side: Info groups -->
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-8 w-full md:w-auto">
-
-      <!-- Contact -->
-      <div>
-        <h3 class="text-white font-semibold mb-2">Contact Us</h3>
-        <div class="text-sm space-y-1">
-          <p><span class="text-gray-400 mr-1">📞</span>0966 240 6825</p>
-          <p><span class="text-gray-400 mr-1">✉️</span>petemobilefixer2015@gmail.com</p>
-        </div>
-      </div>
-
-      <!-- Social -->
-      <div>
-        <h3 class="text-white font-semibold mb-2">Social</h3>
-        <ul class="space-y-1 text-sm">
-          <li>
-            <a href="https://www.facebook.com/profile.php?id=61577111409420" class="hover:text-white">Facebook</a>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Legal -->
-      <div>
-        <h3 class="text-white font-semibold mb-2">Legal</h3>
-        <ul class="space-y-1 text-sm">
-          <li><a href="#" class="hover:text-white">Terms of Service</a></li>
-          <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
-          <li><a href="#" class="hover:text-white">Cookie Policy</a></li>
-        </ul>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Bottom copyright -->
-  <div class="border-t border-white/10 py-4 text-center text-xs text-gray-400">
-    © 2025 TechneFixer. All rights reserved.
-  </div>
-</footer>
-
-
-
+  
+  @include('partials.footer')
 
 
 </body>
