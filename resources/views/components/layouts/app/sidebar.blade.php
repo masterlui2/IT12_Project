@@ -12,19 +12,93 @@
                 </a>
 {{-- resources/views/components/side-nav.blade.php --}}
 <flux:navlist variant="outline">
-    <flux:navlist.group :heading="__('Platform')" class="grid">
-        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-        <flux:navlist.item icon="user" :href="route('quotation')" :current="request()->routeIs('quotation')" wire:navigate>{{ __('Quotation') }}</flux:navlist.item>
-        <flux:navlist.item icon="inbox-arrow-down" :href="route('inquiries')" :current="request()->routeIs('inquiries')" wire:navigate>{{ __('Inquiries') }}</flux:navlist.item>
 
+    <!-- Always visible -->
+    <flux:navlist.item 
+        icon="home" 
+        :href="route('dashboard')" 
+        :current="request()->routeIs('dashboard')" 
+        wire:navigate>
+        {{ __('Dashboard') }}
+    </flux:navlist.item>
+
+
+    <!-- OPERATIONS (dropdown) -->
+    <flux:navlist.group 
+        :heading="__('Operations')" 
+        collapsible
+        :expanded="request()->routeIs(['quotation', 'inquiries'])">
+
+        <flux:navlist.item 
+            icon="user" 
+            :href="route('quotation')" 
+            :current="request()->routeIs('quotation')"
+            wire:navigate>
+            {{ __('Quotation') }}
+        </flux:navlist.item>
+
+        <flux:navlist.item 
+            icon="inbox-arrow-down" 
+            :href="route('inquiries')" 
+            :current="request()->routeIs('inquiries')"
+            wire:navigate>
+            {{ __('Inquiries') }}
+        </flux:navlist.item>
     </flux:navlist.group>
+
+
+    <!-- RECORDS (dropdown) -->
+    <flux:navlist.group 
+        :heading="__('Records')" 
+        collapsible
+        :expanded="request()->routeIs(['customers','technicians','services'])">
+
+        <flux:navlist.item 
+            icon="users" 
+            :href="route('customers')" 
+            :current="request()->routeIs('customers')"
+            wire:navigate>
+            {{ __('Customers') }}
+        </flux:navlist.item>
+
+        <flux:navlist.item 
+            icon="briefcase" 
+            :href="route('technicians')" 
+            :current="request()->routeIs('technicians')"
+            wire:navigate>
+            {{ __('Technicians') }}
+        </flux:navlist.item>
+
+        <flux:navlist.item 
+            icon="wrench"
+            :href="route('services')" 
+            :current="request()->routeIs('services')"
+            wire:navigate>
+            {{ __('Services') }}
+        </flux:navlist.item>
+    </flux:navlist.group>
+
+
+    <!-- REPORTS (dropdown - future expandable) -->
+    <flux:navlist.group 
+        :heading="__('Reports')" 
+        collapsible
+        :expanded="request()->routeIs(['reports'])">
+
+        <flux:navlist.item 
+            icon="chart-bar"
+            :href="route('reports')" 
+            :current="request()->routeIs('reports')"
+            wire:navigate>
+            {{ __('Reports') }}
+        </flux:navlist.item>
+    </flux:navlist.group>
+
 </flux:navlist>
 
 
                 <flux:spacer />
-
                 <flux:navlist variant="outline">
-                 
                 </flux:navlist>
 
             <!-- Desktop User Menu -->

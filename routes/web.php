@@ -12,17 +12,19 @@ Route::get('/', function () {
     return view('customer.welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
 
-Route::view('quotation', 'quotation')
-    ->middleware(['auth', 'verified'])
-    ->name('quotation');
+Route::middleware(['auth', 'verified', 'manager'])->group(function () {
+    Route::get('/dashboard', fn () => view('manager.dashboard'))->name('dashboard');
+    Route::get('/quotation', fn () => view('manager.quotation'))->name('quotation');
+    Route::get('/inquiries', fn () => view('manager.inquiries'))->name('inquiries');
 
- Route::view('inquiries', 'inquiries')
-    ->middleware(['auth', 'verified'])
-    ->name('inquiries');
+    // ⭐ Added missing components (same style, same method)
+    Route::get('/customers', fn () => view('manager.customers'))->name('customers');
+    Route::get('/technicians', fn () => view('manager.technicians'))->name('technicians');
+    Route::get('/services', fn () => view('manager.services'))->name('services');
+    Route::get('/reports', fn () => view('manager.reports'))->name('reports');
+});
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

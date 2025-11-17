@@ -9,9 +9,6 @@
 
 
 @include('customer.hero')
-@include('partials.services')
-
- 
 
  
 @include('customer.contact')
