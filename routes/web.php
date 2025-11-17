@@ -7,6 +7,7 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
+use App\Http\Controllers\InquiryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,7 +25,15 @@ Route::middleware(['auth', 'verified', 'manager'])->group(function () {
     Route::get('/services', fn () => view('manager.services'))->name('services');
     Route::get('/reports', fn () => view('manager.reports'))->name('reports');
 });
+Route::middleware(['auth'])->group(function () {
+    // Show the inquiry creation form
+    Route::get('/inquiry/create', [InquiryController::class, 'create'])
+        ->name('inquiry.create');
 
+    // Handle the inquiry form submission
+    Route::post('/inquiry', [InquiryController::class, 'store'])
+        ->name('inquiry.store');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

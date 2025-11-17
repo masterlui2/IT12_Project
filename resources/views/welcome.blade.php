@@ -168,8 +168,10 @@
         We provide professional and reliable services for computers, laptops, gadgets, air-conditioning units, printers, and more. From troubleshooting to full installation, we ensure your devices run at their best.
       </p>
       <div class="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
-        <a href="#services" class="px-6 py-3 bg-white text-[var(--hero-blue-a)] rounded font-semibold uppercase">Inquire</a>
-        <a href="#contact" class="px-6 py-3 border border-white text-white rounded font-semibold uppercase">Contact Us</a>
+     <a href="{{ route('inquiry.create') }}"
+           class="px-6 py-3 bg-white text-[var(--hero-blue-a)] rounded font-semibold uppercase">
+           {{ __('Inquire') }}
+        </a>        <a href="#contact" class="px-6 py-3 border border-white text-white rounded font-semibold uppercase">Contact Us</a>
       </div>
     </div>
   </div>
