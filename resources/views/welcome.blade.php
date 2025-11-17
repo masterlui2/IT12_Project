@@ -39,13 +39,13 @@
   </style>
 </head>
 <body id="top" class="min-h-screen page-bg text-gray-200">
-
 <header class="bg-black shadow-md">
-    <nav class="mx-auto max-w-7xl flex items-center justify-between px-6 lg:px-2 py-2">
-      <a href="{{ url('/') }}" class="flex items-center gap-4">
+    <nav class="mx-auto max-w-7xl flex items-center justify-between px-4 lg:px-2 py-2">
+      <a href="{{ url('/') }}" class="flex items-center gap-1">
     <img src="{{ asset('images/logo.png') }}" 
          alt="Logo" 
-         class="h-20 w-auto object-contain" />
+         class="h-25 w-auto object-contain mt-7"
+ />
 
     <span class="text-white font-extrabold uppercase tracking-wide text-2xl leading-none">
         TECHNE FIXER
@@ -62,27 +62,81 @@
         <a href="#contact" class="nav-link">Contact</a>
         </div>
 
-    <!-- Authentication -->
-    <div class="hidden lg:flex items-center gap-4">
-      @if (Route::has('login'))
-          @auth
-              <a href="{{ url('/dashboard') }}" 
-                 class="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition">
-                 Dashboard
-              </a>
-          @else
-              <a href="{{ route('login') }}" 
-                 class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white hover:text-black transition">
-                 Log in
-              </a>
+<!-- Authentication -->
+<div class="hidden lg:flex items-center gap-4">
+    {{-- Guests: show Login / Register --}}
+    @guest
+        <a href="{{ route('login') }}"
+           class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white hover:text-black transition">
+            Log in
+        </a>
 
-              <a href="{{ route('register') }}" 
-                 class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                 Register
-              </a>
-          @endauth
-      @endif
-    </div>
+        @if (Route::has('register'))
+            <a href="{{ route('register') }}"
+               class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white hover:text-black transition">
+                Register
+            </a>
+        @endif
+    @endguest
+
+    {{-- Authenticated users: avatar + name + dropdown --}}
+    @auth
+        <div x-data="{ open: false }" class="relative">
+            <button @click="open = !open"
+                    class="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-white/20">
+                    {{-- simple user icon circle --}}
+                    <span class="text-xs font-semibold uppercase">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </span>
+                </div>
+
+                <span class="max-w-[140px] truncate">
+                    {{ auth()->user()->name }}
+                </span>
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+
+            <!-- Dropdown -->
+            <div x-cloak
+                 x-show="open"
+                 @click.outside="open = false"
+                 x-transition
+                 class="absolute right-0 mt-2 w-40 rounded-xl bg-white text-sm text-gray-900 shadow-lg border border-gray-200">
+                @if (Route::has('profile.edit'))
+                    <a href="{{ route('profile.edit') }}"
+                       class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">
+                        Account
+                    </a>
+                @endif
+
+                {{-- Manager shortcut (optional) --}}
+                @if (auth()->user()->role === 'manager')
+                    <a href="{{ route('dashboard') }}"
+                       class="block px-4 py-2 hover:bg-gray-100">
+                        Manager Panel
+                    </a>
+                @endif
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                            class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-xl">
+                        Log out
+                    </button>
+                </form>
+            </div>
+        </div>
+    @endauth
+</div>
+
+
+
 
     <!-- Mobile Menu Button -->
     <button class="lg:hidden text-gray-300 p-2 rounded-md hover:bg-white/10 transition">
@@ -114,7 +168,7 @@
         We provide professional and reliable services for computers, laptops, gadgets, air-conditioning units, printers, and more. From troubleshooting to full installation, we ensure your devices run at their best.
       </p>
       <div class="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
-        <a href="#services" class="px-6 py-3 bg-white text-[var(--hero-blue-a)] rounded font-semibold uppercase">Explore Services</a>
+        <a href="#services" class="px-6 py-3 bg-white text-[var(--hero-blue-a)] rounded font-semibold uppercase">Inquire</a>
         <a href="#contact" class="px-6 py-3 border border-white text-white rounded font-semibold uppercase">Contact Us</a>
       </div>
     </div>
@@ -127,142 +181,162 @@
       <h3 class="services-title">Our Services</h3>
     </div>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 items-stretch gap-6">
-      <!-- Card: Computer & Laptop Repair -->
-      <a
-        href="#contact"
-        class="group flex size-full rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 focus:outline-hidden focus:bg-gray-800 transition-colors"
-      >
-        <svg
-          class="shrink-0 size-8 text-blue-400 mt-0.5 me-6"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24" height="24" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round"
-        >
-          <rect x="3" y="4" width="18" height="12" rx="2" ry="2" />
-          <path d="M8 20h8" />
-          <path d="M12 16v4" />
-        </svg>
-
-        <div>
-          <div>
-            <h3 class="block font-bold text-gray-100">
-              Computer &amp; Laptop Repair
-            </h3>
-            <p class="text-gray-400 text-sm">
-              Diagnostics, OS issues, virus removal, and hardware replacement
-              for desktops and laptops.
-            </p>
-          </div>
-
-          <p class="mt-3 inline-flex items-center gap-x-1 text-sm font-semibold text-blue-300">
-            Book a repair
-            <svg
-              class="shrink-0 size-4 transition-transform ease-in-out group-hover:translate-x-1 group-focus:translate-x-1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+      {{-- Card 1: Computer & Laptop Repair --}}
+      <div class="group bg-black rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900 transition-colors">
+        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gray-900 border border-gray-700 mb-4">
+          <svg class="w-8 h-8 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="12" rx="2" ry="2" />
+            <path d="M8 20h8" />
+            <path d="M12 16v4" />
+          </svg>
         </div>
-      </a>
-      <!-- End Card -->
 
-      <!-- Card: Phone & Gadget Support -->
-      <a
-        href="#contact"
-        class="group flex size-full rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 focus:outline-hidden focus:bg-gray-800 transition-colors"
-      >
-        <svg
-          class="shrink-0 size-8 text-emerald-400 mt-0.5 me-6"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24" height="24" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round"
-        >
-          <rect x="7" y="2" width="10" height="20" rx="2" ry="2" />
-          <line x1="12" y1="18" x2="12.01" y2="18" />
-        </svg>
+        <h3 class="font-bold text-gray-100 text-lg">Computer &amp; Laptop Repair</h3>
+        <p class="mt-2 text-gray-400 text-sm">
+          Full diagnostics, performance tuning, OS issues, virus removal, and hardware replacement.
+        </p>
 
-        <div>
-          <div>
-            <h3 class="block font-bold text-gray-100">
-              Phone &amp; Gadget Support
-            </h3>
-            <p class="text-gray-400 text-sm">
-              Screen and battery replacement, setup, and troubleshooting
-              for phones, tablets, and small gadgets.
-            </p>
-          </div>
-
-          <p class="mt-3 inline-flex items-center gap-x-1 text-sm font-semibold text-emerald-300">
-            Talk to a technician
-            <svg
-              class="shrink-0 size-4 transition-transform ease-in-out group-hover:translate-x-1 group-focus:translate-x-1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </p>
+        <div class="mt-4 flex items-center justify-center">
+          <svg class="w-4 h-4 text-blue-300 transition-transform group-hover:translate-x-1"
+               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
         </div>
-      </a>
-      <!-- End Card -->
+      </div>
 
-      <!-- Card: Appliances & AC Service -->
-      <a
-        href="#contact"
-        class="group flex size-full rounded-lg p-5 bg-gray-900/80 hover:bg-gray-800 focus:outline-hidden focus:bg-gray-800 transition-colors"
-      >
-        <svg
-          class="shrink-0 size-8 text-orange-400 mt-0.5 me-6"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24" height="24" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round"
-        >
-          <rect x="3" y="5" width="18" height="10" rx="2" ry="2" />
-          <line x1="7" y1="9" x2="7.01" y2="9" />
-          <line x1="11" y1="9" x2="11.01" y2="9" />
-          <line x1="15" y1="9" x2="15.01" y2="9" />
-          <path d="M5 19h14" />
-        </svg>
-
-        <div>
-          <div>
-            <h3 class="block font-bold text-gray-100">
-              AC, Printer &amp; Appliance Service
-            </h3>
-            <p class="text-gray-400 text-sm">
-              Installation, cleaning, and repair for air-conditioning units,
-              printers, and washing machines.
-            </p>
-          </div>
-
-          <p class="mt-3 inline-flex items-center gap-x-1 text-sm font-semibold text-orange-300">
-            Schedule a visit
-            <svg
-              class="shrink-0 size-4 transition-transform ease-in-out group-hover:translate-x-1 group-focus:translate-x-1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </p>
+      {{-- Card 2: Phone & Gadget Support --}}
+      <div class="group bg-black rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900 transition-colors">
+        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gray-900 border border-gray-700 mb-4">
+          <svg class="w-8 h-8 text-emerald-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="7" y="2" width="10" height="20" rx="2" ry="2" />
+            <line x1="12" y1="18" x2="12.01" y2="18" />
+          </svg>
         </div>
-      </a>
-      <!-- End Card -->
+
+        <h3 class="font-bold text-gray-100 text-lg">Phone &amp; Gadget Support</h3>
+        <p class="mt-2 text-gray-400 text-sm">
+          Screen and battery replacement, setup, data transfer, and troubleshooting for phones and tablets.
+        </p>
+
+        <div class="mt-4 flex items-center justify-center">
+          <svg class="w-4 h-4 text-emerald-300 transition-transform group-hover:translate-x-1"
+               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </div>
+      </div>
+
+      {{-- Card 3: Aircon Service --}}
+      <div class="group bg-black rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900 transition-colors">
+        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gray-900 border border-gray-700 mb-4">
+          <svg class="w-8 h-8 text-cyan-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="5" width="18" height="10" rx="2" ry="2" />
+            <path d="M5 19h14" />
+            <path d="M8 9h.01M12 9h.01M16 9h.01" />
+          </svg>
+        </div>
+
+        <h3 class="font-bold text-gray-100 text-lg">Aircon Cleaning &amp; Repair</h3>
+        <p class="mt-2 text-gray-400 text-sm">
+          Installation, deep cleaning, freon check, and repair for window and split-type air conditioners.
+        </p>
+
+        <div class="mt-4 flex items-center justify-center">
+          <svg class="w-4 h-4 text-cyan-300 transition-transform group-hover:translate-x-1"
+               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </div>
+      </div>
+
+      {{-- Card 4: Printer Services --}}
+      <div class="group bg-black rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900 transition-colors">
+        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gray-900 border border-gray-700 mb-4">
+          <svg class="w-8 h-8 text-purple-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9V2h12v7" />
+            <rect x="6" y="13" width="12" height="8" rx="2" />
+            <path d="M6 13h12" />
+            <path d="M8 17h4" />
+          </svg>
+        </div>
+
+        <h3 class="font-bold text-gray-100 text-lg">Printer Setup &amp; Repair</h3>
+        <p class="mt-2 text-gray-400 text-sm">
+          Printer installation, paper feed issues, ink system problems, and network printing setup.
+        </p>
+
+        <div class="mt-4 flex items-center justify-center">
+          <svg class="w-4 h-4 text-purple-300 transition-transform group-hover:translate-x-1"
+               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </div>
+      </div>
+
+      {{-- Card 5: Washing Machine Repair --}}
+      <div class="group bg-black rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900 transition-colors">
+        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gray-900 border border-gray-700 mb-4">
+          <svg class="w-8 h-8 text-pink-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="3" width="16" height="18" rx="2" />
+            <circle cx="12" cy="13" r="4" />
+            <path d="M8 7h.01M11 7h.01" />
+          </svg>
+        </div>
+
+        <h3 class="font-bold text-gray-100 text-lg">Washing Machine Repair</h3>
+        <p class="mt-2 text-gray-400 text-sm">
+          Drum, motor, water flow, and control panel issues for automatic and semi-auto washers.
+        </p>
+
+        <div class="mt-4 flex items-center justify-center">
+          <svg class="w-4 h-4 text-pink-300 transition-transform group-hover:translate-x-1"
+               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </div>
+      </div>
+
+      {{-- Card 6: Network & On-site Support --}}
+      <div class="group bg-black rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900 transition-colors">
+        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gray-900 border border-gray-700 mb-4">
+          <svg class="w-8 h-8 text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M2.05 12a10 10 0 0 1 19.9 0" />
+            <path d="M4.5 19a10 10 0 0 1 15 0" />
+          </svg>
+        </div>
+
+        <h3 class="font-bold text-gray-100 text-lg">Network &amp; On-site Support</h3>
+        <p class="mt-2 text-gray-400 text-sm">
+          Home and small office network setup, Wi-Fi issues, and on-site technical assistance.
+        </p>
+
+        <div class="mt-4 flex items-center justify-center">
+          <svg class="w-4 h-4 text-amber-300 transition-transform group-hover:translate-x-1"
+               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 </section>
+
+
 
 </div>
 
