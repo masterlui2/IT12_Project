@@ -46,7 +46,8 @@
 
   <!-- Itemization Table -->
   <div>
-    <h3 class="text-lg font-semibold text-gray-700 mb-3">Items and Services</h3>
+    <h3 class="text-lg font-semibold text-gray-700 mb-3">Items and Services</h3>
+
     <div class="overflow-x-auto">
       <table class="w-full text-left text-sm border rounded-lg">
         <thead class="bg-gray-100 text-gray-700">
@@ -59,14 +60,18 @@
             <th class="px-4 py-2 text-right">–</th>
           </tr>
         </thead>
+
         <tbody id="itemRows" class="divide-y">
+          <!-- existing rows -->
           <tr>
             <td class="px-4 py-3 font-medium text-gray-700">
               <input type="text" value="HP Color LaserJet Managed MFP M280nw"
-                     class="w-full border rounded-md px-2 py-1 text-sm">
+                    class="w-full border rounded-md px-2 py-1 text-sm">
             </td>
             <td class="px-4 py-3">
-              <textarea rows="3" class="w-full border rounded-md px-2 py-1 text-sm">Conducted Preliminary Assessment such as inspection, troubleshooting, maintenance and PMS.</textarea>
+              <textarea rows="3" class="w-full border rounded-md px-2 py-1 text-sm">
+                Conducted Preliminary Assessment such as inspection, troubleshooting, maintenance and PMS.
+              </textarea>
             </td>
             <td class="px-4 py-3 w-20">
               <input type="number" value="1" class="border rounded-md px-2 py-1 w-full text-center text-sm">
@@ -76,22 +81,7 @@
             </td>
             <td class="px-4 py-3 text-gray-700">₱6,000</td>
             <td class="px-4 py-3 text-right">
-              <button class="text-red-500 hover:text-red-700 text-sm">Remove</button>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="px-4 py-3 font-medium text-gray-700">
-              <input type="text" value="Replace Scanner Motor" class="w-full border rounded-md px-2 py-1 text-sm">
-            </td>
-            <td class="px-4 py-3">
-              <textarea rows="3" class="w-full border rounded-md px-2 py-1 text-sm">Replace defective motor with new unit and run testing for smooth operation.</textarea>
-            </td>
-            <td class="px-4 py-3 w-20"><input type="number" value="1" class="border rounded-md w-full px-2 py-1 text-center text-sm"></td>
-            <td class="px-4 py-3 w-24"><input type="number" value="11600" class="border rounded-md w-full px-2 py-1 text-center text-sm"></td>
-            <td class="px-4 py-3 text-gray-700">₱11,600</td>
-            <td class="px-4 py-3 text-right">
-              <button class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+              <button class="remove-row text-red-500 hover:text-red-700 text-sm">Remove</button>
             </td>
           </tr>
         </tbody>
@@ -99,7 +89,7 @@
     </div>
 
     <div class="flex justify-end mt-3">
-      <button class="text-blue-600 hover:underline text-sm">+ Add Item</button>
+      <button id="addItemBtn" class="text-blue-600 hover:underline text-sm">+ Add Item</button>
     </div>
   </div>
 
@@ -158,4 +148,41 @@
 
 </div>
 
+<script>
+  document.getElementById('addItemBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    const tbody = document.getElementById('itemRows');
+    const rowCount = tbody.rows.length + 1;
+
+    // Build a new row string
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td class="px-4 py-3 font-medium text-gray-700">
+        <input type="text" placeholder="Item ${rowCount}" class="w-full border rounded-md px-2 py-1 text-sm">
+      </td>
+      <td class="px-4 py-3">
+        <textarea rows="3" placeholder="Description ${rowCount}" class="w-full border rounded-md px-2 py-1 text-sm"></textarea>
+      </td>
+      <td class="px-4 py-3 w-20">
+        <input type="number" value="1" class="border rounded-md px-2 py-1 w-full text-center text-sm">
+      </td>
+      <td class="px-4 py-3 w-24">
+        <input type="number" value="0" class="border rounded-md px-2 py-1 w-full text-center text-sm">
+      </td>
+      <td class="px-4 py-3 text-gray-700">₱0</td>
+      <td class="px-4 py-3 text-right">
+        <button class="remove-row text-red-500 hover:text-red-700 text-sm">Remove</button>
+      </td>
+    `;
+    tbody.appendChild(newRow);
+  });
+
+  // remove item rows
+  document.getElementById('itemRows').addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-row')) {
+      e.preventDefault();
+      e.target.closest('tr').remove();
+    }
+  });
+</script>
 @endsection
