@@ -10,7 +10,7 @@ use App\Http\Controllers\Technician\TechnicianController;
 use App\Http\Controllers\InquiryController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('customer.welcome');
 })->name('home');
 
 
