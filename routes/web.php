@@ -9,7 +9,7 @@ use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('customer.welcome');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
