@@ -6,7 +6,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="…" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     {{-- Favicon and bundled styles (Vite) --}}
@@ -17,7 +16,7 @@
 
     @include('admin.layout.sidebar')
     {{-- Main Content --}}
-    <main class="flex-1 p-10 overflow-auto">
+    <main class="flex-1 ml-64 p-10 overflow-y-auto">
         @yield('content')
     </main>
 </body>
