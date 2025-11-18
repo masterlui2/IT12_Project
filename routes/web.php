@@ -107,10 +107,22 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
     Route::get('/inquire', [TechnicianController::class, 'inquire'])->name('technician.inquire');
     Route::get('/history', [TechnicianController::class, 'history'])->name('technician.history');
-    Route::prefix('/quotation')->group(function (){
-        Route::get('/index', [TechnicianController::class, 'quotation'])->name('technician.quotation');
-        Route::get('/new',[QuotationController::class, 'newQuotation'])->name('quotation.new');
-        Route::get('/pdf',[PdfController::class,'quotationPreview'])->name('quotation.pdf');
-    });
     
+    Route::prefix('/quotation')->group(function (){
+        Route::get('/index', [QuotationController::class, 'index'])->name('technician.quotation');
+        Route::get('/new', [QuotationController::class, 'newQuotation'])->name('quotation.new');
+        Route::post('/store', [QuotationController::class, 'store'])->name('quotation.store');
+        Route::get('/{id}', [QuotationController::class, 'show'])->name('quotation.show');
+        Route::get('/{id}/edit', [QuotationController::class, 'edit'])->name('quotation.edit');
+        Route::put('/{id}', [QuotationController::class, 'update'])->name('quotation.update');
+        Route::delete('/{id}', [QuotationController::class, 'destroy'])->name('quotation.destroy');
+        
+        // PDF Routes
+        Route::get('/pdf/preview', [PdfController::class, 'quotationPreview'])->name('quotation.pdf.preview'); // Static preview
+        Route::get('/{id}/pdf', [PdfController::class, 'quotationPreview'])->name('quotation.pdf'); // Stream PDF
+        Route::get('/{id}/pdf/download', [PdfController::class, 'quotationDownload'])->name('quotation.pdf.download'); // Download PDF
+        
+        // Logo upload
+        Route::put('/logo', [QuotationController::class, 'uploadLogo'])->name('quotation.uploadLogo');
+    });
 });

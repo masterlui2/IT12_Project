@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('technicians', function (Blueprint $table) {
+        Schema::create('waiver_cases', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->string('specialization')->nullable();
-            $table->string('certifications')->nullable();
+            $table->unsignedBigInteger('waiver_id');
+            $table->string('case_title');
+            $table->text('description')->nullable();
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('waiver_id')
+                ->references('id')->on('quotation_waivers')
+                ->onDelete('cascade');
         });
     }
 
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('technicians');
+        Schema::dropIfExists('waiver_cases');
     }
 };

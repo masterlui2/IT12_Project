@@ -4,9 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Quotation;
+
 class Technician extends Model
 {
-    //
+    protected $fillable = [
+        'user_id',
+        'specialization',
+        'certifications',
+    ];
+    
     public function user()
     {
         return $this->belongsTo(User::class);

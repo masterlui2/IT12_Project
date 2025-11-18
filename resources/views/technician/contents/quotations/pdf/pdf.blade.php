@@ -12,18 +12,16 @@
     </style>
 </head>
 <body>
-    <!-- Company Info Card (DomPDF-safe layout) -->
+    <!-- Company Info Card -->
     <div style="display: table; width: 100%; border: 1px solid #ccc; margin-bottom: 10px;">
-        <!-- Left side -->
         <div style="display: table-cell; width: 35%; background: #f7f7f7; text-align: center; vertical-align: middle; padding: 10px;">
-            @if($logo)
+            @if(!empty($logo))
                 <img src="{{ $logo }}" alt="Company Logo" style="width: 100%; height: auto;">
             @else
                 <p style="color: #999;">Logo not found</p>
             @endif
         </div>
 
-        <!-- Right side -->
         <div style="display: table-cell; width: 65%; padding: 10px; vertical-align: top;">
             <div style="border:1px solid #ddd; margin-bottom:8px; padding:8px;">
                 <h1 style="font-size:14px; font-weight:bold;">Techne Fixer Computer and Laptop Repair Services</h1>
@@ -40,17 +38,22 @@
     </div>
 
     <p><strong>Project Title:</strong> {{ $project_title }}</p>
-    <p><strong>Objective:</strong>words words</p>
+    <p><strong>Objective:</strong> {{ $objective }}</p>
 
     <!-- Client Details Card -->
     <div style="display: table; width: 100%; border: 1px solid #ccc; margin-bottom: 10px;">
         <div style="display: table-cell; width: 35%; background: #f7f7f7;">
-            @if($repair_service_image)
-                <img src="{{ $repair_service_image }}" alt="Repair Service"
-                    style="width: 100%; height: auto; object-fit: cover;">
-            @else
-                <p style="color: #999; padding: 10px;">Image not found</p>
-            @endif
+            <div style="text-align:center;">
+                @if(!empty($client_logo))
+                    <img src="{{ $client_logo }}" alt="Client Logo"
+                        style="width:100%; height:auto; object-fit:cover; display:inline-block;">
+                @elseif(!empty($repair_service_image))
+                    <img src="{{ $repair_service_image }}" alt="Repair Service"
+                        style="width:100%; height:auto; object-fit:cover; display:inline-block;">
+                @else
+                    <p style="color:#999; padding:10px;">Image not found</p>
+                @endif
+            </div>
         </div>
 
         <div style="display: table-cell; width: 65%; padding: 10px; vertical-align: top;">
@@ -62,15 +65,11 @@
                 </tr>
                 <tr style="border: none;">
                     <td style="border: none;"><strong>Date Issued:</strong></td>
-                    <td style="border: none;">November 29, 2024</td>
+                    <td style="border: none;">{{ $date_issued }}</td>
                 </tr>
                 <tr style="border: none;">
                     <td style="border: none;"><strong>Address:</strong></td>
                     <td style="border: none;">{{ $client_address }}</td>
-                </tr>
-                <tr style="border: none;">
-                    <td style="border: none;"><strong>TIN No:</strong></td>
-                    <td style="border: none;">004‑585‑802‑000</td>
                 </tr>
             </table>
         </div>
@@ -107,31 +106,83 @@
     </table>
 
     <div style="clear:both; margin-top:40px;">
+        <hr>
         <h3>Scope of Work</h3>
-        @foreach($scope as $scenario)
-            <p><strong>{{ $scenario['scenario'] }}</strong></p>
-            <ul>
-                @foreach($scenario['cases'] as $case)
-                    <li><strong>{{ $case['case'] }}</strong>: {{ $case['desc'] }}</li>
-                @endforeach
-            </ul>
-        @endforeach
+        @if(count($scope) > 0)
+            @foreach($scope as $scenario)
+                <p><strong>{{ $scenario['scenario'] }}</strong></p>
+                @if(count($scenario['cases']) > 0)
+                    <ul>
+                        @foreach($scenario['cases'] as $case)
+                            <li><strong>{{ $case['case'] }}</strong>: {{ $case['desc'] }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+            @endforeach
+        @else
+            <p>No scope defined.</p>
+        @endif
     </div>
+
+    <hr>
 
     <div>
-        <h3>Expected Deliverables</h3>
-        <ul>
-            @foreach($deliverables as $detail)
-                <li>{{ $detail }}</li>
-            @endforeach
-        </ul>
+        <h3>Waiver of Liability</h3>
+        <p>
+            This Waiver of Liability is executed on 
+            <strong>{{ $date_issued }}</strong>
+            by <strong>{{ $client_name }}</strong>
+            (hereinafter referred to as the "Customer")
+            in favor of Techne Fixer Computer and Laptop Repair Services
+            (hereinafter referred to as the "Service Provider").
+        </p>
     </div>
 
-    <p><strong>Timeline:</strong> {{ $timeline }}</p>
+    @if(isset($waivers) && count($waivers) > 0)
+        <div style="clear:both; margin-top:20px;">
+            <h3>Scope of Liability</h3>
+            @foreach($waivers as $waiver)
+                <p><strong>{{ $waiver['scenario'] }}</strong></p>
+                @if(count($waiver['cases']) > 0)
+                    <ul>
+                        @foreach($waiver['cases'] as $case)
+                            <li><strong>{{ $case['case'] }}</strong>: {{ $case['desc'] }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+            @endforeach
+        </div>
+    @endif
+
+    <div>
+        <h3>Indemnification</h3>
+        <p>The Customer agrees to indemnify and hold harmless the Service Provider from any claims, damages, or expenses resulting from misuse or negligence of the repaired equipment.</p>
+    </div>
+
+    @if(count($deliverables) > 0)
+        <div>
+            <h3>Expected Deliverables</h3>
+            <ul>
+                @foreach($deliverables as $detail)
+                    <li>{{ $detail }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <p><strong>Timeline:</strong> Estimate project completion <strong>{{ $timeline }}</strong> (depending on the availability of replacement parts and completion of the issue)</p>
+
+    @if(isset($terms_conditions) && !empty($terms_conditions))
+        <hr>
+        <div>
+            <h3>Terms and Conditions</h3>
+            <p>{{ $terms_conditions }}</p>
+        </div>
+    @endif
 
     <hr>
     <p style="text-align:center; font-size:11px; margin-top:30px;">
-        Techne Fixer Computer and Laptop Repair Services | Quotation Preview
+        Techne Fixer Computer and Laptop Repair Services | Quotation
     </p>
 </body>
 </html>

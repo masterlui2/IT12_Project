@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('technicians', function (Blueprint $table) {
+        Schema::create('quotation_scope', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->string('specialization')->nullable();
-            $table->string('certifications')->nullable();
+            $table->foreignId('quotation_id')->constrained('quotations')->onDelete('cascade');
+            $table->string('scenario_name');
+            $table->text('description')->nullable(); // optional general notes
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('technicians');
+        Schema::dropIfExists('quotation_scope');
     }
 };

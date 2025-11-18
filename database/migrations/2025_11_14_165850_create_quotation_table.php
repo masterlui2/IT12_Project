@@ -17,10 +17,16 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('technician_id');
             $table->unsignedBigInteger('approved_by')->nullable(); // single manager (user with role='manager')
-
+            $table->string('client_logo')->nullable();
+            $table->string('client_name')->nullable();
+            $table->string('client_address')->nullable();
             $table->string('project_title')->nullable();
             $table->date('date_issued')->nullable();
-
+            $table->text('objective')->nullable();
+            $table->integer('timeline_min_days')->nullable();
+            $table->integer('timeline_max_days')->nullable();
+            $table->text('terms_conditions')->nullable();
+            
             $table->decimal('labor_estimate', 10, 2)->default(0);
             $table->decimal('parts_estimate', 10, 2)->default(0);
             $table->decimal('diagnostic_fee', 10, 2)->default(0);
@@ -41,6 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quotation');
+        Schema::dropIfExists('quotations');
     }
 };
