@@ -8,8 +8,12 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
+=======
+use App\Http\Controllers\InquiryController;
+>>>>>>> 902d92c935ebcf5d76d4277376f5faeb210807be
 
 Route::get('/', function () {
     if (Auth::check() && Auth::user()->role === 'technician') {
@@ -37,7 +41,15 @@ Route::middleware(['auth', 'verified', 'manager'])->group(function () {
     Route::get('/services', fn () => view('manager.services'))->name('services');
     Route::get('/reports', fn () => view('manager.reports'))->name('reports');
 });
+Route::middleware(['auth'])->group(function () {
+    // Show the inquiry creation form
+    Route::get('/inquiry/create', [InquiryController::class, 'create'])
+        ->name('inquiry.create');
 
+    // Handle the inquiry form submission
+    Route::post('/inquiry', [InquiryController::class, 'store'])
+        ->name('inquiry.store');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
