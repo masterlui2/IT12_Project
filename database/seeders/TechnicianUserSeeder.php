@@ -17,8 +17,10 @@ class TechnicianUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'technician@gmail.com'],  // lookup
             [
-                'name' => 'Red Xavier',
-                'password' => Hash::make('123456'), // change this
+                'firstname' => 'Red Xavier',
+                'lastname' => 'Rodrigo',
+                'password' => Hash::make('12345678'), // change this
+                'birthday' => '2005-04-12', // change this
                 'role' => 'technician', // requires you added this column
             ]
         );

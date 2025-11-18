@@ -16,8 +16,10 @@ class ManagerUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'manager@gmail.com'],  // lookup
             [
-                'name' => 'Manager User',
+                'firstname' => 'Manager',
+                'lastname' => 'User',
                 'password' => Hash::make('manager'), // change this
+                'birthday' => '2005-04-12', // change this
                 'role' => 'manager', // requires you added this column
             ]
         );
