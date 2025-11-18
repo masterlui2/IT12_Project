@@ -24,7 +24,12 @@
         <h3 class="text-white font-semibold mb-2">Social</h3>
         <ul class="space-y-1 text-sm">
           <li>
-            <a href="https://www.facebook.com/profile.php?id=61577111409420" class="hover:text-white">Facebook</a>
+            <a href="https://www.facebook.com/profile.php?id=61577111409420"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="hover:text-white">
+                    Facebook
+            </a>
           </li>
         </ul>
       </div>

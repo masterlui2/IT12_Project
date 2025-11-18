@@ -8,12 +8,9 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
-=======
 use App\Http\Controllers\InquiryController;
->>>>>>> 902d92c935ebcf5d76d4277376f5faeb210807be
 
 Route::get('/', function () {
     if (Auth::check() && Auth::user()->role === 'technician') {
