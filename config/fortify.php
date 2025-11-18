@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\Auth;
 
 return [
 
@@ -73,7 +74,15 @@ return [
     |
     */
 
-    'home' => '/dashboard',
+    'home' => function () {
+        $user = Auth::user();
+        return match ($user->role) {
+            'admin' => '/admin/dashboard',
+            'manager' => '/dashboard',
+            'technician' => '/technician/dashboard',
+            default => '/',
+        };
+    },
 
     /*
     |--------------------------------------------------------------------------

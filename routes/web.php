@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\LogoutController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -13,13 +14,17 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/', function () {
     if (Auth::check() && Auth::user()->role === 'technician') {
         return redirect()->route('technician.dashboard');
-    }elseif(Auth::check() && Auth::user()->role === 'manager'){
+    }
+    
+    if(Auth::check() && Auth::user()->role === 'manager'){
         return redirect()->route('dashboard');
     }
 
     return view('customer.welcome');
 })->name('home');
 
+
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'manager'])->group(function () {
     Route::get('/dashboard', fn () => view('manager.dashboard'))->name('dashboard');

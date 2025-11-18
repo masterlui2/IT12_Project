@@ -79,11 +79,12 @@
 
     <!-- Sign Out Button -->
     <div class="px-6 py-2">
-        <a href="#">
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
             <button class="w-full text-gray-600 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition flex items-center gap-2">
                 <i class="fas fa-right-from-bracket"></i> Sign out
             </button>
-        </a>
+        </form>
     </div>
 
 </aside>
