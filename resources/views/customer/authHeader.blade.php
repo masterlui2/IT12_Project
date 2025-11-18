@@ -37,61 +37,6 @@
             </a>
         @endif
     @endguest
-
-    {{-- Authenticated users: avatar + name + dropdown --}}
-    @auth
-        <div x-data="{ open: false }" class="relative">
-            <button @click="open = !open"
-                    class="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium">
-                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-white/20">
-                    {{-- simple user icon circle --}}
-                    <span class="text-xs font-semibold uppercase">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    </span>
-                </div>
-
-                <span class="max-w-[140px] truncate">
-                    {{ auth()->user()->name }}
-                </span>
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
-                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                          d="M19 9l-7 7-7-7"/>
-                </svg>
-            </button>
-
-            <!-- Dropdown -->
-            <div x-cloak
-                 x-show="open"
-                 @click.outside="open = false"
-                 x-transition
-                 class="absolute right-0 mt-2 w-40 rounded-xl bg-white text-sm text-gray-900 shadow-lg border border-gray-200">
-                @if (Route::has('profile.edit'))
-                    <a href="{{ route('profile.edit') }}"
-                       class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">
-                        Account
-                    </a>
-                @endif
-
-                {{-- Manager shortcut (optional) --}}
-                @if (auth()->user()->role === 'manager')
-                    <a href="{{ route('dashboard') }}"
-                       class="block px-4 py-2 hover:bg-gray-100">
-                        Manager Panel
-                    </a>
-                @endif
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit"
-                            class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-xl">
-                        Log out
-                    </button>
-                </form>
-            </div>
-        </div>
-    @endauth
 </div>
 
 

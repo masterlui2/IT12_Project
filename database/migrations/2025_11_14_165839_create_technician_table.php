@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('technician', function (Blueprint $table) {
+        Schema::create('technicians', function (Blueprint $table) {
             $table->id();
-            $table->string("First_Name");
-            $table->string("Last_Name");
-            $table->string("Email");
-            $table->string("Phone_Number");
-            $table->string("Role");
+            $table->unsignedBigInteger('user_id');
+            $table->string('specialization')->nullable();
+            $table->string('certifications')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

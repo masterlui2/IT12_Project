@@ -5,7 +5,7 @@
 </head>
 <body class="min-h-screen bg-black text-gray-200">
 
-@include('customer.authHeader')
+@include('partials.header')
 
 
 @include('customer.hero')

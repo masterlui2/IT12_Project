@@ -64,4 +64,20 @@ class User extends Authenticatable
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
+
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    public function technician()
+    {
+        return $this->hasOne(Technician::class);
+    }
+
+    // Optional helper to detect manager
+    public function isManager()
+    {
+        return $this->role === 'manager';
+    }
 }

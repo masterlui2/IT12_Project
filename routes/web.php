@@ -8,29 +8,36 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
-=======
 use App\Http\Controllers\InquiryController;
->>>>>>> 902d92c935ebcf5d76d4277376f5faeb210807be
+use App\Http\Controllers\PdfController;
 
+// Generic landing
 Route::get('/', function () {
-    if (Auth::check() && Auth::user()->role === 'technician') {
-        return redirect()->route('technician.dashboard');
-    }
-    
-    if(Auth::check() && Auth::user()->role === 'manager'){
-        return redirect()->route('dashboard');
+    if (Auth::check()) {
+        return match (Auth::user()->role) {
+            'technician' => redirect()->route('technician.dashboard'),
+            'manager'    => redirect()->route('dashboard'),
+            'customer'   => redirect()->route('customer.welcome'),
+            default      => view('layouts.welcome'),
+        };
     }
 
-    return view('customer.welcome');
+    return view('layouts.welcome');
 })->name('home');
 
+// Customer area
+Route::middleware(['auth', 'verified', 'role:customer'])
+    ->prefix('customer')
+    ->group(function () {
+        Route::get('/dashboard', fn () => view('customer.welcome'))
+            ->name('customer.welcome');
+    });
 
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
-Route::middleware(['auth', 'verified', 'manager'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
     Route::get('/dashboard', fn () => view('manager.dashboard'))->name('dashboard');
     Route::get('/quotation', fn () => view('manager.quotation'))->name('quotation');
     Route::get('/inquiries', fn () => view('manager.inquiries'))->name('inquiries');
@@ -94,7 +101,7 @@ Route::prefix('/admin')->group(function (){
     Route::get('/documentation',[AdminController::class, 'documentation'])->name('admin.documentation');
 });
 
-Route::middleware(['auth','verified','technician'])->prefix('/technician')->group(function () {
+Route::middleware(['auth','verified','role:technician'])->prefix('/technician')->group(function () {
     Route::get('/dashboard', [TechnicianController::class, 'dashboard'])->name('technician.dashboard');
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
@@ -103,6 +110,7 @@ Route::middleware(['auth','verified','technician'])->prefix('/technician')->grou
     Route::prefix('/quotation')->group(function (){
         Route::get('/index', [TechnicianController::class, 'quotation'])->name('technician.quotation');
         Route::get('/new',[QuotationController::class, 'newQuotation'])->name('quotation.new');
+        Route::get('/pdf',[PdfController::class,'quotationPreview'])->name('quotation.pdf');
     });
     
 });

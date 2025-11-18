@@ -14,12 +14,10 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string $role): Response
     {
-        // Not logged in OR not a manager → block
-        if (!Auth::check() || Auth::user()->role !== 'technician') {
+        if (!Auth::check() || Auth::user()->role !== $role) {
             abort(403, 'Unauthorized');
-            // or: return redirect()->route('login');
         }
 
         return $next($request);
