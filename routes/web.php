@@ -1,20 +1,43 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\LogoutController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\InquiryController;
+use App\Http\Controllers\PdfController;
 
+// Generic landing
 Route::get('/', function () {
-    return view('customer.welcome');
+    if (Auth::check()) {
+        return match (Auth::user()->role) {
+            'technician' => redirect()->route('technician.dashboard'),
+            'manager'    => redirect()->route('dashboard'),
+            'customer'   => redirect()->route('customer.welcome'),
+            default      => view('layouts.welcome'),
+        };
+    }
+
+    return view('layouts.welcome');
 })->name('home');
 
+// Customer area
+Route::middleware(['auth', 'verified', 'role:customer'])
+    ->prefix('customer')
+    ->group(function () {
+        Route::get('/dashboard', fn () => view('customer.welcome'))
+            ->name('customer.welcome');
+    });
 
-Route::middleware(['auth', 'verified', 'manager'])->group(function () {
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+
+Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
     Route::get('/dashboard', fn () => view('manager.dashboard'))->name('dashboard');
     Route::get('/quotation', fn () => view('manager.quotation'))->name('quotation');
     Route::get('/inquiries', fn () => view('manager.inquiries'))->name('inquiries');
@@ -78,15 +101,28 @@ Route::prefix('/admin')->group(function (){
     Route::get('/documentation',[AdminController::class, 'documentation'])->name('admin.documentation');
 });
 
-Route::prefix('/technician')->group(function () {
+Route::middleware(['auth','verified','role:technician'])->prefix('/technician')->group(function () {
     Route::get('/dashboard', [TechnicianController::class, 'dashboard'])->name('technician.dashboard');
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
     Route::get('/inquire', [TechnicianController::class, 'inquire'])->name('technician.inquire');
     Route::get('/history', [TechnicianController::class, 'history'])->name('technician.history');
-    Route::prefix('/quotation')->group(function (){
-        Route::get('/index', [TechnicianController::class, 'quotation'])->name('technician.quotation');
-        Route::get('/new',[QuotationController::class, 'newQuotation'])->name('quotation.new');
-    });
     
+    Route::prefix('/quotation')->group(function (){
+        Route::get('/index', [QuotationController::class, 'index'])->name('technician.quotation');
+        Route::get('/new', [QuotationController::class, 'newQuotation'])->name('quotation.new');
+        Route::post('/store', [QuotationController::class, 'store'])->name('quotation.store');
+        Route::get('/{id}', [QuotationController::class, 'show'])->name('quotation.show');
+        Route::get('/{id}/edit', [QuotationController::class, 'edit'])->name('quotation.edit');
+        Route::put('/{id}', [QuotationController::class, 'update'])->name('quotation.update');
+        Route::delete('/{id}', [QuotationController::class, 'destroy'])->name('quotation.destroy');
+        
+        // PDF Routes
+        Route::get('/pdf/preview', [PdfController::class, 'quotationPreview'])->name('quotation.pdf.preview'); // Static preview
+        Route::get('/{id}/pdf', [PdfController::class, 'quotationPreview'])->name('quotation.pdf'); // Stream PDF
+        Route::get('/{id}/pdf/download', [PdfController::class, 'quotationDownload'])->name('quotation.pdf.download'); // Download PDF
+        
+        // Logo upload
+        Route::put('/logo', [QuotationController::class, 'uploadLogo'])->name('quotation.uploadLogo');
+    });
 });

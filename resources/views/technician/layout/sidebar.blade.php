@@ -15,50 +15,58 @@
     <nav class="flex-1 overflow-y-auto px-6 py-4">
         <ul class="space-y-2 text-gray-700">
 
-            <li>
-                <a href="{{ route('technician.dashboard') }}" 
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition">
-                    <i class="fas fa-gauge text-blue-500"></i>
-                    <span class="text-md font-medium">Dashboard</span>
-                </a>
-            </li>
+          <li>
+            <a href="{{ route('technician.dashboard') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+                    {{ Route::is('technician.dashboard') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
+                    <i class="fas fa-gauge {{ Route::is('technician.dashboard') ? 'text-blue-700' : 'text-blue-500' }}"></i>
+                <span class="text-md font-medium">Dashboard</span>
+            </a>
+          </li>
 
-            <li>
-                <a href="{{ route('technician.messages') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition">
-                    <i class="fas fa-envelope text-blue-500"></i>
-                    <span class="text-md font-medium">Messages</span>
-                </a>
-            </li>
+          <li>
+            <a href="{{ route('technician.messages') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+                    {{ Route::is('technician.messages') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
+                    <i class="fas fa-envelope {{ Route::is('technician.messages') ? 'text-blue-700' : 'text-blue-500' }}"></i>
+                <span class="text-md font-medium">Messages</span>
+            </a>
+        </li>
 
             <li>
                 <a href="{{ route('technician.inquire') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition">
-                    <i class="fas fa-question-circle text-blue-500"></i>
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+                    {{ Route::is('technician.inquire') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
+                    <i class="fas fa-question-circle {{ Route::is('technician.inquire') ? 'text-blue-700' : 'text-blue-500' }}"></i>
                     <span class="text-md font-medium">Inquiries</span>
                 </a>
             </li>
 
             <li>
                 <a href="{{ route('technician.quotation') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition">
-                    <i class="fas fa-file-invoice text-blue-500"></i>
-                    <span class="text-md font-medium">Quotation</span>
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition relative
+                    {{ Route::is('technician.quotation*') || Route::is('quotation.*') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
+                    @if(Route::is('technician.quotation*') || Route::is('quotation.*'))
+                    @endif
+                    <i class="fas fa-file-invoice {{ Route::is('technician.quotation*') || Route::is('quotation.*') ? 'text-blue-700' : 'text-blue-500' }}"></i>
+                    <span class="text-md font-medium ml-2">Quotation</span>
                 </a>
             </li>
 
             <li>
                 <a href="{{ route('technician.reporting') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition">
-                    <i class="fas fa-chart-line text-blue-500"></i>
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+                    {{ Route::is('technician.reporting') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
+                    <i class="fas fa-chart-line {{ Route::is('technician.reporting') ? 'text-blue-700' : 'text-blue-500' }}"></i>
                     <span class="text-md font-medium">Reporting</span>
                 </a>
             </li>
 
             <li>
                 <a href="{{ route('technician.history') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition">
-                    <i class="fas fa-clock-rotate-left text-blue-500"></i>
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+                    {{ Route::is('technician.history') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
+                    <i class="fas fa-clock-rotate-left {{ Route::is('technician.history') ? 'text-blue-700' : 'text-blue-500' }}"></i>
                     <span class="text-md font-medium">History</span>
                 </a>
             </li>
@@ -79,11 +87,12 @@
 
     <!-- Sign Out Button -->
     <div class="px-6 py-2">
-        <a href="#">
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
             <button class="w-full text-gray-600 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition flex items-center gap-2">
                 <i class="fas fa-right-from-bracket"></i> Sign out
             </button>
-        </a>
+        </form>
     </div>
 
 </aside>

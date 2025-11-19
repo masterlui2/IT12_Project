@@ -11,18 +11,34 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quotation', function (Blueprint $table) {
+        Schema::create('quotations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("Inquiry_ID");
-            $table->unsignedBigInteger("Technician_ID");
-            $table->decimal("Labor_Estimate", 2,0);
-            $table->decimal("Parts_Estimate", 2,0);
-            $table->decimal("Diagnostic_Fee", 2,0);
-            $table->decimal("Grand_Total", 2,0);
-            $table->string("Status");
-            $table->string("Date_Issued");
-            $table->unsignedBigInteger("Approved_By");
+
+            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('technician_id');
+            $table->unsignedBigInteger('approved_by')->nullable(); // single manager (user with role='manager')
+            $table->string('client_logo')->nullable();
+            $table->string('client_name')->nullable();
+            $table->string('client_address')->nullable();
+            $table->string('project_title')->nullable();
+            $table->date('date_issued')->nullable();
+            $table->text('objective')->nullable();
+            $table->integer('timeline_min_days')->nullable();
+            $table->integer('timeline_max_days')->nullable();
+            $table->text('terms_conditions')->nullable();
+            
+            $table->decimal('labor_estimate', 10, 2)->default(0);
+            $table->decimal('parts_estimate', 10, 2)->default(0);
+            $table->decimal('diagnostic_fee', 10, 2)->default(0);
+            $table->decimal('grand_total', 12, 2)->default(0);
+
+            $table->string('status')->default('draft');
             $table->timestamps();
+
+            // Foreign keys
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreign('technician_id')->references('id')->on('technicians')->onDelete('cascade');
+            $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 
@@ -31,6 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quotation');
+        Schema::dropIfExists('quotations');
     }
 };
