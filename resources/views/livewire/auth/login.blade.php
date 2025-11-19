@@ -44,7 +44,7 @@
 
                 @if (Route::has('password.request'))
                     <flux:link 
-                        class="text-sm text-blue-600 dark:text-blue-400 hover:underline" 
+                        class="text-sm text-zinc-600 dark:text-zinc-400 hover:underline" 
                         :href="route('password.request')" 
                         wire:navigate
                         >
