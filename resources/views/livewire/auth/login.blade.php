@@ -29,8 +29,7 @@
                     autocomplete="email"
                     placeholder="email@example.com"
                 />
-
-                <div class="relative">
+                <!-- Password Field -->
                     <flux:input
                         name="password"
                         :label="__('Password')"
@@ -39,16 +38,20 @@
                         autocomplete="current-password"
                         :placeholder="__('Password')"
                         viewable
-                    />
-
-                    @if (Route::has('password.request'))
-                        <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                            {{ __('Forgot your password?') }}
-                        </flux:link>
-                    @endif
-                </div>
-
+                />
+            <div class="flex items-center justify-between">
                 <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
+
+                @if (Route::has('password.request'))
+                    <flux:link 
+                        class="text-sm text-blue-600 dark:text-blue-400 hover:underline" 
+                        :href="route('password.request')" 
+                        wire:navigate
+                        >
+                        {{ __('Forgot your password?') }}
+                    </flux:link>
+                @endif
+            </div>
 
                 <flux:button variant="primary" type="submit" class="w-full py-3 text-base font-semibold" data-test="login-button">
                     {{ __('Log in') }}
