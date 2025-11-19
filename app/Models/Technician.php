@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Quotation;
+use Illuminate\Database\Eloquent\Factories\HasFactory;  
 
 class Technician extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'user_id',
         'specialization',

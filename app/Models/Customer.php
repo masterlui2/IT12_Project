@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Quotation;
 class Customer extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'user_id',
         'company_name',

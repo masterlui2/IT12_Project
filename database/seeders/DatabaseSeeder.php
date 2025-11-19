@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use App\Models\Customer;
+use App\Models\Technician;
+use App\Models\Quotation;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,5 +22,12 @@ class DatabaseSeeder extends Seeder
             ManagerUserSeeder::class,
             TechnicianUserSeeder::class
         ]);
+        Technician::factory()->count(2)->create();
+
+        // 5 customers
+        Customer::factory()->count(5)->create();
+
+        // 20 quotations (customers may repeat, technicians randomly assigned)
+        Quotation::factory()->count(20)->create();
     }
 }
