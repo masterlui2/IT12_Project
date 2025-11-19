@@ -18,7 +18,7 @@
       </p>
       <div class="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
      <a href="{{ route('inquiry.create') }}"
-           class="px-6 py-3 bg-white text-[var(--hero-blue-a)] rounded font-semibold uppercase">
+           class="px-6 py-3 bg-white text-[var(--hero-blue-a)] text-black  rounded font-semibold uppercase">
            {{ __('Inquire') }}
         </a>        <a href="#contact" class="px-6 py-3 border border-white text-white rounded font-semibold uppercase">Contact Us</a>
       </div>
