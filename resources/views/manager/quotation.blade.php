@@ -1,18 +1,29 @@
-<x-layouts.app :title="__('Quotations')">
+<x-layouts.app :title="__('Quotation Review')">
     <div class="flex h-full w-full flex-1 flex-col gap-6 rounded-xl">
 
-        {{-- Header + primary actions --}}
+        {{-- Manager Header --}}
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
                 <h1 class="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
-                    {{ __('Quotations') }}
+                    {{ __('Quotation Review') }}
                 </h1>
                 <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                    Manage quotations from new inquiries up to approved jobs.
+                    Review and approve technician quotations
                 </p>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
+                <div class="relative flex-1 text-xs md:w-64">
+                    <span class="pointer-events-none absolute inset-y-0 left-2 flex items-center text-neutral-400">
+                        <x-flux::icon name="magnifying-glass" class="h-4 w-4" />
+                    </span>
+                    <input
+                        type="text"
+                        placeholder="Search quotations..."
+                        class="w-full rounded-lg border border-neutral-200 bg-white py-2 pl-8 pr-3 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                    >
+                </div>
+
                 <button
                     type="button"
                     class="inline-flex items-center rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-medium text-neutral-700 shadow-sm hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
@@ -20,159 +31,254 @@
                     <x-flux::icon name="funnel" class="mr-2 h-4 w-4" />
                     {{ __('Filter') }}
                 </button>
-
-                <button
-                    type="button"
-                    class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
-                >
-                    <x-flux::icon name="plus" class="mr-2 h-4 w-4" />
-                    {{ __('New Quotation') }}
-                </button>
             </div>
         </div>
 
-        {{-- Stat cards --}}
-        <div class="grid gap-4 md:grid-cols-4">
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Drafts') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
-                    {{ $stats['quotations']['draft'] ?? 0 }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Waiting for review') }}
-                </p>
-            </div>
-
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Sent') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
-                    {{ $stats['quotations']['sent'] ?? 0 }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Sent to customers') }}
-                </p>
-            </div>
-
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Approved') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-emerald-500">
-                    {{ $stats['quotations']['approved'] ?? 0 }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Converted to jobs') }}
-                </p>
-            </div>
-
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Rejected / Expired') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-red-500">
-                    {{ $stats['quotations']['rejected'] ?? 0 }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Need follow-up or closure') }}
-                </p>
-            </div>
-        </div>
-
-        {{-- Filters + search --}}
-        <div
-            class="flex flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 md:flex-row md:items-center md:justify-between"
-        >
-            <div class="flex flex-wrap items-center gap-2 text-xs">
-                <span class="text-neutral-500 dark:text-neutral-400">{{ __('Status:') }}</span>
-
-                <button class="rounded-full bg-neutral-900 px-3 py-1 text-xs font-medium text-white dark:bg-neutral-100 dark:text-neutral-900">
-                    {{ __('All') }}
-                </button>
-                <button class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700">
-                    {{ __('Draft') }}
-                </button>
-                <button class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700">
-                    {{ __('Sent') }}
-                </button>
-                <button class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700">
-                    {{ __('Approved') }}
-                </button>
-                <button class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700">
-                    {{ __('Rejected') }}
-                </button>
-            </div>
-
-            <div class="flex w-full items-center gap-2 md:w-auto">
-                <div class="relative flex-1 text-xs">
-                    <span class="pointer-events-none absolute inset-y-0 left-2 flex items-center text-neutral-400">
-                        <x-flux::icon name="magnifying-glass" class="h-4 w-4" />
-                    </span>
-                    <input
-                        type="text"
-                        placeholder="{{ __('Search quotation #, customer, device…') }}"
-                        class="w-full rounded-lg border border-neutral-200 bg-neutral-50 py-2 pl-8 pr-3 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-                    >
+        {{-- Clean Stats --}}
+        <div class="grid gap-4 md:grid-cols-3">
+            <div class="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Pending Review</p>
+                        <p class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-neutral-100">8</p>
+                    </div>
+                    <x-flux::icon name="clock" class="h-8 w-8 text-neutral-400" />
                 </div>
+                <p class="mt-2 text-xs text-neutral-500">Waiting for your approval</p>
+            </div>
 
-                <button
-                    type="button"
-                    class="hidden items-center rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800 md:inline-flex"
-                >
-                    <x-flux::icon name="adjustments-horizontal" class="mr-1.5 h-3.5 w-3.5" />
-                    {{ __('Advanced') }}
-                </button>
+            <div class="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Approved This Week</p>
+                        <p class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-neutral-100">12</p>
+                    </div>
+                    <x-flux::icon name="check-circle" class="h-8 w-8 text-neutral-400" />
+                </div>
+                <p class="mt-2 text-xs text-neutral-500">Ready for processing</p>
+            </div>
+
+            <div class="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Pending Value</p>
+                        <p class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-neutral-100">₱45,200</p>
+                    </div>
+                    <x-flux::icon name="currency-dollar" class="h-8 w-8 text-neutral-400" />
+                </div>
+                <p class="mt-2 text-xs text-neutral-500">Total awaiting approval</p>
             </div>
         </div>
 
-        {{-- Quotations table --}}
-        <div class="relative flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+        {{-- Quick Filters --}}
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm text-neutral-600 dark:text-neutral-400">Show:</span>
+            <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
+                All Quotations
+            </button>
+            <button class="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-200">
+                Pending Review
+            </button>
+            <button class="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-200">
+                High Priority
+            </button>
+            <button class="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-200">
+                Overdue
+            </button>
+        </div>
+
+        {{-- Quotations Table --}}
+        <div class="flex-1 overflow-hidden rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <div class="overflow-x-auto">
-                <table class="min-w-full border-separate border-spacing-0 text-left text-xs">
+                <table class="min-w-full border-separate border-spacing-0 text-left text-sm">
                     <thead>
-                        <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
-                            <th class="px-4 py-3 font-medium">{{ __('Quote #') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Customer') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Device / Issue') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Status') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Total') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Created') }}</th>
-                            <th class="px-4 py-3 font-medium text-right">{{ __('Actions') }}</th>
+                        <tr class="border-b border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
+                            <th class="px-6 py-4 font-medium">Quote #</th>
+                            <th class="px-6 py-4 font-medium">Customer & Device</th>
+                            <th class="px-6 py-4 font-medium">Technician</th>
+                            <th class="px-6 py-4 font-medium">Amount</th>
+                            <th class="px-6 py-4 font-medium">Submitted</th>
+                            <th class="px-6 py-4 font-medium">Status</th>
+                            <th class="px-6 py-4 font-medium text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {{-- Example static row – replace later with @foreach($quotations as $quote) --}}
-                        <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                            <td class="px-4 py-3 align-middle font-medium">Q-2025-0001</td>
-                            <td class="px-4 py-3 align-middle">Juan Dela Cruz</td>
-                            <td class="px-4 py-3 align-middle">Laptop – No power</td>
-                            <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
-                                    {{ __('Pending Approval') }}
+                    <tbody class="text-neutral-700 dark:text-neutral-300">
+                        {{-- High Priority --}}
+                        <tr class="border-b border-neutral-100 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
+                            <td class="px-6 py-4 align-middle">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium">Q-2025-0042</span>
+                                    <x-flux::icon name="exclamation-circle" class="h-4 w-4 text-amber-500" />
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                <div class="font-medium">Maria Santos</div>
+                                <div class="text-sm text-neutral-500">MacBook Pro 16" - Liquid damage</div>
+                            </td>
+                            <td class="px-6 py-4 align-middle text-neutral-600 dark:text-neutral-400">
+                                Tech Rodriguez
+                            </td>
+                            <td class="px-6 py-4 align-middle font-medium">
+                                ₱ 15,800.00
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                <div>2 hours ago</div>
+                                <div class="text-sm text-neutral-500">Urgent</div>
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+                                    <x-flux::icon name="clock" class="h-3 w-3" />
+                                    High Priority
                                 </span>
                             </td>
-                            <td class="px-4 py-3 align-middle">₱ 3,500.00</td>
-                            <td class="px-4 py-3 align-middle">Nov 16, 2025</td>
-                            <td class="px-4 py-3 align-middle text-right">
-                                <button class="text-xs font-medium text-emerald-600 hover:underline">
-                                    {{ __('View') }}
-                                </button>
-                                <span class="mx-1 text-neutral-400">•</span>
-                                <button class="text-xs font-medium text-neutral-500 hover:underline">
-                                    {{ __('Edit') }}
-                                </button>
+                            <td class="px-6 py-4 align-middle text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
+                                        View
+                                    </button>
+                                    <button class="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600">
+                                        Approve
+                                    </button>
+                                </div>
                             </td>
                         </tr>
 
-                        {{-- Empty state --}}
+                        {{-- Standard Priority --}}
+                        <tr class="border-b border-neutral-100 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
+                            <td class="px-6 py-4 align-middle font-medium">Q-2025-0041</td>
+                            <td class="px-6 py-4 align-middle">
+                                <div class="font-medium">John Lim</div>
+                                <div class="text-sm text-neutral-500">Samsung Galaxy S24 - Screen replacement</div>
+                            </td>
+                            <td class="px-6 py-4 align-middle text-neutral-600 dark:text-neutral-400">
+                                Tech Garcia
+                            </td>
+                            <td class="px-6 py-4 align-middle font-medium">
+                                ₱ 4,200.00
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                <div>1 day ago</div>
+                                <div class="text-sm text-neutral-500">Standard</div>
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                                    Pending Review
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 align-middle text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
+                                        View
+                                    </button>
+                                    <button class="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600">
+                                        Approve
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        {{-- Quote with Notes --}}
+                        <tr class="border-b border-neutral-100 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
+                            <td class="px-6 py-4 align-middle">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium">Q-2025-0040</span>
+                                    <x-flux::icon name="chat-bubble-left" class="h-4 w-4 text-neutral-400" />
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                <div class="font-medium">Robert Chen</div>
+                                <div class="text-sm text-neutral-500">Dell XPS 15 - Motherboard repair</div>
+                            </td>
+                            <td class="px-6 py-4 align-middle text-neutral-600 dark:text-neutral-400">
+                                Tech Martinez
+                            </td>
+                            <td class="px-6 py-4 align-middle font-medium">
+                                ₱ 8,500.00
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                <div>2 days ago</div>
+                                <div class="text-sm text-amber-500">Needs review</div>
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
+                                    Waiting
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 align-middle text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
+                                        View
+                                    </button>
+                                    <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
+                                        Update
+                                    </button>
+                                    <button class="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600">
+                                        Approve
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        {{-- Empty State --}}
                         {{-- 
                         @forelse ($quotations as $quote)
                             ...
                         @empty
                         --}}
                         <tr>
-                            <td colspan="7" class="px-4 py-10 text-center text-xs text-neutral-500 dark:text-neutral-400">
-                                {{ __('No quotations yet. Create a new quotation from a customer inquiry to see it here.') }}
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center gap-3">
+                                    <x-flux::icon name="document-magnifying-glass" class="h-12 w-12 text-neutral-400" />
+                                    <div>
+                                        <div class="font-medium text-neutral-700 dark:text-neutral-300">No quotations to review</div>
+                                        <div class="mt-1 text-sm text-neutral-500">All pending quotations have been processed</div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         {{-- @endforelse --}}
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        {{-- Recently Processed --}}
+        <div class="rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+            <div class="border-b border-neutral-200 px-6 py-4 dark:border-neutral-700">
+                <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Recently Approved</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4 text-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <x-flux::icon name="check-circle" class="h-5 w-5 text-neutral-400" />
+                            <div>
+                                <span class="font-medium text-neutral-700 dark:text-neutral-300">Q-2025-0039</span>
+                                <span class="ml-2 text-neutral-500">iPad Pro - Battery replacement</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-neutral-500">
+                            <span>Tech Rodriguez</span>
+                            <span class="font-medium text-neutral-700 dark:text-neutral-300">₱ 3,800.00</span>
+                            <span class="text-xs">2 hours ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <x-flux::icon name="check-circle" class="h-5 w-5 text-neutral-400" />
+                            <div>
+                                <span class="font-medium text-neutral-700 dark:text-neutral-300">Q-2025-0038</span>
+                                <span class="ml-2 text-neutral-500">HP Laptop - RAM upgrade</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-neutral-500">
+                            <span>Tech Garcia</span>
+                            <span class="font-medium text-neutral-700 dark:text-neutral-300">₱ 2,200.00</span>
+                            <span class="text-xs">5 hours ago</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
