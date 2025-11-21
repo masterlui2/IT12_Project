@@ -120,15 +120,15 @@
         {{-- Customers table --}}
         <div class="relative flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <div class="overflow-x-auto">
-                <table class="min-w-full border-separate border-spacing-0 text-left text-xs">
+                <table class="min-w-full border-separate border-spacing-0 text-left text-sm">
                     <thead>
-                        <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
-                            <th class="px-4 py-3 font-medium">{{ __('Customer') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Contact') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Total Jobs') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Last Activity') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Status') }}</th>
-                            <th class="px-4 py-3 font-medium text-right">{{ __('Actions') }}</th>
+                        <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
+                            <th class="px-4 py-3 font-medium text-left">{{ __('Customer') }}</th>
+                            <th class="px-4 py-3 font-medium text-left">{{ __('Contact') }}</th>
+                            <th class="px-4 py-3 font-medium text-center">{{ __('Total Jobs') }}</th>
+                            <th class="px-4 py-3 font-medium text-center">{{ __('Last Activity') }}</th>
+                            <th class="px-4 py-3 font-medium text-center">{{ __('Status') }}</th>
+                            <th class="px-4 py-3 font-medium text-center w-40">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,40 +137,34 @@
                             <td class="px-4 py-3 align-middle">
                                 <div class="flex flex-col">
                                     <span class="text-xs font-medium">Juan Dela Cruz</span>
-                                    <span class="text-[11px] text-neutral-500 dark:text-neutral-400">
+                                    <span class="text-xs text-neutral-500 dark:text-neutral-400">
                                         {{ __('Online customer') }}
                                     </span>
                                 </div>
                             </td>
                             <td class="px-4 py-3 align-middle">
                                 <div class="flex flex-col">
-                                    <span class="text-[11px]">0917 123 4567</span>
-                                    <span class="text-[11px] text-neutral-500">juan@example.com</span>
+                                    <span class="text-xs">0917 123 4567</span>
+                                    <span class="text-xs text-neutral-500">juan@example.com</span>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 align-middle">
+                            <td class="px-4 py-3 align-middle text-center">
                                 5
                             </td>
-                            <td class="px-4 py-3 align-middle">
+                            <td class="px-4 py-3 align-middle text-center">
                                 {{ __('Nov 15, 2025 · Quotation approved') }}
                             </td>
-                            <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+                            <td class="px-4 py-3 align-middle text-center">
+                                <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
                                     {{ __('Active') }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 align-middle text-right">
-                                <button class="text-xs font-medium text-emerald-600 hover:underline">
-                                    {{ __('View') }}
-                                </button>
-                                <span class="mx-1 text-neutral-400">•</span>
-                                <button class="text-xs font-medium text-neutral-500 hover:underline">
-                                    {{ __('Edit') }}
-                                </button>
-                                <span class="mx-1 text-neutral-400">•</span>
-                                <button class="text-xs font-medium text-neutral-500 hover:underline">
-                                    {{ __('History') }}
-                                </button>
+                            <td class="px-4 py-3 align-middle text-center">
+                                <div class="inline-flex items-center justify-center gap-2">
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-amber-600 hover:text-amber-700" title="Edit"><i class="fas fa-pen-to-square"></i><span class="sr-only">Edit</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-slate-600 hover:text-slate-700" title="History"><i class="fas fa-clock-rotate-left"></i><span class="sr-only">History</span></a>
+                                </div>
                             </td>
                         </tr>
 

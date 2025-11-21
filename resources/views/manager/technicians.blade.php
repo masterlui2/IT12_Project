@@ -87,15 +87,15 @@
         {{-- Technicians table --}}
         <div class="relative flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <div class="overflow-x-auto">
-                <table class="min-w-full border-separate border-spacing-0 text-left text-xs">
+                <table class="min-w-full border-separate border-spacing-0 text-left text-sm">
                     <thead>
-                        <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
-                            <th class="px-4 py-3 font-medium">{{ __('Technician') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Contact') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Specialization') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Current Assignment') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Status') }}</th>
-                            <th class="px-4 py-3 font-medium text-right">{{ __('Actions') }}</th>
+                        <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
+                            <th class="px-4 py-3 font-medium text-left">{{ __('Technician') }}</th>
+                            <th class="px-4 py-3 font-medium text-left">{{ __('Contact') }}</th>
+                            <th class="px-4 py-3 font-medium text-left">{{ __('Specialization') }}</th>
+                            <th class="px-4 py-3 font-medium text-left">{{ __('Current Assignment') }}</th>
+                            <th class="px-4 py-3 font-medium text-center">{{ __('Status') }}</th>
+                            <th class="px-4 py-3 font-medium text-center w-40">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -103,12 +103,12 @@
                         <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
                             <td class="px-4 py-3 align-middle">
                                 <div class="flex items-center gap-2">
-                                    <div class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+                                    <div class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
                                         JD
                                     </div>
                                     <div class="flex flex-col">
                                         <span class="text-xs font-medium">John Doe</span>
-                                        <span class="text-[11px] text-neutral-500 dark:text-neutral-400">
+                                        <span class="text-xs text-neutral-500 dark:text-neutral-400">
                                             {{ __('Senior Technician') }}
                                         </span>
                                     </div>
@@ -116,8 +116,8 @@
                             </td>
                             <td class="px-4 py-3 align-middle">
                                 <div class="flex flex-col">
-                                    <span class="text-[11px]">0917 987 6543</span>
-                                    <span class="text-[11px] text-neutral-500">john.doe@example.com</span>
+                                    <span class="text-xs">0917 987 6543</span>
+                                    <span class="text-xs text-neutral-500">john.doe@example.com</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3 align-middle">
@@ -126,23 +126,17 @@
                             <td class="px-4 py-3 align-middle">
                                 {{ __('Job #JOB-2025-010 · On-site – Makati') }}
                             </td>
-                            <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
+                            <td class="px-4 py-3 align-middle text-center">
+                                <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
                                     {{ __('On-site') }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 align-middle text-right">
-                                <button class="text-xs font-medium text-emerald-600 hover:underline">
-                                    {{ __('View schedule') }}
-                                </button>
-                                <span class="mx-1 text-neutral-400">•</span>
-                                <button class="text-xs font-medium text-neutral-500 hover:underline">
-                                    {{ __('Assign job') }}
-                                </button>
-                                <span class="mx-1 text-neutral-400">•</span>
-                                <button class="text-xs font-medium text-neutral-500 hover:underline">
-                                    {{ __('Edit') }}
-                                </button>
+                            <td class="px-4 py-3 align-middle text-center">
+                                <div class="inline-flex items-center justify-center gap-2">
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="Schedule"><i class="fas fa-calendar-days"></i><span class="sr-only">View schedule</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-indigo-600 hover:text-indigo-700" title="Assign"><i class="fas fa-user-check"></i><span class="sr-only">Assign job</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-amber-600 hover:text-amber-700" title="Edit"><i class="fas fa-pen-to-square"></i><span class="sr-only">Edit</span></a>
+                                </div>
                             </td>
                         </tr>
 
