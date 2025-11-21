@@ -28,9 +28,7 @@
       <option>Closed</option>
     </select>
 
-    <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">
-      + New Inquiry
-    </button>
+    <a href="{{ route('inquiry.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">+ New Inquiry</a>
   </div>
 </nav>
 
@@ -38,65 +36,61 @@
 <!-- Inquiries Table -->
 <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
   <table class="w-full text-left text-sm">
-    <thead class="bg-gray-100 text-gray-700">
-      <tr>
-        <th class="px-6 py-3">Inquiry #</th>
-        <th class="px-6 py-3">Client</th>
-        <th class="px-6 py-3">Subject</th>
-        <th class="px-6 py-3">Status</th>
-        <th class="px-6 py-3">Date Submitted</th>
-        <th class="px-6 py-3 text-right">Actions</th>
+    <thead class="bg-neutral-50 text-neutral-700">
+      <tr class="border-b border-neutral-200">
+        <th class="px-4 py-3 font-medium">Inquiry #</th>
+        <th class="px-4 py-3 font-medium">Client</th>
+        <th class="px-4 py-3 font-medium">Subject</th>
+        <th class="px-4 py-3 font-medium">Status</th>
+        <th class="px-4 py-3 font-medium text-right">Date Submitted</th>
+        <th class="px-4 py-3 font-medium text-center w-48">Actions</th>
       </tr>
     </thead>
 
     <tbody class="divide-y">
+      @forelse($inquiries as $inq)
       <tr class="hover:bg-gray-50 transition">
-        <td class="px-6 py-4 font-medium text-gray-800">INQ-2025-001</td>
-        <td class="px-6 py-4">Tesla Energy</td>
-        <td class="px-6 py-4">Request for New Charging Site</td>
-        <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Pending</span></td>
-        <td class="px-6 py-4">2025-11-12</td>
-        <td class="px-6 py-4 text-right space-x-3">
-          <button class="text-blue-600 hover:underline text-sm">View</button>
-          <button class="text-green-600 hover:text-green-700 text-sm">Convert to Quote</button>
+        <td class="px-4 py-3 font-medium text-neutral-900">INQ-{{ str_pad($inq->id, 5, '0', STR_PAD_LEFT) }}</td>
+        <td class="px-4 py-3"><div class="max-w-[180px] truncate text-neutral-900">{{ $inq->name ?? ('Customer #'.$inq->user_id) }}</div></td>
+        <td class="px-4 py-3"><div class="max-w-[260px] truncate text-neutral-800">{{ $inq->issue_description ?? '—' }}</div></td>
+        <td class="px-4 py-3">
+          @php
+            $status = $inq->status ?? 'new';
+            $statusColors = [
+              'new' => 'bg-blue-100 text-blue-700',
+              'open' => 'bg-yellow-100 text-yellow-800',
+              'responded' => 'bg-green-100 text-green-700',
+              'closed' => 'bg-gray-100 text-gray-700',
+            ];
+            $color = $statusColors[$status] ?? 'bg-gray-100 text-gray-700';
+          @endphp
+          <span class="{{ $color }} text-xs px-2 py-1 rounded capitalize">{{ $status }}</span>
+        </td>
+        <td class="px-4 py-3 text-right">{{ $inq->created_at?->format('M d, Y') }}</td>
+        <td class="px-4 py-3 text-center align-middle">
+          <div class="inline-flex items-center justify-center gap-2">
+            <a href="{{ route('technician.inquire.show', $inq->id) }}" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
+            <a href="{{ route('quotation.new', ['inquiry' => $inq->id]) }}" class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap">Convert to Quote</a>
+            <form action="{{ route('technician.inquire.destroy', $inq->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete inquiry INQ-{{ $inq->id }}?')">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="inline-flex w-8 h-8 items-center justify-center text-red-600 hover:text-red-700" title="Delete"><i class="fas fa-trash"></i><span class="sr-only">Delete</span></button>
+            </form>
+          </div>
         </td>
       </tr>
-
-      <tr class="hover:bg-gray-50 transition">
-        <td class="px-6 py-4 font-medium text-gray-800">INQ-2025-002</td>
-        <td class="px-6 py-4">RapidEV Solutions</td>
-        <td class="px-6 py-4">System Integration Follow-up</td>
-        <td class="px-6 py-4"><span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Responded</span></td>
-        <td class="px-6 py-4">2025-11-10</td>
-        <td class="px-6 py-4 text-right space-x-3">
-          <button class="text-blue-600 hover:underline text-sm">View</button>
-          <button class="text-gray-500 hover:text-red-600 text-sm">Delete</button>
-        </td>
+      @empty
+      <tr>
+        <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-500">No inquiries found.</td>
       </tr>
-
-      <tr class="hover:bg-gray-50 transition">
-        <td class="px-6 py-4 font-medium text-gray-800">INQ-2025-003</td>
-        <td class="px-6 py-4">GreenCharge Pvt Ltd</td>
-        <td class="px-6 py-4">Software Support and Updates</td>
-        <td class="px-6 py-4"><span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">Closed</span></td>
-        <td class="px-6 py-4">2025-10-28</td>
-        <td class="px-6 py-4 text-right space-x-3">
-          <button class="text-blue-600 hover:underline text-sm">View</button>
-          <button class="text-gray-500 hover:text-red-600 text-sm">Delete</button>
-        </td>
-      </tr>
+      @endforelse
     </tbody>
   </table>
 
   <!-- Pagination -->
   <div class="border-t bg-white px-6 py-3 flex justify-between items-center text-sm text-gray-500">
-    <p>Showing 1–3 of 20 inquiries</p>
-    <div class="space-x-1">
-      <button class="px-2 py-1 border rounded hover:bg-gray-100">Prev</button>
-      <button class="px-2 py-1 border rounded bg-blue-600 text-white">1</button>
-      <button class="px-2 py-1 border rounded hover:bg-gray-100">2</button>
-      <button class="px-2 py-1 border rounded hover:bg-gray-100">Next</button>
-    </div>
+    <p>Showing {{ $inquiries->firstItem() ?? 0 }}–{{ $inquiries->lastItem() ?? 0 }} of {{ $inquiries->total() }} inquiries</p>
+    <div class="space-x-1">{{ $inquiries->links() }}</div>
   </div>
 </div>
 
