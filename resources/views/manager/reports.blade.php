@@ -8,7 +8,7 @@
                     {{ __('Reports') }}
                 </h1>
                 <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                    View performance summaries for inquiries, quotations, jobs, and revenue.
+                    Track quotations, downpayments, diagnostic fees, and overall sales performance.
                 </p>
             </div>
 
@@ -31,48 +31,57 @@
             </div>
         </div>
 
-        {{-- Stat cards --}}
+        {{-- Sales / payment stat cards --}}
         <div class="grid gap-4 md:grid-cols-4">
+            {{-- Total quotation sales (approved quotations total) --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Revenue (This Month)') }}</p>
+                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                    {{ __('Total Quotation Sales (This Month)') }}
+                </p>
                 <p class="mt-2 text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
-                    {{ $stats['reports']['revenue_month'] ?? '₱ 0.00' }}
+                    {{ $stats['reports']['quotation_sales_month'] ?? '₱ 0.00' }}
                 </p>
                 <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('vs last month:') }}
-                    <span class="font-medium text-emerald-500">
-                        {{ $stats['reports']['revenue_change'] ?? '+0%' }}
-                    </span>
+                    {{ __('Sum of approved quotations for this month.') }}
                 </p>
             </div>
 
+            {{-- Expected 50% downpayments --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Completed Jobs') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
-                    {{ $stats['reports']['jobs_completed'] ?? 0 }}
+                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                    {{ __('Expected 50% Downpayments') }}
+                </p>
+                <p class="mt-2 text-2xl font-semibold tracking-tight text-emerald-500">
+                    {{ $stats['reports']['expected_downpayments'] ?? '₱ 0.00' }}
                 </p>
                 <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Closed within selected period') }}
+                    {{ __('50% of all approved quotation totals.') }}
                 </p>
             </div>
 
+            {{-- Downpayments actually collected --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Avg. Turnaround Time') }}</p>
+                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                    {{ __('Downpayments Collected') }}
+                </p>
                 <p class="mt-2 text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
-                    {{ $stats['reports']['avg_tat'] ?? '—' }}
+                    {{ $stats['reports']['downpayments_collected'] ?? '₱ 0.00' }}
                 </p>
                 <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('From inquiry to job completion') }}
+                    {{ __('Actual 50% payments received from customers.') }}
                 </p>
             </div>
 
+            {{-- Diagnostic fees (when no 50% downpayment is made) --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Unpaid / Pending Collection') }}</p>
+                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                    {{ __('Diagnostic Fees Collected') }}
+                </p>
                 <p class="mt-2 text-2xl font-semibold tracking-tight text-amber-500">
-                    {{ $stats['reports']['unpaid_total'] ?? '₱ 0.00' }}
+                    {{ $stats['reports']['diagnostic_fees'] ?? '₱ 1,500.00' }}
                 </p>
                 <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Balance from completed jobs') }}
+                    {{ __('For jobs where 50% downpayment was not made.') }}
                 </p>
             </div>
         </div>
@@ -113,15 +122,15 @@
                 </div>
 
                 <div class="flex items-center gap-2 text-xs">
-                    <span class="text-neutral-500 dark:text-neutral-400">{{ __('Report type:') }}</span>
+                    <span class="text-neutral-500 dark:text-neutral-400">{{ __('View:') }}</span>
                     <select
                         class="rounded-lg border border-neutral-200 bg-neutral-50 px-2 py-2 text-xs text-neutral-800 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                     >
                         <option>{{ __('Summary (default)') }}</option>
-                        <option>{{ __('Revenue report') }}</option>
-                        <option>{{ __('Inquiries vs. quotations') }}</option>
+                        <option>{{ __('Sales & Downpayments') }}</option>
+                        <option>{{ __('Diagnostic Fee Report') }}</option>
+                        <option>{{ __('Inquiries vs. Quotations') }}</option>
                         <option>{{ __('Technician performance') }}</option>
-                        <option>{{ __('Service popularity') }}</option>
                     </select>
                 </div>
             </div>
@@ -134,14 +143,13 @@
                 <div class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                            {{ __('Inquiries → Quotations → Jobs') }}
+                            {{ __('Quotations → Downpayment → Completed Jobs') }}
                         </p>
                         <span class="text-[11px] text-neutral-400">
-                            {{ __('Conversion funnel') }}
+                            {{ __('Payment funnel') }}
                         </span>
                     </div>
                     <div class="mt-4 h-32 rounded-lg bg-neutral-50 dark:bg-neutral-900/60">
-                        {{-- Placeholder area – plug in chart later --}}
                         <div class="flex h-full items-center justify-center text-[11px] text-neutral-400 dark:text-neutral-500">
                             {{ __('Chart placeholder') }}
                         </div>
@@ -151,61 +159,64 @@
                 <div class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                            {{ __('Top Services') }}
+                            {{ __('Top Revenue Sources') }}
                         </p>
                         <span class="text-[11px] text-neutral-400">
-                            {{ __('By revenue') }}
+                            {{ __('By quotations / diagnostics') }}
                         </span>
                     </div>
 
                     <div class="mt-3 space-y-2 text-[11px] text-neutral-600 dark:text-neutral-300">
                         <div class="flex items-center justify-between">
-                            <span>{{ __('Laptop Full Diagnostics') }}</span>
-                            <span class="font-medium">₱ 25,000</span>
+                            <span>{{ __('Approved quotations') }}</span>
+                            <span class="font-medium">{{ $stats['reports']['quotation_sales_month'] ?? '₱ 0.00' }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span>{{ __('Network Setup & Repair') }}</span>
-                            <span class="font-medium">₱ 18,500</span>
+                            <span>{{ __('Downpayments collected') }}</span>
+                            <span class="font-medium">{{ $stats['reports']['downpayments_collected'] ?? '₱ 0.00' }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span>{{ __('Printer Repair') }}</span>
-                            <span class="font-medium">₱ 9,800</span>
+                            <span>{{ __('Diagnostic fees') }}</span>
+                            <span class="font-medium">{{ $stats['reports']['diagnostic_fees'] ?? '₱ 0.00' }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Right: detailed table --}}
+            {{-- Right: detailed payment table --}}
             <div class="relative flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900 md:col-span-2">
                 <div class="overflow-x-auto">
                     <table class="min-w-full border-separate border-spacing-0 text-left text-xs">
                         <thead>
                             <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
                                 <th class="px-4 py-3 font-medium">{{ __('Date') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Inquiries') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Quotations Sent') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Jobs Completed') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Revenue') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Unpaid') }}</th>
+                                <th class="px-4 py-3 font-medium">{{ __('Quotation #') }}</th>
+                                <th class="px-4 py-3 font-medium">{{ __('Customer') }}</th>
+                                <th class="px-4 py-3 font-medium">{{ __('Quotation Total') }}</th>
+                                <th class="px-4 py-3 font-medium">{{ __('Expected 50%') }}</th>
+                                <th class="px-4 py-3 font-medium">{{ __('Downpayment Paid') }}</th>
+                                <th class="px-4 py-3 font-medium">{{ __('Diagnostic Fee') }}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- Example static rows – later replace with @foreach($reportRows as $row) --}}
+                            {{-- Example static rows – replace with @foreach($reportRows as $row) --}}
                             <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
                                 <td class="px-4 py-3 align-middle">Nov 15, 2025</td>
-                                <td class="px-4 py-3 align-middle">8</td>
-                                <td class="px-4 py-3 align-middle">5</td>
-                                <td class="px-4 py-3 align-middle">3</td>
-                                <td class="px-4 py-3 align-middle">₱ 12,500.00</td>
-                                <td class="px-4 py-3 align-middle">₱ 2,000.00</td>
+                                <td class="px-4 py-3 align-middle">Q-2025-0001</td>
+                                <td class="px-4 py-3 align-middle">Juan Dela Cruz</td>
+                                <td class="px-4 py-3 align-middle">₱ 10,000.00</td>
+                                <td class="px-4 py-3 align-middle">₱ 5,000.00</td>
+                                <td class="px-4 py-3 align-middle">₱ 5,000.00</td>
+                                <td class="px-4 py-3 align-middle">₱ 1,500.00</td>
                             </tr>
                             <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
                                 <td class="px-4 py-3 align-middle">Nov 14, 2025</td>
-                                <td class="px-4 py-3 align-middle">6</td>
-                                <td class="px-4 py-3 align-middle">4</td>
-                                <td class="px-4 py-3 align-middle">4</td>
-                                <td class="px-4 py-3 align-middle">₱ 9,300.00</td>
+                                <td class="px-4 py-3 align-middle">Q-2025-0002</td>
+                                <td class="px-4 py-3 align-middle">Maria Santos</td>
+                                <td class="px-4 py-3 align-middle">₱ 3,000.00</td>
+                                <td class="px-4 py-3 align-middle">₱ 1,500.00</td>
                                 <td class="px-4 py-3 align-middle">₱ 0.00</td>
+                                <td class="px-4 py-3 align-middle">₱ 1,500.00</td>
                             </tr>
 
                             {{-- Empty state --}}
@@ -215,8 +226,8 @@
                             @empty
                             --}}
                             <tr>
-                                <td colspan="6" class="px-4 py-10 text-center text-xs text-neutral-500 dark:text-neutral-400">
-                                    {{ __('No report data yet. Adjust the date range or generate a new report to see details here.') }}
+                                <td colspan="7" class="px-4 py-10 text-center text-xs text-neutral-500 dark:text-neutral-400">
+                                    {{ __('No payment data yet. Adjust the date range or generate a new report to see details here.') }}
                                 </td>
                             </tr>
                             {{-- @endforelse --}}

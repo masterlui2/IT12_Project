@@ -36,23 +36,22 @@
                 </div>
             </div>
 
-            <!-- Active Jobs -->
+            <!-- Job Orders Overview -->
             <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="flex items-start justify-between">
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Active Jobs</p>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">Avg TAT {{ $stats['jobs']['avg_turnaround'] ?? '—' }}</span>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Job Orders</p>
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400">Active: {{ $stats['jobs']['active'] ?? 0 }}</span>
                 </div>
-                <p class="mt-2 text-2xl font-semibold tracking-tight">{{ number_format($stats['jobs']['active'] ?? 0) }}</p>
+                <p class="mt-2 text-2xl font-semibold tracking-tight">{{ number_format($stats['jobs']['total'] ?? 0) }}</p>
                 <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    Pending {{ number_format($stats['jobs']['pending'] ?? 0) }} •
-                    In-Progress {{ number_format($stats['jobs']['in_progress'] ?? 0) }} •
-                    For Pickup {{ number_format($stats['jobs']['for_pickup'] ?? 0) }}
+                    Completed {{ number_format($stats['jobs']['completed'] ?? 0) }} • 
+                    Ongoing {{ number_format($stats['jobs']['ongoing'] ?? 0) }}
                 </p>
 
                 <!-- progress -->
                 <div class="mt-4 progress h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
                     <div class="progress__bar h-full bg-neutral-900 dark:bg-neutral-100"
-                         style="--progress: {{ $stats['jobs']['completion_progress'] ?? 0 }};">
+                         style="--progress: {{ $stats['jobs']['completion_rate'] ?? 0 }};">
                     </div>
                 </div>
             </div>
@@ -64,7 +63,10 @@
                     <span class="text-xs text-neutral-500 dark:text-neutral-400">This month</span>
                 </div>
                 <p class="mt-2 text-2xl font-semibold tracking-tight">₱{{ number_format($stats['payments']['downpayments_month'] ?? 0, 2) }}</p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Receivables ₱{{ number_format($stats['payments']['receivables'] ?? 0, 2) }}</p>
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    Receivables ₱{{ number_format($stats['payments']['receivables'] ?? 0, 2) }} • 
+                    Refunded {{ number_format($stats['payments']['refunded_count'] ?? 0) }}
+                </p>
 
                 <!-- progress -->
                 <div class="mt-4 progress h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
@@ -75,58 +77,62 @@
             </div>
         </div>
 
-        <!-- Secondary: Attendance/Payroll & Pipeline & Expense Summary -->
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-            <!-- Attendance & Payroll -->
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
+        <!-- Job Orders Status Breakdown -->
+        <div class="grid gap-4 md:grid-cols-4">
+            <!-- Ongoing Jobs -->
+            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Attendance & Payroll</h3>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">This cutoff</span>
+                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Ongoing Jobs</h3>
+                    <x-flux::icon name="wrench" class="h-5 w-5 text-blue-500" />
                 </div>
-                <dl class="mt-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Compliance</dt>
-                        <dd class="text-sm font-semibold">{{ $stats['attendance']['compliance_rate'] ?? '—' }}</dd>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Late/Absences</dt>
-                        <dd class="text-sm font-semibold">{{ number_format($stats['attendance']['late'] ?? 0) }}/{{ number_format($stats['attendance']['absent'] ?? 0) }}</dd>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Payroll Due</dt>
-                        <dd class="text-sm font-semibold">₱{{ number_format($stats['payroll']['due'] ?? 0, 2) }}</dd>
-                    </div>
-                </dl>
+                <p class="mt-2 text-2xl font-semibold text-blue-600">{{ number_format($stats['jobs']['ongoing'] ?? 0) }}</p>
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    In progress {{ number_format($stats['jobs']['in_progress'] ?? 0) }} • 
+                    Pending {{ number_format($stats['jobs']['pending'] ?? 0) }}
+                </p>
             </div>
 
-            <!-- Funnel: Inquiry → Quotation → Job → Paid -->
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
+            <!-- Completed Jobs -->
+            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Service Pipeline</h3>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">This month</span>
+                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Completed Jobs</h3>
+                    <x-flux::icon name="check-circle" class="h-5 w-5 text-emerald-500" />
                 </div>
-                <ul class="mt-4 space-y-3">
-                    <li class="flex items-center justify-between"><span class="text-sm text-neutral-600 dark:text-neutral-300">Inquiries</span><span class="text-sm font-semibold">{{ number_format($stats['pipeline']['inquiries'] ?? 0) }}</span></li>
-                    <li class="flex items-center justify-between"><span class="text-sm text-neutral-600 dark:text-neutral-300">Quotations</span><span class="text-sm font-semibold">{{ number_format($stats['pipeline']['quotations'] ?? 0) }}</span></li>
-                    <li class="flex items-center justify-between"><span class="text-sm text-neutral-600 dark:text-neutral-300">Jobs Created</span><span class="text-sm font-semibold">{{ number_format($stats['pipeline']['jobs'] ?? 0) }}</span></li>
-                    <li class="flex items-center justify-between"><span class="text-sm text-neutral-600 dark:text-neutral-300">Paid</span><span class="text-sm font-semibold">{{ number_format($stats['pipeline']['paid'] ?? 0) }}</span></li>
-                </ul>
+                <p class="mt-2 text-2xl font-semibold text-emerald-600">{{ number_format($stats['jobs']['completed'] ?? 0) }}</p>
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    This week {{ number_format($stats['jobs']['completed_week'] ?? 0) }} • 
+                    For pickup {{ number_format($stats['jobs']['for_pickup'] ?? 0) }}
+                </p>
             </div>
 
-            <!-- Expenses Snapshot (taxes, materials, utilities) -->
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
+            <!-- Refunded Jobs -->
+            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Expenses Snapshot</h3>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">This month</span>
+                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Refunded Jobs</h3>
+                    <x-flux::icon name="arrow-path" class="h-5 w-5 text-amber-500" />
                 </div>
-                <dl class="mt-4 space-y-3">
-                    <div class="flex items-center justify-between"><dt class="text-sm text-neutral-600 dark:text-neutral-300">Materials</dt><dd class="text-sm font-semibold">₱{{ number_format($stats['expenses']['materials'] ?? 0, 2) }}</dd></div>
-                    <div class="flex items-center justify-between"><dt class="text-sm text-neutral-600 dark:text-neutral-300">Utilities & Rent</dt><dd class="text-sm font-semibold">₱{{ number_format($stats['expenses']['overhead'] ?? 0, 2) }}</dd></div>
-                    <div class="flex items-center justify-between"><dt class="text-sm text-neutral-600 dark:text-neutral-300">Taxes (Quarterly est.)</dt><dd class="text-sm font-semibold">₱{{ number_format($stats['expenses']['tax_est'] ?? 0, 2) }}</dd></div>
-                </dl>
+                <p class="mt-2 text-2xl font-semibold text-amber-600">{{ number_format($stats['jobs']['refunded'] ?? 0) }}</p>
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    This month {{ number_format($stats['jobs']['refunded_month'] ?? 0) }} • 
+                    Value ₱{{ number_format($stats['jobs']['refunded_value'] ?? 0, 2) }}
+                </p>
+            </div>
+
+            <!-- Job Performance -->
+            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Job Performance</h3>
+                    <x-flux::icon name="chart-bar" class="h-5 w-5 text-neutral-500" />
+                </div>
+                <p class="mt-2 text-2xl font-semibold text-neutral-900 dark:text-neutral-100">{{ $stats['jobs']['completion_rate'] ?? '—' }}%</p>
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    Avg TAT {{ $stats['jobs']['avg_turnaround'] ?? '—' }} • 
+                    Success Rate {{ $stats['jobs']['success_rate'] ?? '—' }}%
+                </p>
             </div>
         </div>
 
+     
         <!-- Main: Recent Job Orders (aligned with ERD fields) -->
         <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <div class="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-neutral-700">
@@ -162,7 +168,8 @@
                                         'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' => $status === 'in-progress',
                                         'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' => $status === 'completed',
                                         'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' => $status === 'for pickup',
-                                        'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300' => !in_array($status, ['pending','in-progress','completed','for pickup']),
+                                        'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' => $status === 'refunded',
+                                        'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300' => !in_array($status, ['pending','in-progress','completed','for pickup','refunded']),
                                     ])>
                                         {{ ucfirst($status) ?: '—' }}
                                     </span>
