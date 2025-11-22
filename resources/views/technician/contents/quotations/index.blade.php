@@ -68,26 +68,30 @@
     <!-- Table Display -->
     <div class="overflow-x-auto border rounded-lg">
       <table class="w-full text-left text-sm">
-        <thead class="bg-gray-100 text-gray-700">
-          <tr>
-            <th class="px-6 py-3">Quote #</th>
-            <th class="px-6 py-3">Client</th>
-            <th class="px-6 py-3">Project Title</th>
-            <th class="px-6 py-3">Amount</th>
-            <th class="px-6 py-3">Status</th>
-            <th class="px-6 py-3">Issue Date</th>
-            <th class="px-6 py-3 text-right">Actions</th>
+        <thead class="bg-neutral-50 text-neutral-700">
+          <tr class="border-b border-neutral-200">
+            <th class="px-4 py-3 font-medium">Quote #</th>
+            <th class="px-4 py-3 font-medium">Client</th>
+            <th class="px-4 py-3 font-medium">Project Title</th>
+            <th class="px-4 py-3 font-medium text-right">Amount</th>
+            <th class="px-4 py-3 font-medium">Status</th>
+            <th class="px-4 py-3 font-medium text-right">Issue Date</th>
+            <th class="px-4 py-3 font-medium text-center w-40">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y">
           @forelse($quotations as $quotation)
           <tr class="hover:bg-gray-50 transition">
-            <td class="px-6 py-4 font-medium text-gray-800">
+            <td class="px-4 py-3 font-medium text-neutral-900">
               QTN-{{ str_pad($quotation->id, 5, '0', STR_PAD_LEFT) }}
             </td>
-            <td class="px-6 py-4">{{ $quotation->client_name }}</td>
-            <td class="px-6 py-4">{{ Str::limit($quotation->project_title, 30) }}</td>
-            <td class="px-6 py-4">₱{{ number_format($quotation->grand_total, 2) }}</td>
+            <td class="px-4 py-3">
+              <div class="max-w-[180px] truncate text-neutral-900">{{ $quotation->client_name }}</div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="max-w-[240px] truncate text-neutral-800">{{ Str::limit($quotation->project_title, 60) }}</div>
+            </td>
+            <td class="px-4 py-3 text-right text-neutral-900">₱{{ number_format($quotation->grand_total, 2) }}</td>
             <td class="px-6 py-4">
               @php
                 $statusColors = [
@@ -102,28 +106,47 @@
                 {{ $quotation->status }}
               </span>
             </td>
-            <td class="px-6 py-4">{{ \Carbon\Carbon::parse($quotation->date_issued)->format('M d, Y') }}</td>
-            <td class="px-6 py-4 text-right space-x-2">
-              <a href="{{ route('quotation.show', $quotation->id) }}" 
-                 class="text-blue-600 hover:underline text-sm">View</a>
-              
-              @if($quotation->status === 'draft')
-                <a href="{{ route('quotation.edit', $quotation->id) }}" 
-                   class="text-green-600 hover:underline text-sm">Edit</a>
-              @endif
-              
-              <a href="{{ route('quotation.pdf', $quotation->id) }}" 
-                 target="_blank"
-                 class="text-purple-600 hover:underline text-sm">PDF</a>
-              
-              <form action="{{ route('quotation.destroy', $quotation->id) }}" 
-                    method="POST" 
-                    class="inline"
-                    onsubmit="return confirm('Are you sure you want to delete this quotation?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
-              </form>
+            <td class="px-4 py-3 text-right text-neutral-700">{{ \Carbon\Carbon::parse($quotation->date_issued)->format('M d, Y') }}</td>
+            <td class="px-4 py-3 text-center">
+              <div class="inline-flex items-center justify-center gap-2">
+                <a href="{{ route('quotation.show', $quotation->id) }}" 
+                   class="inline-flex items-center justify-center w-8 h-8 text-blue-600 hover:text-blue-800"
+                   title="View">
+                  <i class="fas fa-eye"></i>
+                  <span class="sr-only">View</span>
+                </a>
+
+                <a href="{{ route('quotation.pdf', $quotation->id) }}" 
+                   target="_blank"
+                   class="inline-flex items-center justify-center w-8 h-8 text-purple-600 hover:text-purple-800"
+                   title="PDF">
+                  <i class="fas fa-file-pdf"></i>
+                  <span class="sr-only">PDF</span>
+                </a>
+
+                @if($quotation->status === 'draft')
+                  <a href="{{ route('quotation.edit', $quotation->id) }}" 
+                     class="inline-flex items-center justify-center w-8 h-8 text-green-600 hover:text-green-800"
+                     title="Edit">
+                    <i class="fas fa-pen"></i>
+                    <span class="sr-only">Edit</span>
+                  </a>
+                @endif
+
+                <form action="{{ route('quotation.destroy', $quotation->id) }}" 
+                      method="POST" 
+                      class="inline"
+                      onsubmit="return confirm('Are you sure you want to delete this quotation?')">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" 
+                          class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:text-red-700"
+                          title="Delete">
+                    <i class="fas fa-trash"></i>
+                    <span class="sr-only">Delete</span>
+                  </button>
+                </form>
+              </div>
             </td>
           </tr>
           @empty

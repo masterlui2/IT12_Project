@@ -106,6 +106,8 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
     Route::get('/inquire', [TechnicianController::class, 'inquire'])->name('technician.inquire');
+    Route::get('/inquire/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('technician.inquire.show');
+    Route::delete('/inquire/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('technician.inquire.destroy');
     Route::get('/history', [TechnicianController::class, 'history'])->name('technician.history');
     
     Route::prefix('/quotation')->group(function (){

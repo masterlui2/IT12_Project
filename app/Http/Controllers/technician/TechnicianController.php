@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Technician;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Inquiry;
 
 class TechnicianController extends Controller
 {
@@ -23,7 +24,21 @@ class TechnicianController extends Controller
     }
 
     public function inquire(){
-        return view('technician.contents.inquire');
+        $inquiries = Inquiry::orderByDesc('created_at')->paginate(10);
+        return view('technician.contents.inquire', compact('inquiries'));
+    }
+
+    public function inquireShow(int $id){
+        $inq = Inquiry::findOrFail($id);
+        return redirect()->route('technician.inquire')
+            ->with('status', 'Viewing inquiry INQ-'.$inq->id);
+    }
+
+    public function inquireDestroy(int $id){
+        $inq = Inquiry::findOrFail($id);
+        $inq->delete();
+        return redirect()->route('technician.inquire')
+            ->with('status', 'Inquiry INQ-'.$id.' deleted');
     }
 
     public function history(){
