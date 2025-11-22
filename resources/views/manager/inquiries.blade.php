@@ -114,7 +114,12 @@
                     <tbody>
                         {{-- Unassigned Inquiry --}}
                         <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                            <td class="px-4 py-3 align-middle font-medium">INQ-2025-0012</td>
+                            <td class="px-4 py-3 align-middle">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium">INQ-2025-0012</span>
+                                    <i class="fas fa-circle-exclamation text-red-500"></i>
+                                </div>
+                            </td>
                             <td class="px-4 py-3 align-middle">
                                 <div class="font-medium">Maria Santos</div>
                                 <div class="text-xs text-neutral-500">Desktop Computer</div>
@@ -124,12 +129,12 @@
                                 <div class="mt-1 text-xs text-neutral-500">0917 123 4567</div>
                             </td>
                             <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
                                     Unassigned
                                 </span>
                             </td>
                             <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/40 dark:text-red-200">
+                            <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/40 dark:text-red-200">
                                     High
                                 </span>
                             </td>
@@ -160,7 +165,7 @@
                                 <div class="text-xs text-neutral-500">Today</div>
                             </td>
                             <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
                                     Medium
                                 </span>
                             </td>
