@@ -48,7 +48,9 @@
                     :label="__('Birthday')"
                     type="date"
                     required
-                />
+                    :max="now()->toDateString()"
+                    />
+
 
                 <!-- Email -->
                 <flux:input
