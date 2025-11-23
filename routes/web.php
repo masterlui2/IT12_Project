@@ -34,7 +34,15 @@ Route::middleware(['auth', 'verified', 'role:customer'])
         Route::get('/dashboard', fn () => view('customer.welcome'))
             ->name('customer.welcome');
     });
+   // 🔹 Customer: Track Repair page
+    Route::get('/track-repair', function () {
+        return view('customer.track-repair');
+    })->name('customer.track');
 
+    // 🔹 Customer: Messages page
+    Route::get('/messages', function () {
+        return view('customer.messages');
+    })->name('customer.messages');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
