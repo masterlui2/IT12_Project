@@ -39,6 +39,15 @@
                     {{ Route::is('technician.inquire') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
                     <i class="fas fa-question-circle {{ Route::is('technician.inquire') ? 'text-blue-700' : 'text-blue-500' }}"></i>
                     <span class="text-md font-medium">Inquiries</span>
+                    @php
+                      $hasNewTech = isset($tech_inquiries_new_count) && $tech_inquiries_new_count > 0;
+                      $hasPendingTech = isset($tech_inquiries_pending_count) && $tech_inquiries_pending_count > 0;
+                    @endphp
+                    @if($hasNewTech)
+                      <span class="ml-2 inline-block w-2.5 h-2.5 rounded-full bg-red-500" title="New inquiries"></span>
+                    @elseif($hasPendingTech)
+                      <span class="ml-2 inline-block w-2.5 h-2.5 rounded-full bg-amber-500" title="Pending / Unassigned"></span>
+                    @endif
                 </a>
             </li>
 
@@ -62,14 +71,7 @@
                 </a>
             </li>
 
-            <li>
-                <a href="{{ route('technician.history') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition
-                    {{ Route::is('technician.history') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
-                    <i class="fas fa-clock-rotate-left {{ Route::is('technician.history') ? 'text-blue-700' : 'text-blue-500' }}"></i>
-                    <span class="text-md font-medium">History</span>
-                </a>
-            </li>
+            
 
         </ul>
     </nav>

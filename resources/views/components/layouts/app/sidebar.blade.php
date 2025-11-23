@@ -33,6 +33,15 @@
              class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ Route::is('inquiries') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
              <i class="fas fa-question-circle {{ Route::is('inquiries') ? 'text-blue-700' : 'text-blue-500' }}"></i>
              <span class="text-md font-medium">Inquiries</span>
+             @php
+               $hasNew = isset($inquiries_new_count) && $inquiries_new_count > 0;
+               $hasPending = isset($inquiries_pending_count) && $inquiries_pending_count > 0;
+             @endphp
+             @if($hasNew)
+               <span class="ml-2 inline-block w-2.5 h-2.5 rounded-full bg-red-500" title="New inquiries"></span>
+             @elseif($hasPending)
+               <span class="ml-2 inline-block w-2.5 h-2.5 rounded-full bg-amber-500" title="Pending / Unassigned"></span>
+             @endif
           </a>
         </li>
 
@@ -52,13 +61,7 @@
           </a>
         </li>
 
-        <li>
-          <a href="{{ route('services') }}"
-             class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ Route::is('services') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
-             <i class="fas fa-screwdriver-wrench {{ Route::is('services') ? 'text-blue-700' : 'text-blue-500' }}"></i>
-             <span class="text-md font-medium">Services</span>
-          </a>
-        </li>
+        
 
         <li>
           <a href="{{ route('reports') }}"

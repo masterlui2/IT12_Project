@@ -114,12 +114,7 @@
                     <tbody>
                         {{-- Unassigned Inquiry --}}
                         <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                            <td class="px-4 py-3 align-middle">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-medium">INQ-2025-0012</span>
-                                    <i class="fas fa-circle-exclamation text-red-500"></i>
-                                </div>
-                            </td>
+                            <td class="px-4 py-3 align-middle font-medium">INQ-2025-0012</td>
                             <td class="px-4 py-3 align-middle">
                                 <div class="font-medium">Maria Santos</div>
                                 <div class="text-xs text-neutral-500">Desktop Computer</div>
