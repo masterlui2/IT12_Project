@@ -186,37 +186,37 @@
             {{-- Right: detailed payment table --}}
             <div class="relative flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900 md:col-span-2">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full border-separate border-spacing-0 text-left text-xs">
+                    <table class="min-w-full border-separate border-spacing-0 text-left text-sm">
                         <thead>
-                            <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
-                                <th class="px-4 py-3 font-medium">{{ __('Date') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Quotation #') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Customer') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Quotation Total') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Expected 50%') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Downpayment Paid') }}</th>
-                                <th class="px-4 py-3 font-medium">{{ __('Diagnostic Fee') }}</th>
+                            <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
+                                <th class="px-4 py-3 font-medium text-center">{{ __('Date') }}</th>
+                                <th class="px-4 py-3 font-medium text-left">{{ __('Quotation #') }}</th>
+                                <th class="px-4 py-3 font-medium text-left">{{ __('Customer') }}</th>
+                                <th class="px-4 py-3 font-medium text-right">{{ __('Quotation Total') }}</th>
+                                <th class="px-4 py-3 font-medium text-right">{{ __('Expected 50%') }}</th>
+                                <th class="px-4 py-3 font-medium text-right">{{ __('Downpayment Paid') }}</th>
+                                <th class="px-4 py-3 font-medium text-right">{{ __('Diagnostic Fee') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {{-- Example static rows – replace with @foreach($reportRows as $row) --}}
                             <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                                <td class="px-4 py-3 align-middle">Nov 15, 2025</td>
+                                <td class="px-4 py-3 align-middle text-center">Nov 15, 2025</td>
                                 <td class="px-4 py-3 align-middle">Q-2025-0001</td>
                                 <td class="px-4 py-3 align-middle">Juan Dela Cruz</td>
-                                <td class="px-4 py-3 align-middle">₱ 10,000.00</td>
-                                <td class="px-4 py-3 align-middle">₱ 5,000.00</td>
-                                <td class="px-4 py-3 align-middle">₱ 5,000.00</td>
-                                <td class="px-4 py-3 align-middle">₱ 1,500.00</td>
+                                <td class="px-4 py-3 align-middle text-right">₱ 10,000.00</td>
+                                <td class="px-4 py-3 align-middle text-right">₱ 5,000.00</td>
+                                <td class="px-4 py-3 align-middle text-right">₱ 5,000.00</td>
+                                <td class="px-4 py-3 align-middle text-right">₱ 1,500.00</td>
                             </tr>
                             <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                                <td class="px-4 py-3 align-middle">Nov 14, 2025</td>
+                                <td class="px-4 py-3 align-middle text-center">Nov 14, 2025</td>
                                 <td class="px-4 py-3 align-middle">Q-2025-0002</td>
                                 <td class="px-4 py-3 align-middle">Maria Santos</td>
-                                <td class="px-4 py-3 align-middle">₱ 3,000.00</td>
-                                <td class="px-4 py-3 align-middle">₱ 1,500.00</td>
-                                <td class="px-4 py-3 align-middle">₱ 0.00</td>
-                                <td class="px-4 py-3 align-middle">₱ 1,500.00</td>
+                                <td class="px-4 py-3 align-middle text-right">₱ 3,000.00</td>
+                                <td class="px-4 py-3 align-middle text-right">₱ 1,500.00</td>
+                                <td class="px-4 py-3 align-middle text-right">₱ 0.00</td>
+                                <td class="px-4 py-3 align-middle text-right">₱ 1,500.00</td>
                             </tr>
 
                             {{-- Empty state --}}

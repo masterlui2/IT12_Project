@@ -34,7 +34,15 @@ Route::middleware(['auth', 'verified', 'role:customer'])
         Route::get('/dashboard', fn () => view('customer.welcome'))
             ->name('customer.welcome');
     });
+   // 🔹 Customer: Track Repair page
+    Route::get('/track-repair', function () {
+        return view('customer.track-repair');
+    })->name('customer.track');
 
+    // 🔹 Customer: Messages page
+    Route::get('/messages', function () {
+        return view('customer.messages');
+    })->name('customer.messages');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
@@ -106,6 +114,8 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
     Route::get('/inquire', [TechnicianController::class, 'inquire'])->name('technician.inquire');
+    Route::get('/inquire/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('technician.inquire.show');
+    Route::delete('/inquire/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('technician.inquire.destroy');
     Route::get('/history', [TechnicianController::class, 'history'])->name('technician.history');
     
     Route::prefix('/quotation')->group(function (){

@@ -92,14 +92,14 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full border-separate border-spacing-0 text-left text-sm">
                     <thead>
-                        <tr class="border-b border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
-                            <th class="px-6 py-4 font-medium">Quote #</th>
-                            <th class="px-6 py-4 font-medium">Customer & Device</th>
-                            <th class="px-6 py-4 font-medium">Technician</th>
-                            <th class="px-6 py-4 font-medium">Amount</th>
-                            <th class="px-6 py-4 font-medium">Submitted</th>
-                            <th class="px-6 py-4 font-medium">Status</th>
-                            <th class="px-6 py-4 font-medium text-right">Actions</th>
+                        <tr class="border-b border-neutral-200 bg-neutral-50 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
+                            <th class="px-6 py-4 font-medium text-left">Quote #</th>
+                            <th class="px-6 py-4 font-medium text-left">Customer & Device</th>
+                            <th class="px-6 py-4 font-medium text-left">Technician</th>
+                            <th class="px-6 py-4 font-medium text-right">Amount</th>
+                            <th class="px-6 py-4 font-medium text-right">Submitted</th>
+                            <th class="px-6 py-4 font-medium text-center">Status</th>
+                            <th class="px-6 py-4 font-medium text-center w-40">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="text-neutral-700 dark:text-neutral-300">
@@ -108,37 +108,32 @@
                             <td class="px-6 py-4 align-middle">
                                 <div class="flex items-center gap-2">
                                     <span class="font-medium">Q-2025-0042</span>
-                                    <x-flux::icon name="exclamation-circle" class="h-4 w-4 text-amber-500" />
+                                    <x-flux::icon name="exclamation-circle" class="h-4 w-4 text-red-500" />
                                 </div>
                             </td>
                             <td class="px-6 py-4 align-middle">
                                 <div class="font-medium">Maria Santos</div>
-                                <div class="text-sm text-neutral-500">MacBook Pro 16" - Liquid damage</div>
+                                <div class="text-xs text-neutral-500">MacBook Pro 16" - Liquid damage</div>
                             </td>
                             <td class="px-6 py-4 align-middle text-neutral-600 dark:text-neutral-400">
                                 Tech Rodriguez
                             </td>
-                            <td class="px-6 py-4 align-middle font-medium">
-                                ₱ 15,800.00
-                            </td>
-                            <td class="px-6 py-4 align-middle">
+                            <td class="px-6 py-4 align-middle font-medium text-right whitespace-nowrap">₱ 15,800.00</td>
+                            <td class="px-6 py-4 align-middle text-right">
                                 <div>2 hours ago</div>
-                                <div class="text-sm text-neutral-500">Urgent</div>
+                                <div class="text-xs text-neutral-500">Urgent</div>
                             </td>
-                            <td class="px-6 py-4 align-middle">
-                                <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-                                    <x-flux::icon name="clock" class="h-3 w-3" />
+                            <td class="px-6 py-4 align-middle text-center">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-800 dark:bg-red-900/40 dark:text-red-200">
+                                    <i class="fas fa-circle-exclamation"></i>
                                     High Priority
                                 </span>
                             </td>
-                            <td class="px-6 py-4 align-middle text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
-                                        View
-                                    </button>
-                                    <button class="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600">
-                                        Approve
-                                    </button>
+                            <td class="px-6 py-4 align-middle text-center">
+                                <div class="inline-flex items-center justify-center gap-2">
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-amber-600 hover:text-amber-700" title="Update"><i class="fas fa-pen-to-square"></i><span class="sr-only">Update</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-emerald-600 hover:text-emerald-700" title="Approve"><i class="fas fa-check"></i><span class="sr-only">Approve</span></a>
                                 </div>
                             </td>
                         </tr>
@@ -148,31 +143,27 @@
                             <td class="px-6 py-4 align-middle font-medium">Q-2025-0041</td>
                             <td class="px-6 py-4 align-middle">
                                 <div class="font-medium">John Lim</div>
-                                <div class="text-sm text-neutral-500">Samsung Galaxy S24 - Screen replacement</div>
+                                <div class="text-xs text-neutral-500">Samsung Galaxy S24 - Screen replacement</div>
                             </td>
                             <td class="px-6 py-4 align-middle text-neutral-600 dark:text-neutral-400">
                                 Tech Garcia
                             </td>
-                            <td class="px-6 py-4 align-middle font-medium">
-                                ₱ 4,200.00
-                            </td>
-                            <td class="px-6 py-4 align-middle">
+                            <td class="px-6 py-4 align-middle font-medium text-right whitespace-nowrap">₱ 4,200.00</td>
+                            <td class="px-6 py-4 align-middle text-right">
                                 <div>1 day ago</div>
-                                <div class="text-sm text-neutral-500">Standard</div>
+                                <div class="text-xs text-neutral-500">Standard</div>
                             </td>
-                            <td class="px-6 py-4 align-middle">
-                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                            <td class="px-6 py-4 align-middle text-center">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
+                                    <i class="fas fa-circle-check"></i>
                                     Pending Review
                                 </span>
                             </td>
-                            <td class="px-6 py-4 align-middle text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
-                                        View
-                                    </button>
-                                    <button class="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600">
-                                        Approve
-                                    </button>
+                            <td class="px-6 py-4 align-middle text-center">
+                                <div class="inline-flex items-center justify-center gap-2">
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-amber-600 hover:text-amber-700" title="Update"><i class="fas fa-pen-to-square"></i><span class="sr-only">Update</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-emerald-600 hover:text-emerald-700" title="Approve"><i class="fas fa-check"></i><span class="sr-only">Approve</span></a>
                                 </div>
                             </td>
                         </tr>
@@ -187,34 +178,27 @@
                             </td>
                             <td class="px-6 py-4 align-middle">
                                 <div class="font-medium">Robert Chen</div>
-                                <div class="text-sm text-neutral-500">Dell XPS 15 - Motherboard repair</div>
+                                <div class="text-xs text-neutral-500">Dell XPS 15 - Motherboard repair</div>
                             </td>
                             <td class="px-6 py-4 align-middle text-neutral-600 dark:text-neutral-400">
                                 Tech Martinez
                             </td>
-                            <td class="px-6 py-4 align-middle font-medium">
-                                ₱ 8,500.00
-                            </td>
-                            <td class="px-6 py-4 align-middle">
+                            <td class="px-6 py-4 align-middle font-medium text-right whitespace-nowrap">₱ 8,500.00</td>
+                            <td class="px-6 py-4 align-middle text-right">
                                 <div>2 days ago</div>
-                                <div class="text-sm text-amber-500">Needs review</div>
+                                <div class="text-xs text-amber-500">Needs review</div>
                             </td>
-                            <td class="px-6 py-4 align-middle">
-                                <span class="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
+                            <td class="px-6 py-4 align-middle text-center">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700 dark:bg-neutral-800/40 dark:text-neutral-300">
+                                    <i class="fas fa-circle-check"></i>
                                     Waiting
                                 </span>
                             </td>
-                            <td class="px-6 py-4 align-middle text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
-                                        View
-                                    </button>
-                                    <button class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
-                                        Update
-                                    </button>
-                                    <button class="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600">
-                                        Approve
-                                    </button>
+                            <td class="px-6 py-4 align-middle text-center">
+                                <div class="inline-flex items-center justify-center gap-2">
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-amber-600 hover:text-amber-700" title="Update"><i class="fas fa-pen-to-square"></i><span class="sr-only">Update</span></a>
+                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-emerald-600 hover:text-emerald-700" title="Approve"><i class="fas fa-check"></i><span class="sr-only">Approve</span></a>
                                 </div>
                             </td>
                         </tr>
