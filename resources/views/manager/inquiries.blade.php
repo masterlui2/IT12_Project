@@ -124,12 +124,12 @@
                                 <div class="mt-1 text-xs text-neutral-500">0917 123 4567</div>
                             </td>
                             <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
                                     Unassigned
                                 </span>
                             </td>
                             <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/40 dark:text-red-200">
+                            <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/40 dark:text-red-200">
                                     High
                                 </span>
                             </td>
@@ -160,7 +160,7 @@
                                 <div class="text-xs text-neutral-500">Today</div>
                             </td>
                             <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
                                     Medium
                                 </span>
                             </td>
