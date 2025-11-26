@@ -316,7 +316,7 @@
           <div class="flex items-start gap-5 bg-gray-800 rounded-2xl p-6 h-full">
             <div class="flex-shrink-0">
               <div class="w-20 h-20 rounded-full border-4 border-blue-400 overflow-hidden">
-                <img src="{{ asset('what customer say/letterk.png') }}" alt="Kristel Villame" class="w-full h-full object-cover">
+                <img src="{{ asset('feedback/letterk.png') }}" alt="Kristel Villame" class="w-full h-full object-cover">
               </div>
             </div>
             <div class="flex flex-col h-full w-full">
@@ -339,7 +339,7 @@
           <div class="flex items-start gap-5 bg-gray-800 rounded-2xl p-6 h-full">
             <div class="flex-shrink-0">
               <div class="w-20 h-20 rounded-full border-4 border-blue-400 overflow-hidden">
-                <img src="{{ asset('what customer say/arnelpajota.png') }}" alt="Arnel Pajota" class="w-full h-full object-cover">
+                <img src="{{ asset('feedback/arnelpajota.png') }}" alt="Arnel Pajota" class="w-full h-full object-cover">
               </div>
             </div>
             <div class="flex flex-col h-full w-full">
@@ -364,7 +364,7 @@
           <div class="flex items-start gap-5 bg-gray-800 rounded-2xl p-6 h-full">
             <div class="flex-shrink-0">
               <div class="w-20 h-20 rounded-full border-4 border-blue-400 overflow-hidden">
-                <img src="{{ asset('what customer say/letterx.jpg') }}" alt="XCL 88" class="w-full h-full object-cover">
+                <img src="{{ asset('feedback/letterx.jpg') }}" alt="XCL 88" class="w-full h-full object-cover">
               </div>
             </div>
             <div class="flex flex-col h-full w-full">
@@ -385,7 +385,7 @@
           <div class="flex items-start gap-5 bg-gray-800 rounded-2xl p-6 h-full">
             <div class="flex-shrink-0">
               <div class="w-20 h-20 rounded-full border-4 border-blue-400 overflow-hidden">
-                <img src="{{ asset('what customer say/letterc.png') }}" alt="Christian Vincent Pacleb" class="w-full h-full object-cover">
+                <img src="{{ asset('feedback/letterc.png') }}" alt="Christian Vincent Pacleb" class="w-full h-full object-cover">
               </div>
             </div>
             <div class="flex flex-col h-full w-full">
