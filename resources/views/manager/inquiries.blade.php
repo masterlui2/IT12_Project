@@ -111,6 +111,7 @@
                             <th class="px-4 py-3 font-medium text-center w-40">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
+<<<<<<< HEAD
                     <tbody>
                         {{-- Unassigned Inquiry --}}
                         <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
@@ -225,6 +226,43 @@
                         </tr>
                         {{-- @endforelse --}}
                     </tbody>
+=======
+                   <tbody>
+    @forelse ($inquiries as $inquiry)
+        <tr class="border-b border-neutral-200 dark:border-neutral-800">
+            <td class="px-4 py-3 align-middle">
+                INQ-{{ str_pad($inquiry->id, 8, '0', STR_PAD_LEFT) }}
+            </td>
+            <td class="px-4 py-3 align-middle">
+                {{ $inquiry->name ?? $inquiry->user->name }}
+            </td>
+            <td class="px-4 py-3 align-middle">
+                {{ $inquiry->contact_number }}
+            </td>
+            <td class="px-4 py-3 align-middle">
+                {{ $inquiry->issue_description }}
+            </td>
+            <td class="px-4 py-3 align-middle">
+                {{ ucfirst($inquiry->status) ?? 'New' }}
+            </td>
+            <td class="px-4 py-3 align-middle">
+                {{ $inquiry->created_at->format('M d, Y') }}
+            </td>
+            <td class="px-4 py-3 align-middle">
+                <a href="{{ route('inquiries.show', $inquiry) }}"
+                   class="text-sm text-emerald-600 hover:underline">View</a>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="7" class="px-4 py-10 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                No inquiries have been submitted yet.
+            </td>
+        </tr>
+    @endforelse
+</tbody>
+
+>>>>>>> 15728eef75077fce3980d7ea53b029b3b63dd16f
                 </table>
             </div>
         </div>
