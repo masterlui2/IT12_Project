@@ -6,11 +6,12 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
 use App\Http\Controllers\Technician\TechnicianController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\InquiryController;
+use App\Http\Controllers\General\InquiryController;
 use App\Http\Controllers\PdfController;
 
 // Generic landing
@@ -19,7 +20,6 @@ Route::get('/', function () {
         return match (Auth::user()->role) {
             'technician' => redirect()->route('technician.dashboard'),
             'manager'    => redirect()->route('dashboard'),
-            'customer'   => redirect()->route('customer.welcome'),
             default      => view('layouts.welcome'),
         };
     }
@@ -31,18 +31,16 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified', 'role:customer'])
     ->prefix('customer')
     ->group(function () {
-        Route::get('/dashboard', fn () => view('customer.welcome'))
-            ->name('customer.welcome');
-    });
-   // 🔹 Customer: Track Repair page
-    Route::get('/track-repair', function () {
-        return view('customer.track-repair');
-    })->name('customer.track');
+        Route::get('/dashboard', fn () => view('customer.welcome'))->name('customer.welcome');
+        Route::post('/inquiry', [InquiryController::class, 'store'])->name('inquiry.store');
+        Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('inquiry.create');
+    // 🔹 Customer: Track Repair page
+    Route::get('/track-repair', [CustomerController::class, 'track'])->name('customer.track');
 
     // 🔹 Customer: Messages page
-    Route::get('/messages', function () {
-        return view('customer.messages');
-    })->name('customer.messages');
+    Route::get('/messages', [CustomerController::class, 'messages'])->name('customer.messages');
+
+    });
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
@@ -58,12 +56,8 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
 });
 Route::middleware(['auth'])->group(function () {
     // Show the inquiry creation form
-    Route::get('/inquiry/create', [InquiryController::class, 'create'])
-        ->name('inquiry.create');
 
     // Handle the inquiry form submission
-    Route::post('/inquiry', [InquiryController::class, 'store'])
-        ->name('inquiry.store');
 });
 
 Route::middleware(['auth'])->group(function () {
