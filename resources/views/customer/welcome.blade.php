@@ -12,7 +12,7 @@
 
  
 @include('customer.contact')
-
+@include('customer.about-feedback')
 
   
   @include('partials.footer')
