@@ -193,7 +193,7 @@
                         <p class="text-gray-400 text-xs">Device Repair</p>
                     </div>
                     <div class="flex items-center text-yellow-400 text-xs">
-                        <i class="fas fa-star mr-1"></i> 4.9
+                        <i class="fas fa-star mr-1"></i> 4.0
                     </div>
                 </div>
                 <p class="text-gray-300 text-sm leading-relaxed flex-grow">
@@ -221,75 +221,7 @@ I’ll definitely be coming back!”
         </div>
     </div>
 </section>
-{{-- Feedback Modal --}}
-<div id="feedbackModal"
-    class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center px-6 z-50 hidden">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-            <div>
-                <p class="text-xs uppercase tracking-wide text-emerald-300 font-semibold">Share your experience</p>
-                <h3 class="text-xl font-bold text-white">Customer Feedback</h3>
-            </div>
-            <button id="closeFeedbackModal" type="button"
-                class="text-gray-400 hover:text-white transition-colors duration-150">
-                <i class="fas fa-times text-lg"></i>
-            </button>
-        </div>
 
-        <form class="px-6 py-5 space-y-4">
-            <div class="grid md:grid-cols-2 gap-4">
-                <div class="space-y-2">
-                    <label for="feedbackName" class="text-sm text-gray-200 font-medium">Name</label>
-                    <input id="feedbackName" type="text" name="name" placeholder="Your name"
-                        class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
-                        required>
-                </div>
-                <div class="space-y-2">
-                    <label for="feedbackService" class="text-sm text-gray-200 font-medium">Service</label>
-                    <input id="feedbackService" type="text" name="service" placeholder="e.g., Laptop Repair"
-                        class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400">
-                </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-4">
-                <div class="space-y-2">
-                    <label for="feedbackRating" class="text-sm text-gray-200 font-medium">Rating</label>
-                    <select id="feedbackRating" name="rating"
-                        class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400">
-                        <option value="" selected disabled>Choose</option>
-                        <option value="5">5 - Excellent</option>
-                        <option value="4">4 - Very Good</option>
-                        <option value="3">3 - Good</option>
-                        <option value="2">2 - Fair</option>
-                        <option value="1">1 - Poor</option>
-                    </select>
-                </div>
-                <div class="space-y-2">
-                    <label for="feedbackContact" class="text-sm text-gray-200 font-medium">Contact (optional)</label>
-                    <input id="feedbackContact" type="email" name="contact" placeholder="you@example.com"
-                        class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400">
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label for="feedbackMessage" class="text-sm text-gray-200 font-medium">Feedback</label>
-                <textarea id="feedbackMessage" name="message" rows="4" placeholder="Share your experience"
-                    class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
-                    required></textarea>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <button id="cancelFeedbackModal" type="button"
-                    class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-300 border border-gray-700 hover:bg-gray-800 transition">
-                    Cancel
-                </button>
-                <button type="submit"
-                    class="px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition">
-                    Submit Feedback
-                </button>
-            </div>
-        </form>
-    </div>
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", () => {

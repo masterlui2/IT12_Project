@@ -37,14 +37,16 @@ Route::middleware(['auth', 'verified', 'role:customer'])
             ->name('customer.welcome');
     });
    // 🔹 Customer: Track Repair page
-    Route::get('/track-repair', function () {
-        return view('customer.track-repair');
-    })->name('customer.track');
 
-    // 🔹 Customer: Messages page
-    Route::get('/messages', function () {
-        return view('customer.messages');
-    })->name('customer.messages');
+        // 🔹 Customer: Track Repair page
+        Route::get('/track-repair', function () {
+            return view('customer.track-repair');
+        })->name('customer.track');
+
+        // 🔹 Customer: Messages page
+        Route::get('/messages', function () {
+            return view('customer.messages');
+        })->name('customer.messages');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
@@ -66,12 +68,13 @@ Route::middleware(['auth'])->group(function () {
     // Handle the inquiry form submission
     Route::post('/inquiry', [InquiryController::class, 'store'])
         ->name('inquiry.store');
-        Route::get('/feedback', [FeedbackController::class, 'create'])
+    Route::get('/feedback/create', [FeedbackController::class, 'create'])
         ->name('feedback.create');
 
     Route::post('/feedback', [FeedbackController::class, 'store'])
         ->name('feedback.store');
 });
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
