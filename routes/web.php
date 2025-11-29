@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\FeedbackController;
 
 // Generic landing
 Route::get('/', function () {
@@ -32,6 +33,7 @@ Route::middleware(['auth', 'verified', 'role:customer'])
     ->prefix('customer')
     ->group(function () {
         Route::get('/dashboard', fn () => view('customer.welcome'))
+        
             ->name('customer.welcome');
     });
    // 🔹 Customer: Track Repair page
@@ -64,6 +66,11 @@ Route::middleware(['auth'])->group(function () {
     // Handle the inquiry form submission
     Route::post('/inquiry', [InquiryController::class, 'store'])
         ->name('inquiry.store');
+        Route::get('/feedback', [FeedbackController::class, 'create'])
+        ->name('feedback.create');
+
+    Route::post('/feedback', [FeedbackController::class, 'store'])
+        ->name('feedback.store');
 });
 
 Route::middleware(['auth'])->group(function () {

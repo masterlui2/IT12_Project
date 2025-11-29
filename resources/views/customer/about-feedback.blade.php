@@ -106,6 +106,40 @@
         </div>
     </div>
 </section>
+{{-- LOCATION MAP SECTION --}}
+<section id="location" class="bg-gray-950 py-16 border-t border-gray-800">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 space-y-8">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div>
+                <span
+                    class="inline-block px-4 py-1 mb-3 bg-blue-900/30 text-blue-300 rounded-full text-xs font-semibold border border-blue-800/60">
+                    Find Us
+                </span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white">
+                    Visit Our Service Center
+                </h2>
+                <p class="text-gray-400 mt-2 max-w-3xl">
+                    Drop by our location for consultations, walk-in diagnostics, or to pick up completed repairs.
+                    We keep the space comfortable and ready to serve you.
+                </p>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md text-sm text-gray-300 space-y-1">
+                <p class="font-semibold text-white">Hours</p>
+                <p>Mon - Sat: 9:00 AM – 6:00 PM</p>
+                <p class="text-blue-200">Need help finding us? Tap the map for directions.</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="relative w-full h-[420px]">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4078.4335142038844!2d125.49317867510116!3d7.027566117100341!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f90d345435ca29%3A0x956b6d7472a90432!2sTechne%20Fixer%20Computer%20and%20Laptop%20Repair%20Services%2F%20CCTV%20INSTALLATION!5e1!3m2!1sen!2sph!4v1764341286198!5m2!1sen!2sph"
+                    class="absolute inset-0 w-full h-full border-0" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </div>
+</section>
 
 {{-- CUSTOMER FEEDBACK / TESTIMONIALS --}}
 <section id="feedback" class="bg-gray-950 py-16 border-t border-gray-800">
@@ -123,9 +157,12 @@
                 </p>
             </div>
 
-            <a href="#contact" class="inline-flex items-center text-sm font-semibold text-emerald-300 hover:text-emerald-200">
-                <i class="fas fa-comment-dots mr-2"></i>
+            <a href="{{ route('feedback.create') }}" class="inline-flex items-center text-sm font-semibold text-emerald-300 hover:text-emerald-200">
+               <button id="openFeedbackModal" type="button"
+                class="inline-flex items-center text-sm font-semibold text-emerald-300 hover:text-emerald-200">
+                  <i class="fas fa-comment-dots mr-2"></i>
                 Leave your feedback
+            </button>
             </a>
         </div>
 
@@ -135,16 +172,16 @@
             <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-md flex flex-col">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <p class="text-white font-semibold text-sm">Mark R.</p>
-                        <p class="text-gray-400 text-xs">Laptop Repair</p>
+                        <p class="text-white font-semibold text-sm">kristel villame.</p>
+                        <p class="text-gray-400 text-xs">Dental Chair and CCTVs Installation</p>
                     </div>
                     <div class="flex items-center text-yellow-400 text-xs">
                         <i class="fas fa-star mr-1"></i> 5.0
                     </div>
                 </div>
                 <p class="text-gray-300 text-sm leading-relaxed flex-grow">
-                    “They fixed my laptop in just one day. Clear explanation of the problem,
-                    fair pricing, and it runs much faster now. Highly recommended!”
+                 "I had a great experience here, especially with Sir Pete, the owner. 
+    He’s very reliable and did an excellent job fixing my tech gadgets. He also installs dental chairs, CCTVs, and repairs all kinds of electronic devices. Everything is now working perfectly! Highly recommended!"
                 </p>
             </div>
 
@@ -152,16 +189,17 @@
             <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-md flex flex-col">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <p class="text-white font-semibold text-sm">Jen A.</p>
-                        <p class="text-gray-400 text-xs">Aircon Cleaning</p>
+                        <p class="text-white font-semibold text-sm">Arnel Pajota.</p>
+                        <p class="text-gray-400 text-xs">Device Repair</p>
                     </div>
                     <div class="flex items-center text-yellow-400 text-xs">
                         <i class="fas fa-star mr-1"></i> 4.9
                     </div>
                 </div>
                 <p class="text-gray-300 text-sm leading-relaxed flex-grow">
-                    “Very professional and on time. Our aircon is now cooling properly and
-                    they left the area clean after the service.”
+                    “Absolutely Outstanding Service!
+I had a great experience at this shop! The staff were friendly, knowledgeable, and honest with their recommendations. They fixed my device quickly and even explained the problem clearly. Prices are fair, and the quality of work is top-notch. Highly recommended if you're looking for reliable electronics repair in Toril Davao City. 
+I’ll definitely be coming back!”
                 </p>
             </div>
 
@@ -169,21 +207,90 @@
             <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-md flex flex-col">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <p class="text-white font-semibold text-sm">Carlos D.</p>
-                        <p class="text-gray-400 text-xs">Washing Machine Repair</p>
+                        <p class="text-white font-semibold text-sm">XCL 88.</p>
+                        <p class="text-gray-400 text-xs">Computers Repair</p>
                     </div>
                     <div class="flex items-center text-yellow-400 text-xs">
                         <i class="fas fa-star mr-1"></i> 5.0
                     </div>
                 </div>
                 <p class="text-gray-300 text-sm leading-relaxed flex-grow">
-                    “Our washing machine stopped mid-cycle and they were able to diagnose
-                    and fix it on the same day. Great service!”
+                    “Explains where the problem occurred. Provides options available for resolution.”
                 </p>
             </div>
         </div>
     </div>
 </section>
+{{-- Feedback Modal --}}
+<div id="feedbackModal"
+    class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center px-6 z-50 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-emerald-300 font-semibold">Share your experience</p>
+                <h3 class="text-xl font-bold text-white">Customer Feedback</h3>
+            </div>
+            <button id="closeFeedbackModal" type="button"
+                class="text-gray-400 hover:text-white transition-colors duration-150">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+
+        <form class="px-6 py-5 space-y-4">
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label for="feedbackName" class="text-sm text-gray-200 font-medium">Name</label>
+                    <input id="feedbackName" type="text" name="name" placeholder="Your name"
+                        class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
+                        required>
+                </div>
+                <div class="space-y-2">
+                    <label for="feedbackService" class="text-sm text-gray-200 font-medium">Service</label>
+                    <input id="feedbackService" type="text" name="service" placeholder="e.g., Laptop Repair"
+                        class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400">
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label for="feedbackRating" class="text-sm text-gray-200 font-medium">Rating</label>
+                    <select id="feedbackRating" name="rating"
+                        class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400">
+                        <option value="" selected disabled>Choose</option>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Very Good</option>
+                        <option value="3">3 - Good</option>
+                        <option value="2">2 - Fair</option>
+                        <option value="1">1 - Poor</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label for="feedbackContact" class="text-sm text-gray-200 font-medium">Contact (optional)</label>
+                    <input id="feedbackContact" type="email" name="contact" placeholder="you@example.com"
+                        class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="feedbackMessage" class="text-sm text-gray-200 font-medium">Feedback</label>
+                <textarea id="feedbackMessage" name="message" rows="4" placeholder="Share your experience"
+                    class="w-full bg-gray-950 border border-gray-800 text-white rounded-lg px-3 py-2 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
+                    required></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button id="cancelFeedbackModal" type="button"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-300 border border-gray-700 hover:bg-gray-800 transition">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition">
+                    Submit Feedback
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const slidesContainer = document.getElementById("aboutSlides");
@@ -238,5 +345,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     goToSlide(0);
     startAutoSlide();
+     // Feedback Modal
+    const feedbackModal = document.getElementById("feedbackModal");
+    const openFeedbackModal = document.getElementById("openFeedbackModal");
+    const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+    const cancelFeedbackModal = document.getElementById("cancelFeedbackModal");
+
+    const toggleModal = (open) => {
+        feedbackModal.classList.toggle("hidden", !open);
+        document.body.classList.toggle("overflow-hidden", open);
+    };
+
+    openFeedbackModal.addEventListener("click", () => toggleModal(true));
+    closeFeedbackModal.addEventListener("click", () => toggleModal(false));
+    cancelFeedbackModal.addEventListener("click", () => toggleModal(false));
+    feedbackModal.addEventListener("click", (event) => {
+        if (event.target === feedbackModal) toggleModal(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !feedbackModal.classList.contains("hidden")) {
+            toggleModal(false);
+        }
+    });
 });
 </script>

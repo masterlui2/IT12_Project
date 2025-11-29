@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
     if (request()->header('X-Forwarded-Proto') === 'https') {
         URL::forceScheme('https');
     }
+    
 
         User::observe(UserObserver::class);
     }
