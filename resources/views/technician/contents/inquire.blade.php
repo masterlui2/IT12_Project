@@ -28,7 +28,7 @@
       <option>Closed</option>
     </select>
 
-    <a href="{{ route('inquiry.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">+ New Inquiry</a>
+    <a href="{{ route('technician.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">+ New Inquiry</a>
   </div>
 </nav>
 

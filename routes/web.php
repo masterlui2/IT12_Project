@@ -107,9 +107,14 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::get('/dashboard', [TechnicianController::class, 'dashboard'])->name('technician.dashboard');
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
-    Route::get('/inquire', [TechnicianController::class, 'inquire'])->name('technician.inquire');
-    Route::get('/inquire/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('technician.inquire.show');
-    Route::delete('/inquire/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('technician.inquire.destroy');
+    
+    Route::prefix('/inquire')->group(function(){
+        Route::get('/index', [TechnicianController::class, 'inquire'])->name('technician.inquire');
+        Route::get('/create', [InquiryController::class, 'create'])->name('technician.inquire.create');
+        Route::post('/store', [InquiryController::class, 'store'])->name('technician.inquire.store');
+        Route::get('/index/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('technician.inquire.show');
+        Route::delete('/index/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('technician.inquire.destroy');
+    });
     Route::get('/history', [TechnicianController::class, 'history'])->name('technician.history');
     
     Route::prefix('/quotation')->group(function (){

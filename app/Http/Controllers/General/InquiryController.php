@@ -13,7 +13,13 @@ class InquiryController extends Controller
     // Show the inquiry form
     public function create()
     {
-        return view('customer.inquiries.create');
+        if(Auth::check()){
+            return match(Auth::user()->role){
+                'technician'   => view('technician.contents.inquiries.create'),
+                'customer'     => view('customer.inquiry.create'),
+                default        => view('customer.inquiry.create')
+            };
+        }
     }
 
     // Save the inquiry
@@ -41,7 +47,7 @@ class InquiryController extends Controller
 
         // Set default status and link to authenticated user if logged in
         $validated['status'] = 'Pending';
-        if (Auth::check()) {
+        if (Auth::check() && Auth::user()->role == 'customer') {
             $validated['customer_id'] = Auth::id();
         }
 

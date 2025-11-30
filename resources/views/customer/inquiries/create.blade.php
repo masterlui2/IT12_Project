@@ -40,7 +40,7 @@
 
                 {{-- Right side: form --}}
                 <div class="p-8 md:p-10 bg-gray-900/70">
-                    @if(session('success'))
+                    @if(    session('success'))
                         <div class="mb-4 rounded-lg border border-emerald-500 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
                             {{ session('success') }}
                         </div>
