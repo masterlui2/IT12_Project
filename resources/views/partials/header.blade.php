@@ -21,7 +21,8 @@
       <a href="#home" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
         About Us
       </a>
-      <a href="#contact" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+      <a href="{{ route('feedback.create') }}" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+
         Feedbacks
       </a>
       <a href="#services" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">

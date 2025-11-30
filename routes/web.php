@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Manager\ManagerController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\LogoutController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\General\InquiryController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\FeedbackController;
 
 // Generic landing
 Route::get('/', function () {
@@ -44,21 +46,34 @@ Route::middleware(['auth', 'verified', 'role:customer'])
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
-    Route::get('/dashboard', fn () => view('manager.dashboard'))->name('dashboard');
-    Route::get('/quotation', fn () => view('manager.quotation'))->name('quotation');
-    Route::get('/inquiries', fn () => view('manager.inquiries'))->name('inquiries');
+    Route::get('/dashboard', [ManagerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/quotation', [ManagerController::class, 'quotation'])->name('quotation');
+
+    Route::prefix('/inquire')->group(function(){
+        Route::get('/index', [ManagerController::class, 'inquiries'])->name('inquiries');
+        Route::get('/index/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('inquiries.show');
+        Route::delete('/index/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('inquiries.destroy');
+    });
 
     // ⭐ Added missing components (same style, same method)
-    Route::get('/customers', fn () => view('manager.customers'))->name('customers');
-    Route::get('/technicians', fn () => view('manager.technicians'))->name('technicians');
-    Route::get('/services', fn () => view('manager.services'))->name('services');
-    Route::get('/reports', fn () => view('manager.reports'))->name('reports');
+    Route::get('/customers', [ManagerController::class, 'customers'])->name('customers');
+    Route::get('/technicians',[ManagerController::class, 'technicians'])->name('technicians');
+    Route::get('/services', [ManagerController::class, 'services'])->name('services');
+    Route::get('/reports',[ManagerController::class, 'reports'])->name('reports');
 });
 Route::middleware(['auth'])->group(function () {
     // Show the inquiry creation form
 
     // Handle the inquiry form submission
+    Route::post('/inquiry', [InquiryController::class, 'store'])
+        ->name('inquiry.store');
+    Route::get('/feedback/create', [FeedbackController::class, 'create'])
+        ->name('feedback.create');
+
+    Route::post('/feedback', [FeedbackController::class, 'store'])
+        ->name('feedback.store');
 });
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

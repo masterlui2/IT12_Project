@@ -18,6 +18,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Technician;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Inquiry;
 
 class QuotationController extends Controller
 {
@@ -67,9 +68,22 @@ class QuotationController extends Controller
     /**
      * Show the form for creating a new quotation
      */
-    public function newQuotation()
+    public function newQuotation(Request $request)
     {
-        return view('technician.contents.quotations.create');
+        $inquiryId = $request->query('inquiry'); // gets ?inquiry=5 from URL
+
+        $inquiry = null;
+
+        if ($inquiryId) {
+            $inquiry = Inquiry::with(['customer'])->find($inquiryId);
+            
+            if (!$inquiry) {
+                return redirect()->route('technician.inquire.index')
+                    ->with('error', 'Inquiry not found.');
+            }
+        }
+
+        return view('technician.contents.quotations.create', compact('inquiry'));
     }
 
     /**
