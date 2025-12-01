@@ -9,16 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
+   public function up(): void
+{
+    if (!Schema::hasTable('quotation_scope')) {
         Schema::create('quotation_scope', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('quotation_id')->constrained('quotations')->onDelete('cascade');
+            $table->unsignedBigInteger('quotation_id');
             $table->string('scenario_name');
-            $table->text('description')->nullable(); // optional general notes
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
+}
 
     /**
      * Reverse the migrations.

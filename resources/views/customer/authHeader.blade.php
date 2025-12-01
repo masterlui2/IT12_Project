@@ -10,8 +10,6 @@
         TECHNE FIXER
     </span>
 </a>
-
-
         <!-- Desktop Navigation -->
         <div class="hidden lg:flex items-center gap-8">
         <a href="#home" class="nav-link">Home</a>
@@ -38,10 +36,6 @@
         @endif
     @endguest
 </div>
-
-
-
-
     <!-- Mobile Menu Button -->
     <button class="lg:hidden text-gray-300 p-2 rounded-md hover:bg-white/10 transition">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-7 h-7">
