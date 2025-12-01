@@ -28,7 +28,7 @@
       <option>Closed</option>
     </select>
 
-    <a href="{{ route('inquiry.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">+ New Inquiry</a>
+    <a href="{{ route('technician.inquire.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">+ New Inquiry</a>
   </div>
 </nav>
 
@@ -40,7 +40,9 @@
       <tr class="border-b border-neutral-200">
         <th class="px-4 py-3 font-medium">Inquiry #</th>
         <th class="px-4 py-3 font-medium">Client</th>
-        <th class="px-4 py-3 font-medium">Subject</th>
+        <th class="px-4 py-3 font-medium">Category</th>
+        <th class="px-4 py-3 font-medium">Technician</th>
+        <th class="px-4 py-3 font-medium">Urgency</th>
         <th class="px-4 py-3 font-medium">Status</th>
         <th class="px-4 py-3 font-medium text-right">Date Submitted</th>
         <th class="px-4 py-3 font-medium text-center w-48">Actions</th>
@@ -50,9 +52,60 @@
     <tbody class="divide-y">
       @forelse($inquiries as $inq)
       <tr class="hover:bg-gray-50 transition">
-        <td class="px-4 py-3 font-medium text-neutral-900">INQ-{{ str_pad($inq->id, 5, '0', STR_PAD_LEFT) }}</td>
-        <td class="px-4 py-3"><div class="max-w-[180px] truncate text-neutral-900">{{ $inq->name ?? ('Customer #'.$inq->user_id) }}</div></td>
-        <td class="px-4 py-3"><div class="max-w-[260px] truncate text-neutral-800">{{ $inq->issue_description ?? '—' }}</div></td>
+        <!-- Inquiry number -->
+        <td class="px-4 py-3 font-medium text-neutral-900">
+          INQ-{{ str_pad($inq->id, 5, '0', STR_PAD_LEFT) }}
+        </td>
+
+        <!-- Client Info -->
+        <td class="px-4 py-3">
+          <div class="max-w-[180px] truncate text-neutral-900 font-medium">
+            {{ $inq->name ?? 'Customer #'.$inq->user_id }}
+          </div>
+          @if($inq->contact_number || $inq->service_location)
+            <div class="text-xs text-gray-500 mt-0.5">
+              @if($inq->contact_number)
+                📞 {{ $inq->contact_number }}
+              @endif
+              @if($inq->service_location)
+                <br>📍 {{ Str::limit($inq->service_location, 40) }}
+              @endif
+            </div>
+          @endif
+        </td>
+
+        <!-- Category -->
+        <td class="px-4 py-3 text-neutral-800">
+          {{ $inq->category ?? '—' }}
+        </td>
+
+        <!-- Assigned Technician -->
+        <td class="px-4 py-3 text-neutral-800">
+            @if ($inq->assignedTechnician)
+                <span class="font-medium text-neutral-900">
+                    {{ $inq->assignedTechnician->firstname }}
+                </span>
+            @else
+                <span class="text-gray-400">Unassigned</span>
+            @endif
+        </td>
+
+        <!-- Urgency -->
+        <td class="px-4 py-3">
+          @php
+            $urgencyColors = [
+              'Normal' => 'bg-blue-100 text-blue-700',
+              'Urgent' => 'bg-red-100 text-red-700',
+              'Flexible' => 'bg-green-100 text-green-700',
+            ];
+            $urgencyColor = $urgencyColors[$inq->urgency ?? 'Normal'] ?? 'bg-gray-100 text-gray-700';
+          @endphp
+          <span class="{{ $urgencyColor }} text-xs px-2 py-1 rounded capitalize">
+            {{ $inq->urgency ?? 'Normal' }}
+          </span>
+        </td>
+
+        <!-- Status -->
         <td class="px-4 py-3">
           @php
             $status = $inq->status ?? 'new';
@@ -62,26 +115,62 @@
               'responded' => 'bg-green-100 text-green-700',
               'closed' => 'bg-gray-100 text-gray-700',
             ];
-            $color = $statusColors[$status] ?? 'bg-gray-100 text-gray-700';
+            $statusColor = $statusColors[$status] ?? 'bg-gray-100 text-gray-700';
           @endphp
-          <span class="{{ $color }} text-xs px-2 py-1 rounded capitalize">{{ $status }}</span>
+          <span class="{{ $statusColor }} text-xs px-2 py-1 rounded capitalize">
+            {{ $status }}
+          </span>
         </td>
-        <td class="px-4 py-3 text-right">{{ $inq->created_at?->format('M d, Y') }}</td>
+
+        <!-- Date -->
+        <td class="px-4 py-3 text-right text-neutral-600">
+          {{ $inq->created_at?->format('M d, Y') }}
+        </td>
+
+        <!-- Actions -->
         <td class="px-4 py-3 text-center align-middle">
           <div class="inline-flex items-center justify-center gap-2">
-            <a href="{{ route('technician.inquire.show', $inq->id) }}" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
-            <a href="{{ route('quotation.new', ['inquiry' => $inq->id]) }}" class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap">Convert to Quote</a>
-            <form action="{{ route('technician.inquire.destroy', $inq->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete inquiry INQ-{{ $inq->id }}?')">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="inline-flex w-8 h-8 items-center justify-center text-red-600 hover:text-red-700" title="Delete"><i class="fas fa-trash"></i><span class="sr-only">Delete</span></button>
+            <a href="{{ route('technician.inquire.show', $inq->id) }}" 
+              class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View">
+              <i class="fas fa-eye"></i><span class="sr-only">View</span>
+            </a>
+
+            @if(!$inq->assignedTechnician)
+                <form action="{{ route('technician.inquire.claim', $inq->id) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" 
+                            class="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
+                            title="Claim this inquiry">
+                        Claim
+                    </button>
+                </form>
+            @elseif ($inq->assignedTechnician && $inq->assignedTechnician->id === auth()->id())
+                <span class="text-green-600 text-sm font-medium">Assigned to You</span>
+            @else
+                <span class="text-gray-500 text-sm">Assigned to {{ $inq->assignedTechnician->firstname }}</span>
+            @endif
+
+            <a href="{{ route('quotation.new', ['inquiry' => $inq->id]) }}" 
+              class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap" title="Convert to Quote">
+              Convert
+            </a>
+
+            <form action="{{ route('technician.inquire.destroy', $inq->id) }}" method="POST" class="inline"
+                  onsubmit="return confirm('Delete inquiry INQ-{{ $inq->id }}?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="inline-flex w-8 h-8 items-center justify-center text-red-600 hover:text-red-700" title="Delete">
+                    <i class="fas fa-trash"></i><span class="sr-only">Delete</span>
+                </button>
             </form>
-          </div>
+        </div>
         </td>
       </tr>
       @empty
       <tr>
-        <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-500">No inquiries found.</td>
+        <td colspan="7" class="px-4 py-10 text-center text-sm text-gray-500">
+          No inquiries found.
+        </td>
       </tr>
       @endforelse
     </tbody>
@@ -94,14 +183,16 @@
   </div>
 </div>
 
-
-<!-- Inquiries Summary -->
+<!-- Summary -->
 <div class="mt-4 bg-white border-t shadow-sm rounded-b-lg px-6 py-4 flex justify-between items-center text-sm">
   <div class="font-medium text-gray-700">
-    Total Inquiries: <span class="text-blue-600 font-semibold">20</span>
+    Total Inquiries: <span class="text-blue-600 font-semibold">{{ $inquiries->total() }}</span>
   </div>
   <div class="font-medium text-gray-700">
-    Pending Responses: <span class="text-yellow-600 font-semibold">5</span>
+    Pending Responses: 
+    <span class="text-yellow-600 font-semibold">
+      {{ $inquiries->where('status','open')->count() + $inquiries->where('status','new')->count() }}
+    </span>
   </div>
 </div>
 

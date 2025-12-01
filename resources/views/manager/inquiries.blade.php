@@ -96,122 +96,34 @@
             </div>
         </div>
 
-        {{-- Inquiries table with minimalist actions --}}
+        {{-- Notification for unanswered inquiries --}}
+        @if ($unanswered > 0)
+            <div class="rounded-lg bg-amber-100 border border-amber-300 text-amber-800 p-3 text-sm">
+                ⚠️ {{ $unanswered }} inquiries have been unattended for more than 48 hours —
+                consider assigning a technician.
+            </div>
+        @endif
+
+        {{-- Table --}}
         <div class="relative flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <div class="overflow-x-auto">
                 <table class="min-w-full border-separate border-spacing-0 text-left text-sm">
                     <thead>
                         <tr class="border-b border-neutral-100 bg-neutral-50 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
                             <th class="px-4 py-3 font-medium text-center">{{ __('Inquiry #') }}</th>
-                            <th class="px-4 py-3 font-medium text-left">{{ __('Customer & Device') }}</th>
+                            <th class="px-4 py-3 font-medium text-center">{{ __('Customer') }}</th>
                             <th class="px-4 py-3 font-medium text-center">{{ __('Issue Description') }}</th>
-                            <th class="px-4 py-3 font-medium text-left">{{ __('Assigned To') }}</th>
-                            <th class="px-4 py-3 font-medium text-left">{{ __('Priority') }}</th>
+                            <th class="px-4 py-3 font-medium text-center">{{ __('Assigned Technician') }}</th>
+                            <th class="px-4 py-3 font-medium text-center">{{ __('Status') }}</th>
                             <th class="px-4 py-3 font-medium text-center">{{ __('Created') }}</th>
                             <th class="px-4 py-3 font-medium text-center w-40">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- Unassigned Inquiry --}}
-                        <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                            <td class="px-4 py-3 align-middle font-medium">INQ-2025-0012</td>
-                            <td class="px-4 py-3 align-middle">
-                                <div class="font-medium">Maria Santos</div>
-                                <div class="text-xs text-neutral-500">Desktop Computer</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-center">
-                                <div>No display output, powers on but no signal</div>
-                                <div class="mt-1 text-xs text-neutral-500">0917 123 4567</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle">
-                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
-                                    Unassigned
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 align-middle">
-                            <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/40 dark:text-red-200">
-                                    High
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-right">
-                                <div>2 hours ago</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-center">
-                                <div class="inline-flex items-center justify-center gap-2">
-                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
-                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-indigo-600 hover:text-indigo-700" title="Assign"><i class="fas fa-user-check"></i><span class="sr-only">Assign</span></a>
-                                </div>
-                            </td>
-                        </tr>
-
-                        {{-- Assigned Inquiry --}}
-                        <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                            <td class="px-4 py-3 align-middle font-medium">INQ-2025-0011</td>
-                            <td class="px-4 py-3 align-middle">
-                                <div class="font-medium">John Lim</div>
-                                <div class="text-xs text-neutral-500">MacBook Pro 16"</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-center">
-                                <div>Liquid damage, keyboard not working</div>
-                                <div class="mt-1 text-xs text-neutral-500">0918 765 4321</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle">
-                                <div class="font-medium">Tech Rodriguez</div>
-                                <div class="text-xs text-neutral-500">Today</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle">
-                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
-                                    Medium
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-right">
-                                <div>1 day ago</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-center">
-                                <div class="inline-flex items-center justify-center gap-2">
-                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
-                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-indigo-600 hover:text-indigo-700" title="Assign"><i class="fas fa-user-check"></i><span class="sr-only">Assign</span></a>
-                                </div>
-                            </td>
-                        </tr>
-
-                        {{-- Scheduled Inquiry --}}
-                        <tr class="border-b border-neutral-100 text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                            <td class="px-4 py-3 align-middle font-medium">INQ-2025-0010</td>
-                            <td class="px-4 py-3 align-middle">
-                                <div class="font-medium">Robert Chen</div>
-                                <div class="text-xs text-neutral-500">iPhone 15 Pro</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-center">
-                                <div>Cracked screen, touch functionality affected</div>
-                                <div class="mt-1 text-xs text-neutral-500">0919 555 8888</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle">
-                                <div class="font-medium">Tech Garcia</div>
-                                <div class="text-xs text-neutral-500">Nov 18</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle">
-                                <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
-                                    Low
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-right">
-                                <div>2 days ago</div>
-                            </td>
-                            <td class="px-4 py-3 align-middle text-center">
-                                <div class="inline-flex items-center justify-center gap-2">
-                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i><span class="sr-only">View</span></a>
-                                    <a href="#" class="inline-flex w-8 h-8 items-center justify-center text-indigo-600 hover:text-indigo-700" title="Assign"><i class="fas fa-user-check"></i><span class="sr-only">Assign</span></a>
-                                </div>
-                            </td>
-                        </tr>
-
-                        {{-- Empty state --}}
-                        {{-- 
                         @forelse ($inquiries as $inquiry)
                             ...
                         @empty
-                        --}}
+                        
                         <tr>
                             <td colspan="7" class="px-4 py-10 text-center text-xs text-neutral-500 dark:text-neutral-400">
                                 <div class="flex flex-col items-center gap-2">
@@ -228,6 +140,7 @@
                 </table>
             </div>
         </div>
+
 
     </div>
 </x-layouts.app>
