@@ -68,4 +68,10 @@ class InquiryController extends Controller
         return view('manager.inquiries', compact('inquiry'));
     }
 
+    public function show($id)
+    {
+        $inquiry = Inquiry::with('assignedTechnician', 'customer')->findOrFail($id);
+        return view('technician.inquiries.show', compact('inquiry'));
+    }
+
 }

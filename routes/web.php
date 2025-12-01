@@ -51,8 +51,9 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
 
     Route::prefix('/inquire')->group(function(){
         Route::get('/index', [ManagerController::class, 'inquiries'])->name('inquiries');
-        Route::get('/index/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('inquiries.show');
-        Route::delete('/index/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('inquiries.destroy');
+        Route::get('/index/{id}', [ManagerController::class, 'inquireShow'])->whereNumber('id')->name('inquiries.show');
+        Route::delete('/index/{id}', [ManagerController::class, 'inquireDestroy'])->whereNumber('id')->name('inquiries.destroy');
+        Route::post('/{id}/assign', [ManagerController::class, 'assignTechnician'])->name('manager.inquiries.assign');
     });
 
     // ⭐ Added missing components (same style, same method)
@@ -126,7 +127,8 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::prefix('/inquire')->group(function(){
         Route::get('/index', [TechnicianController::class, 'inquire'])->name('technician.inquire');
         Route::get('/create', [InquiryController::class, 'create'])->name('technician.inquire.create');
-        Route::post('/store', [InquiryController::class, 'store'])->name('technician.inquire.store');
+        Route::post('/store', [InquiryController::class, 'store'])->name('technician.inquire.store');   
+        Route::post('/{id}/claim', [TechnicianController::class, 'claim'])->name('technician.inquire.claim');
         Route::get('/index/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('technician.inquire.show');
         Route::delete('/index/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('technician.inquire.destroy');
     });

@@ -49,4 +49,14 @@ class Inquiry extends Model
     {
         return $this->belongsTo(User::class, 'assigned_technician_id');
     }
+
+    public function scopeUnassigned($query)
+    {
+        return $query->whereNull('assigned_technician_id');
+    }
+
+    public function scopeByStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
 }

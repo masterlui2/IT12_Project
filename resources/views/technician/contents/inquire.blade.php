@@ -41,6 +41,7 @@
         <th class="px-4 py-3 font-medium">Inquiry #</th>
         <th class="px-4 py-3 font-medium">Client</th>
         <th class="px-4 py-3 font-medium">Category</th>
+        <th class="px-4 py-3 font-medium">Technician</th>
         <th class="px-4 py-3 font-medium">Urgency</th>
         <th class="px-4 py-3 font-medium">Status</th>
         <th class="px-4 py-3 font-medium text-right">Date Submitted</th>
@@ -76,6 +77,17 @@
         <!-- Category -->
         <td class="px-4 py-3 text-neutral-800">
           {{ $inq->category ?? '—' }}
+        </td>
+
+        <!-- Assigned Technician -->
+        <td class="px-4 py-3 text-neutral-800">
+            @if ($inq->assignedTechnician)
+                <span class="font-medium text-neutral-900">
+                    {{ $inq->assignedTechnician->firstname }}
+                </span>
+            @else
+                <span class="text-gray-400">Unassigned</span>
+            @endif
         </td>
 
         <!-- Urgency -->
@@ -119,28 +131,39 @@
         <td class="px-4 py-3 text-center align-middle">
           <div class="inline-flex items-center justify-center gap-2">
             <a href="{{ route('technician.inquire.show', $inq->id) }}" 
-               class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" 
-               title="View">
+              class="inline-flex w-8 h-8 items-center justify-center text-blue-600 hover:text-blue-800" title="View">
               <i class="fas fa-eye"></i><span class="sr-only">View</span>
             </a>
+
+            @if(!$inq->assignedTechnician)
+                <form action="{{ route('technician.inquire.claim', $inq->id) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" 
+                            class="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
+                            title="Claim this inquiry">
+                        Claim
+                    </button>
+                </form>
+            @elseif ($inq->assignedTechnician && $inq->assignedTechnician->id === auth()->id())
+                <span class="text-green-600 text-sm font-medium">Assigned to You</span>
+            @else
+                <span class="text-gray-500 text-sm">Assigned to {{ $inq->assignedTechnician->firstname }}</span>
+            @endif
+
             <a href="{{ route('quotation.new', ['inquiry' => $inq->id]) }}" 
-               class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap" 
-               title="Convert to Quote">
+              class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap" title="Convert to Quote">
               Convert
             </a>
-            <form action="{{ route('technician.inquire.destroy', $inq->id) }}" 
-                  method="POST" 
-                  class="inline"
+
+            <form action="{{ route('technician.inquire.destroy', $inq->id) }}" method="POST" class="inline"
                   onsubmit="return confirm('Delete inquiry INQ-{{ $inq->id }}?')">
-              @csrf
-              @method('DELETE')
-              <button type="submit" 
-                      class="inline-flex w-8 h-8 items-center justify-center text-red-600 hover:text-red-700" 
-                      title="Delete">
-                <i class="fas fa-trash"></i><span class="sr-only">Delete</span>
-              </button>
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="inline-flex w-8 h-8 items-center justify-center text-red-600 hover:text-red-700" title="Delete">
+                    <i class="fas fa-trash"></i><span class="sr-only">Delete</span>
+                </button>
             </form>
-          </div>
+        </div>
         </td>
       </tr>
       @empty

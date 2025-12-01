@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Technician;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inquiry;
-
+use Illuminate\Support\Facades\Auth;
 class TechnicianController extends Controller
 {
     public function dashboard(){
@@ -28,16 +28,35 @@ class TechnicianController extends Controller
         return view('technician.contents.inquire', compact('inquiries'));
     }
 
-    public function inquireShow(int $id){
-        $inq = Inquiry::findOrFail($id);
-        return redirect()->route('technician.contents.inquire')
-            ->with('status', 'Viewing inquiry INQ-'.$inq->id);
+    public function claim($id)
+    {
+        $inquiry = Inquiry::findOrFail($id);
+
+        // Prevent re-claiming if already assigned
+        if ($inquiry->assigned_technician_id) {
+            return redirect()->back()->with('error', 'This inquiry is already claimed.');
+        }
+
+        $inquiry->assigned_technician_id = Auth::user()->id;
+        $inquiry->status = 'Acknowledged'; // assuming your ENUM workflow
+        $inquiry->save();
+
+        return redirect()->back()->with('status', 'Inquiry INQ-' . str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) . ' claimed successfully.');
+    }
+
+    public function inquireShow(int $id)
+    {
+        // Fetch inquiry with necessary relationships
+        $inquiry = Inquiry::with('assignedTechnician', 'customer')->findOrFail($id);
+
+        // Render technician detail view
+        return view('technician.contents.inquiries.show', compact('inquiry'));
     }
 
     public function inquireDestroy(int $id){
         $inq = Inquiry::findOrFail($id);
         $inq->delete();
-        return redirect()->route('technician.contents.inquire')
+        return redirect()->route('technician.inquire')
             ->with('status', 'Inquiry INQ-'.$id.' deleted');
     }
 
