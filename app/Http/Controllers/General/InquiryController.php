@@ -67,11 +67,6 @@ class InquiryController extends Controller
         // create this view: resources/views/manager/inquiry-show.blade.php (or whatever name you prefer)
         return view('manager.inquiries', compact('inquiry'));
     }
-
-    public function show($id)
-    {
-        $inquiry = Inquiry::with('assignedTechnician', 'customer')->findOrFail($id);
-        return view('technician.inquiries.show', compact('inquiry'));
-    }
+    
 
 }

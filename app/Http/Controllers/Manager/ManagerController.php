@@ -69,6 +69,7 @@ class ManagerController extends Controller
         return redirect()->route('inquiries')
             ->with('status', 'Technician assigned to inquiry INQ-' . str_pad($inquiry->id, 8, '0', STR_PAD_LEFT));
     }
+    
     public function inquireShow(int $id){
         $inq = Inquiry::findOrFail($id);
         return redirect()->route('manager.inquiries')
