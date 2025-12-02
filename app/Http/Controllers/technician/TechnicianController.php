@@ -54,7 +54,7 @@ class TechnicianController extends Controller
     public function inquireDestroy(int $id){
         $inq = Inquiry::findOrFail($id);
         $inq->delete();
-        return redirect()->route('technician.inquire')
+        return redirect()->route('technician.inquire.index')
             ->with('status', 'Inquiry INQ-'.$id.' deleted');
     }
 

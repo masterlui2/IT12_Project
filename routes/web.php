@@ -9,12 +9,14 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
+use App\Http\Controllers\Technician\Job\JobOrderTechnicianController;
 use App\Http\Controllers\Technician\TechnicianController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\General\InquiryController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\FeedbackController;
+use App\Models\JobOrder;
 
 // Generic landing
 Route::get('/', function () {
@@ -156,5 +158,12 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
         
         // Logo upload
         Route::put('/logo', [QuotationController::class, 'uploadLogo'])->name('quotation.uploadLogo');
+    });
+
+    Route::prefix('/job')->group(function(){
+        Route::get('/index', [JobOrderTechnicianController::class, 'index'])->name('technician.job.index');
+        Route::get('/show', [JobOrderTechnicianController::class, 'show'])->name('technician.job.show');
+        Route::get('/edit', [JobOrderTechnicianController::class, 'edit'])->name('technician.job.edit');
+        Route::put('/mark-complete', [JobOrderTechnicianController::class, 'markComplete'])->name('technician.job.mark-complete');
     });
 });

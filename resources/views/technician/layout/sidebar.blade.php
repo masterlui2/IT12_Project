@@ -61,6 +61,17 @@
                     <span class="text-md font-medium ml-2">Quotation</span>
                 </a>
             </li>
+            
+            <li>
+                <a href="{{ route('technician.job.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition relative
+                    {{ Route::is('technician.job*') || Route::is('job.*') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
+                    @if(Route::is('technician.job*') || Route::is('job.*'))
+                    @endif
+                    <i class="fas fa-file-invoice {{ Route::is('technician.job*') || Route::is('job.*') ? 'text-blue-700' : 'text-blue-500' }}"></i>
+                    <span class="text-md font-medium ml-2">Job Order</span>
+                </a>
+            </li>
 
             <li>
                 <a href="{{ route('technician.reporting') }}"
