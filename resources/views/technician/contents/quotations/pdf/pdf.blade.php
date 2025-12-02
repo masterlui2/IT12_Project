@@ -159,6 +159,42 @@
         <p>The Customer agrees to indemnify and hold harmless the Service Provider from any claims, damages, or expenses resulting from misuse or negligence of the repaired equipment.</p>
     </div>
 
+    <hr style="margin-top:20px;">
+
+    <div style="margin-top:20px;">
+        <h3 style="font-size:13px; font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:6px;">
+            Acceptance of Terms
+        </h3>
+
+        <p style="font-size:11px;">
+            By signing below, the <strong>Customer</strong> acknowledges and agrees to the terms, conditions,
+            and scope of this quotation and authorizes Techne Fixer Computer and Laptop Repair Services
+            to proceed with the listed work and repairs.
+        </p>
+
+        <table style="width:100%; border:none; font-size:11px; margin-top:10px;">
+            <tr style="border:none;">
+                <td style="width:50%; vertical-align:top; border:none;">
+                    <strong>Customer / Authorized Representative:</strong><br>
+                    {{ $customer_name ?? '_____________________________' }}<br>
+                    <em>Signature / eSign:</em>
+                    {{ $customer_signature ?? '_____________________________' }}<br>
+                    <em>Date:</em>
+                    {{ $customer_date ?? $date_issued }}
+                </td>
+
+                <td style="width:50%; vertical-align:top; border:none;">
+                    <strong>Service Provider Representative:</strong><br>
+                    {{ $provider_name ?? '_____________________________' }}<br>
+                    <em>Signature / eSign:</em>
+                    {{ $provider_signature ?? '_____________________________' }}<br>
+                    <em>Date:</em>
+                    {{ $provider_date ?? $date_issued }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
     @if(count($deliverables) > 0)
         <div>
             <h3>Expected Deliverables</h3>

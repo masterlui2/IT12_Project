@@ -311,8 +311,8 @@
       <button type="submit" name="action" value="draft" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">
         Save Draft
       </button>
-      <button type="submit" name="action" value="generate_pdf" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-        Generate PDF
+      <button type="submit" name="action" value="submit_manager" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+        Send To Manager
       </button>
     </div>
 

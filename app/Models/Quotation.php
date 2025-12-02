@@ -27,6 +27,7 @@ class Quotation extends Model
         'timeline_min_days',
         'timeline_max_days',
         'terms_conditions',
+        'inquiry_id',
     ];
 
     protected $casts = [
@@ -121,5 +122,15 @@ class Quotation extends Model
             return "{$this->timeline_min_days} days";
         }
         return 'Not specified';
+    }
+
+    public function jobOrder()
+    {
+        return $this->hasOne(JobOrder::class);
+    }
+    
+    public function inquiry()
+    {
+        return $this->belongsTo(Inquiry::class);
     }
 }

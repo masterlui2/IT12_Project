@@ -108,7 +108,7 @@
 
     {{-- Actions --}}
     <div class="flex justify-end space-x-3 border-t pt-4">
-        <a href="{{ route('technician.inquire') }}">
+        <a href="{{ route('technician.inquire.index') }}">
             <button type="button" class="px-4 py-2 border rounded-md text-sm text-gray-600 hover:bg-gray-100 transition">
                 Back to List
             </button>

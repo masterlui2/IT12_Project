@@ -150,10 +150,15 @@
                 <span class="text-gray-500 text-sm">Assigned to {{ $inq->assignedTechnician->firstname }}</span>
             @endif
 
-            <a href="{{ route('quotation.new', ['inquiry' => $inq->id]) }}" 
-              class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap" title="Convert to Quote">
-              Convert
-            </a>
+            @if($inq->assignedTechnician && $inq->assignedTechnician->id === auth()->id())
+                <a href="{{ route('quotation.new', ['inquiry' => $inq->id]) }}" 
+                  class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap"
+                  title="Convert to Quote">
+                  Convert
+                </a>
+            @else
+                <span class="text-gray-400 text-sm italic" title="Claim this inquiry first">Convert</span>
+            @endif
 
             <form action="{{ route('technician.inquire.destroy', $inq->id) }}" method="POST" class="inline"
                   onsubmit="return confirm('Delete inquiry INQ-{{ $inq->id }}?')">

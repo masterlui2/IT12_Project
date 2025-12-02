@@ -9,12 +9,14 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
+use App\Http\Controllers\Technician\Job\JobOrderTechnicianController;
 use App\Http\Controllers\Technician\TechnicianController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\General\InquiryController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\FeedbackController;
+use App\Models\JobOrder;
 
 // Generic landing
 Route::get('/', function () {
@@ -47,7 +49,13 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
     Route::get('/dashboard', [ManagerController::class, 'dashboard'])->name('dashboard');
-    Route::get('/quotation', [ManagerController::class, 'quotation'])->name('quotation');
+
+    Route::prefix('/quotation')->group(function() {
+        Route::get('/index', [ManagerController::class, 'quotation'])->name('quotation');
+        Route::post('/{quotation}/approve', [ManagerController::class,'approve'])->name('manager.quotation.approve');
+        Route::post('/{quotation}/reject', [ManagerController::class,'reject'])->name('manager.quotation.reject');
+    });
+    
 
     Route::prefix('/inquire')->group(function(){
         Route::get('/index', [ManagerController::class, 'inquiries'])->name('inquiries');
@@ -125,7 +133,7 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
     
     Route::prefix('/inquire')->group(function(){
-        Route::get('/index', [TechnicianController::class, 'inquire'])->name('technician.inquire');
+        Route::get('/index', [TechnicianController::class, 'inquire'])->name('technician.inquire.index');
         Route::get('/create', [InquiryController::class, 'create'])->name('technician.inquire.create');
         Route::post('/store', [InquiryController::class, 'store'])->name('technician.inquire.store');   
         Route::post('/{id}/claim', [TechnicianController::class, 'claim'])->name('technician.inquire.claim');
@@ -150,5 +158,12 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
         
         // Logo upload
         Route::put('/logo', [QuotationController::class, 'uploadLogo'])->name('quotation.uploadLogo');
+    });
+
+    Route::prefix('/job')->group(function(){
+        Route::get('/index', [JobOrderTechnicianController::class, 'index'])->name('technician.job.index');
+        Route::get('/show', [JobOrderTechnicianController::class, 'show'])->name('technician.job.show');
+        Route::get('/edit', [JobOrderTechnicianController::class, 'edit'])->name('technician.job.edit');
+        Route::put('/mark-complete', [JobOrderTechnicianController::class, 'markComplete'])->name('technician.job.mark-complete');
     });
 });

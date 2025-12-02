@@ -11,10 +11,6 @@ class TechnicianController extends Controller
         return view('technician.contents.dashboard');
     }
 
-    public function quotation(){
-        return view('technician.contents.quotation');
-    }
-
     public function messages(){
         return view('technician.contents.messages');
     }
@@ -25,7 +21,7 @@ class TechnicianController extends Controller
 
     public function inquire(){
         $inquiries = Inquiry::orderByDesc('created_at')->paginate(10);
-        return view('technician.contents.inquire', compact('inquiries'));
+        return view('technician.contents.inquiries.index', compact('inquiries'));
     }
 
     public function claim($id)
@@ -41,7 +37,9 @@ class TechnicianController extends Controller
         $inquiry->status = 'Acknowledged'; // assuming your ENUM workflow
         $inquiry->save();
 
-        return redirect()->back()->with('status', 'Inquiry INQ-' . str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) . ' claimed successfully.');
+        return redirect()->route('technician.inquire.index')
+        ->with('success', 'Inquiry INQ-' . str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) . ' claimed successfully.');
+
     }
 
     public function inquireShow(int $id)
@@ -56,7 +54,7 @@ class TechnicianController extends Controller
     public function inquireDestroy(int $id){
         $inq = Inquiry::findOrFail($id);
         $inq->delete();
-        return redirect()->route('technician.inquire')
+        return redirect()->route('technician.inquire.index')
             ->with('status', 'Inquiry INQ-'.$id.' deleted');
     }
 

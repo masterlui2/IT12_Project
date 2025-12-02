@@ -257,9 +257,17 @@ class QuotationController extends Controller
             DB::commit();
 
             // Redirect based on action
-            if ($request->action === 'generate_pdf') {
-                return redirect()->route('quotation.pdf', $quotation->id)
-                    ->with('success', 'Quotation created successfully!');
+            if ($request->action === 'submit_manager') {
+                // Update quotation status to 'pending' so the manager can review it
+                $quotation->update(['status' => 'pending']);
+
+                // Optional: assign technician and issue date if not already done
+                $quotation->technician_id = Auth::user()->id;
+                $quotation->date_issued = now();
+                $quotation->save();
+
+                return redirect()->route('technician.quotation')
+                    ->with('success', 'Quotation sent to manager for approval.');
             }
 
             return redirect()->route('quotation.show', $quotation->id)
