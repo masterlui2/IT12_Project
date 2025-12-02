@@ -72,14 +72,14 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
 });
 Route::middleware(['auth'])->group(function () {
     // Show the inquiry creation form
-
+    Route::get('/inquiry/create', [InquiryController::class, 'create'])
+        ->name('inquiry.create');
+      Route::get('/feedback/create', [FeedbackController::class, 'create'])
+        ->name('feedback.create');
     // Handle the inquiry form submission
     Route::post('/inquiry', [InquiryController::class, 'store'])
         ->name('inquiry.store');
-    Route::get('/feedback/create', [FeedbackController::class, 'create'])
-        ->name('feedback.create');
-
-    Route::post('/feedback', [FeedbackController::class, 'store'])
+    Route::post('/feedback/create', [FeedbackController::class, 'store'])
         ->name('feedback.store');
 });
 

@@ -9,20 +9,23 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+ public function up(): void
     {
         Schema::create('quotation_waivers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('quotation_id')->constrained('quotations')->onDelete('cascade');
-            $table->string('waiver_title');
+
+            $table->foreignId('quotation_id')
+                  ->constrained('quotations')
+                  ->onDelete('cascade');
+
+            // 👇 match the seeder fields
+            $table->string('waiver_title')->nullable();
             $table->text('waiver_description')->nullable();
+
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('quotation_waivers');

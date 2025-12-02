@@ -3,41 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Models\Feedback;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class FeedbackController extends Controller
 {
-    /**
-     * Show the feedback form.
-     */
-    public function create(): View
+    // Show page + list of feedbacks
+    public function create()
     {
-        return view('feedback.create');
+        $feedbacks = Feedback::with('user')
+            ->orderByDesc('Date_Submitted')   // newest first
+            ->orderByDesc('created_at')
+            ->take(50)                        // adjust if you want
+            ->get();
+
+        return view('feedback.create', compact('feedbacks'));
     }
 
-    /**
-     * Store a new feedback message for the authenticated user.
-     */
-    public function store(Request $request): RedirectResponse
+    // Store feedback from modal (MANY per user allowed)
+    public function store(Request $request)
     {
         $validated = $request->validate([
-            'subject' => ['nullable', 'string', 'max:255'],
-            'message' => ['required', 'string', 'max:2000'],
-            'rating'  => ['nullable', 'integer', 'min:1', 'max:5'],
+            'rating'   => ['nullable', 'integer', 'min:1', 'max:5'],
+            'category' => ['required', 'string', 'max:255'],
+            'message'  => ['required', 'string', 'min:5'],
         ]);
 
         Feedback::create([
-            'user_id' => Auth::id(),
-            'subject' => $validated['subject'] ?? null,
-            'message' => $validated['message'],
-            'rating'  => $validated['rating'] ?? null,
+            'Customer_ID'   => Auth::id(),             // who submitted
+            'Comments'      => $validated['message'],  // legacy column
+            'rating'        => $validated['rating'] ?? null,
+            'category'      => $validated['category'],
+            'message'       => $validated['message'],  // new column
+            'Date_Submitted'=> now(),                  // required column
         ]);
 
         return redirect()
             ->route('feedback.create')
-            ->with('status', 'Thank you for sharing your feedback!');
+            ->with('success', 'Thank you for your feedback!');
     }
 }

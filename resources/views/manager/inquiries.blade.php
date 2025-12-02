@@ -121,69 +121,21 @@
                     </thead>
                     <tbody>
                         @forelse ($inquiries as $inquiry)
-                            <tr class="border-b border-neutral-200 dark:border-neutral-800">
-                                <td class="px-4 py-3 text-center align-middle">
-                                    INQ-{{ str_pad($inquiry->id, 8, '0', STR_PAD_LEFT) }}
-                                </td>
-                                <td class="px-4 py-3 text-left align-middle">
-                                    {{ $inquiry->name ?? $inquiry->customer->name }}
-                                </td>
-                                <td class="px-4 py-3 text-center align-middle">
-                                    {{ $inquiry->issue_description }}
-                                </td>
-
-                                {{-- Technician column --}}
-                                <td class="px-4 py-3 text-left align-middle">
-                                    @if ($inquiry->assignedTechnician)
-                                        <span class="font-medium">{{ $inquiry->assignedTechnician->firstname }}</span>
-                                    @else
-                                        <form action="{{ route('manager.inquiries.assign', $inquiry->id) }}" method="POST" class="flex items-center gap-2">
-                                            @csrf
-                                            <select name="technician_id" class="rounded-md border border-neutral-300 bg-white text-xs px-2 py-1 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-100">
-                                                <option value="">Assign...</option>
-                                                @foreach ($technicians as $tech)
-                                                    <option value="{{ $tech->id }}">{{ $tech->firstname }}</option>
-                                                @endforeach
-                                            </select>
-                                            <button type="submit" class="text-xs text-blue-600 hover:underline">Save</button>
-                                        </form>
-                                    @endif
-                                </td>
-
-                                {{-- ✅ Urgency --}}
-                                <td class="px-4 py-3 text-center">
-                                    <span class="
-                                        @if ($inquiry->urgency === 'Urgent')
-                                            bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300
-                                        @elseif ($inquiry->urgency === 'Flexible')
-                                            bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300
-                                        @else
-                                            bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300
-                                        @endif
-                                        px-2 py-1 rounded-md text-xs font-medium
-                                    ">
-                                        {{ $inquiry->urgency }}
-                                    </span>
-                                </td>
-
-                                <td class="px-4 py-3 text-left align-middle">
-                                    {{ ucfirst($inquiry->status) ?? 'New' }}
-                                </td>
-                                <td class="px-4 py-3 text-center align-middle">
-                                    {{ $inquiry->created_at->format('M d, Y') }}
-                                </td>
-                                <td class="px-4 py-3 text-center align-middle">
-                                    <a href="{{ route('inquiries.show', $inquiry) }}"
-                                    class="text-sm text-emerald-600 hover:underline">View</a>
-                                </td>
-                            </tr>
+                            ...
                         @empty
-                            <tr>
-                                <td colspan="7" class="px-4 py-10 text-center text-sm text-neutral-500 dark:text-neutral-400">
-                                    No inquiries have been submitted yet.
-                                </td>
-                            </tr>
-                        @endforelse
+                        
+                        <tr>
+                            <td colspan="7" class="px-4 py-10 text-center text-xs text-neutral-500 dark:text-neutral-400">
+                                <div class="flex flex-col items-center gap-2">
+                                    <x-flux::icon name="inbox" class="h-8 w-8 text-neutral-400" />
+                                    <div>
+                                        <div class="font-medium text-neutral-700 dark:text-neutral-300">No inquiries to manage</div>
+                                        <div class="mt-1">All current inquiries have been assigned and processed</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {{-- @endforelse --}}
                     </tbody>
                 </table>
             </div>
