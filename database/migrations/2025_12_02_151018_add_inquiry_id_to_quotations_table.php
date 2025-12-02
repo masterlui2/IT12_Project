@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::table('inquiries', function (Blueprint $table) {
-    $table->string('name')->after('user_id');
-    $table->string('contact_number')->after('name');
-    $table->dateTime('preferred_schedule')->nullable()->after('issue_description');
-});
-
+        Schema::table('quotations', function (Blueprint $table) {
+            $table->foreignId('inquiry_id')->nullable()->constrained()->onDelete('set null');
+        });
     }
 
     /**
@@ -24,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('inquiries', function (Blueprint $table) {
+        Schema::table('quotations', function (Blueprint $table) {
             //
         });
     }

@@ -10,14 +10,12 @@
         TECHNE FIXER
     </span>
 </a>
-
-
         <!-- Desktop Navigation -->
         <div class="hidden lg:flex items-center gap-8">
         <a href="#home" class="nav-link">Home</a>
         <a href="#about" class="nav-link">About Us</a>
         <a href="#track" class="nav-link">Track Repair</a>
-        <a href="#feedback" class="nav-link">Feedback</a>
+        <a href="{{ route('feedback.create') }}" class="nav-link">Feedback</a>
         <a href="#contact" class="nav-link">Contact</a>
         </div>
 
@@ -38,10 +36,6 @@
         @endif
     @endguest
 </div>
-
-
-
-
     <!-- Mobile Menu Button -->
     <button class="lg:hidden text-gray-300 p-2 rounded-md hover:bg-white/10 transition">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-7 h-7">

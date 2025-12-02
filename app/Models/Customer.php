@@ -25,5 +25,9 @@ class Customer extends Model
     {
         return $this->hasMany(Quotation::class);
     }
-
+ 
+       public function feedback()
+    {
+        return $this->hasMany(Feedback::class, 'Customer_ID');
+    }
 }

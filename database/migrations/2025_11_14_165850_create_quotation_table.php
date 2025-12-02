@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('quotations', function (Blueprint $table) {
+            $table->engine = 'InnoDB';  
             $table->id();
 
             $table->unsignedBigInteger('customer_id');
@@ -32,7 +33,7 @@ return new class extends Migration
             $table->decimal('diagnostic_fee', 10, 2)->default(0);
             $table->decimal('grand_total', 12, 2)->default(0);
 
-            $table->string('status')->default('draft');
+            $table->enum('status', ['draft', 'pending', 'approved', 'rejected'])->default('draft');
             $table->timestamps();
 
             // Foreign keys

@@ -1,17 +1,22 @@
 <?php
 
+use App\Http\Controllers\Manager\ManagerController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\LogoutController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Technician\Quotation\QuotationController;
+use App\Http\Controllers\Technician\Job\JobOrderTechnicianController;
 use App\Http\Controllers\Technician\TechnicianController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\InquiryController;
+use App\Http\Controllers\General\InquiryController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\FeedbackController;
+use App\Models\JobOrder;
 
 // Generic landing
 Route::get('/', function () {
@@ -19,7 +24,6 @@ Route::get('/', function () {
         return match (Auth::user()->role) {
             'technician' => redirect()->route('technician.dashboard'),
             'manager'    => redirect()->route('dashboard'),
-            'customer'   => redirect()->route('customer.welcome'),
             default      => view('layouts.welcome'),
         };
     }
@@ -31,40 +35,54 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified', 'role:customer'])
     ->prefix('customer')
     ->group(function () {
-        Route::get('/dashboard', fn () => view('customer.welcome'))
-            ->name('customer.welcome');
-    });
-   // 🔹 Customer: Track Repair page
-    Route::get('/track-repair', function () {
-        return view('customer.track-repair');
-    })->name('customer.track');
+        Route::get('/dashboard', fn () => view('customer.welcome'))->name('customer.welcome');
+        Route::post('/inquiry', [InquiryController::class, 'store'])->name('inquiry.store');
+        Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('inquiry.create');
+    // 🔹 Customer: Track Repair page
+    Route::get('/track-repair', [CustomerController::class, 'track'])->name('customer.track');
 
     // 🔹 Customer: Messages page
-    Route::get('/messages', function () {
-        return view('customer.messages');
-    })->name('customer.messages');
+    Route::get('/messages', [CustomerController::class, 'messages'])->name('customer.messages');
+
+    });
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
-    Route::get('/dashboard', fn () => view('manager.dashboard'))->name('dashboard');
-    Route::get('/quotation', fn () => view('manager.quotation'))->name('quotation');
-    Route::get('/inquiries', fn () => view('manager.inquiries'))->name('inquiries');
+    Route::get('/dashboard', [ManagerController::class, 'dashboard'])->name('dashboard');
+
+    Route::prefix('/quotation')->group(function() {
+        Route::get('/index', [ManagerController::class, 'quotation'])->name('quotation');
+        Route::post('/{quotation}/approve', [ManagerController::class,'approve'])->name('manager.quotation.approve');
+        Route::post('/{quotation}/reject', [ManagerController::class,'reject'])->name('manager.quotation.reject');
+    });
+    
+
+    Route::prefix('/inquire')->group(function(){
+        Route::get('/index', [ManagerController::class, 'inquiries'])->name('inquiries');
+        Route::get('/index/{id}', [ManagerController::class, 'inquireShow'])->whereNumber('id')->name('inquiries.show');
+        Route::delete('/index/{id}', [ManagerController::class, 'inquireDestroy'])->whereNumber('id')->name('inquiries.destroy');
+        Route::post('/{id}/assign', [ManagerController::class, 'assignTechnician'])->name('manager.inquiries.assign');
+    });
 
     // ⭐ Added missing components (same style, same method)
-    Route::get('/customers', fn () => view('manager.customers'))->name('customers');
-    Route::get('/technicians', fn () => view('manager.technicians'))->name('technicians');
-    Route::get('/services', fn () => view('manager.services'))->name('services');
-    Route::get('/reports', fn () => view('manager.reports'))->name('reports');
+    Route::get('/customers', [ManagerController::class, 'customers'])->name('customers');
+    Route::get('/technicians',[ManagerController::class, 'technicians'])->name('technicians');
+    Route::get('/services', [ManagerController::class, 'services'])->name('services');
+    Route::get('/reports',[ManagerController::class, 'reports'])->name('reports');
 });
 Route::middleware(['auth'])->group(function () {
     // Show the inquiry creation form
     Route::get('/inquiry/create', [InquiryController::class, 'create'])
         ->name('inquiry.create');
-
+      Route::get('/feedback/create', [FeedbackController::class, 'create'])
+        ->name('feedback.create');
     // Handle the inquiry form submission
     Route::post('/inquiry', [InquiryController::class, 'store'])
         ->name('inquiry.store');
+    Route::post('/feedback/create', [FeedbackController::class, 'store'])
+        ->name('feedback.store');
 });
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -113,9 +131,15 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::get('/dashboard', [TechnicianController::class, 'dashboard'])->name('technician.dashboard');
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
-    Route::get('/inquire', [TechnicianController::class, 'inquire'])->name('technician.inquire');
-    Route::get('/inquire/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('technician.inquire.show');
-    Route::delete('/inquire/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('technician.inquire.destroy');
+    
+    Route::prefix('/inquire')->group(function(){
+        Route::get('/index', [TechnicianController::class, 'inquire'])->name('technician.inquire.index');
+        Route::get('/create', [InquiryController::class, 'create'])->name('technician.inquire.create');
+        Route::post('/store', [InquiryController::class, 'store'])->name('technician.inquire.store');   
+        Route::post('/{id}/claim', [TechnicianController::class, 'claim'])->name('technician.inquire.claim');
+        Route::get('/index/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('technician.inquire.show');
+        Route::delete('/index/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('technician.inquire.destroy');
+    });
     Route::get('/history', [TechnicianController::class, 'history'])->name('technician.history');
     
     Route::prefix('/quotation')->group(function (){
@@ -134,5 +158,12 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
         
         // Logo upload
         Route::put('/logo', [QuotationController::class, 'uploadLogo'])->name('quotation.uploadLogo');
+    });
+
+    Route::prefix('/job')->group(function(){
+        Route::get('/index', [JobOrderTechnicianController::class, 'index'])->name('technician.job.index');
+        Route::get('/show', [JobOrderTechnicianController::class, 'show'])->name('technician.job.show');
+        Route::get('/edit', [JobOrderTechnicianController::class, 'edit'])->name('technician.job.edit');
+        Route::put('/mark-complete', [JobOrderTechnicianController::class, 'markComplete'])->name('technician.job.mark-complete');
     });
 });

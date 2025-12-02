@@ -18,6 +18,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Technician;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Inquiry;
 
 class QuotationController extends Controller
 {
@@ -67,9 +68,22 @@ class QuotationController extends Controller
     /**
      * Show the form for creating a new quotation
      */
-    public function newQuotation()
+    public function newQuotation(Request $request)
     {
-        return view('technician.contents.quotations.create');
+        $inquiryId = $request->query('inquiry'); // gets ?inquiry=5 from URL
+
+        $inquiry = null;
+
+        if ($inquiryId) {
+            $inquiry = Inquiry::with(['customer'])->find($inquiryId);
+            
+            if (!$inquiry) {
+                return redirect()->route('technician.inquire.index')
+                    ->with('error', 'Inquiry not found.');
+            }
+        }
+
+        return view('technician.contents.quotations.create', compact('inquiry'));
     }
 
     /**
@@ -243,9 +257,17 @@ class QuotationController extends Controller
             DB::commit();
 
             // Redirect based on action
-            if ($request->action === 'generate_pdf') {
-                return redirect()->route('quotation.pdf', $quotation->id)
-                    ->with('success', 'Quotation created successfully!');
+            if ($request->action === 'submit_manager') {
+                // Update quotation status to 'pending' so the manager can review it
+                $quotation->update(['status' => 'pending']);
+
+                // Optional: assign technician and issue date if not already done
+                $quotation->technician_id = Auth::user()->id;
+                $quotation->date_issued = now();
+                $quotation->save();
+
+                return redirect()->route('technician.quotation')
+                    ->with('success', 'Quotation sent to manager for approval.');
             }
 
             return redirect()->route('quotation.show', $quotation->id)

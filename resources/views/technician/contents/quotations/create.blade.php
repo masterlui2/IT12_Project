@@ -5,6 +5,28 @@
 <form action="{{ route('quotation.store') }}" method="POST" enctype="multipart/form-data" id="quotationForm">
   @csrf
 
+  @if(isset($inquiry) && $inquiry)
+    <input type="hidden" name="inquiry_id" value="{{ $inquiry->id }}">
+  @endif
+
+  <div class="bg-white rounded-xl shadow-sm border p-8 space-y-8">
+    @if(isset($inquiry) && $inquiry)
+      <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+          </svg>
+          <div>
+            <strong>Converting Inquiry:</strong> 
+            INQ-{{ str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) }} - {{ $inquiry->category }}
+            @if($inquiry->contact_number)
+              <span class="text-sm ml-2">| Contact: {{ $inquiry->contact_number }}</span>
+            @endif
+          </div>
+        </div>
+      </div>
+    @endif
+
   <div class="bg-white rounded-xl shadow-sm border p-8 space-y-8">
 
     <!-- Display Validation Errors -->
@@ -60,23 +82,30 @@
     <div class="bg-gray-50 border rounded-md p-4 grid sm:grid-cols-2 gap-4">
       <div>
         <label class="block text-sm text-gray-600">Project Title *</label>
-        <input type="text" name="project_title" value="{{ old('project_title') }}" required
-               class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+        <input type="text" name="project_title" 
+              value="{{ old('project_title', isset($inquiry) ? $inquiry->device_details : '') }}" 
+              required
+              class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
       </div>
       <div>
         <label class="block text-sm text-gray-600">Date Issued *</label>
-        <input type="date" name="date_issued" value="{{ old('date_issued') }}" required
-               class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+        <input type="date" name="date_issued" 
+              value="{{ old('date_issued', now()->format('Y-m-d')) }}" 
+              required
+              class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
       </div>
       <div>
         <label class="block text-sm text-gray-600">Client Company Name *</label>
-        <input type="text" name="client_name" value="{{ old('client_name') }}" required
-               class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+        <input type="text" name="client_name" 
+              value="{{ old('client_name', isset($inquiry) ? $inquiry->name : '') }}" 
+              required
+              class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
       </div>
       <div>
         <label class="block text-sm text-gray-600">Client Address</label>
-        <input type="text" name="client_address" value="{{ old('client_address') }}"
-               class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+        <input type="text" name="client_address" 
+              value="{{ old('client_address', isset($inquiry) ? $inquiry->service_location : '') }}"
+              class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
       </div>
     </div>
 
@@ -84,8 +113,9 @@
     <div>
       <label class="block text-sm text-gray-700 font-semibold mb-2">Objective</label>
       <textarea rows="3" name="objective"
-                class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('objective') }}</textarea>
+                class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('objective', isset($inquiry) ? $inquiry->issue_description : '') }}</textarea>
     </div>
+
 
     <!-- Itemization Table -->
     <div>
@@ -237,21 +267,35 @@
       <div class="grid md:grid-cols-2 gap-6">
         <div>
           <label class="block text-sm text-gray-700 font-medium mb-1">Customer Name</label>
-          <input type="text" name="customer_name" placeholder="Client / Authorized Representative" value="{{ old('customer_name') }}"
-                 class="w-full border rounded-md px-3 py-2 text-sm mb-2 focus:ring-blue-500 focus:border-blue-500">
+          <input type="text" name="customer_name" 
+                placeholder="Client / Authorized Representative" 
+                value="{{ old('customer_name', isset($inquiry) ? $inquiry->name : '') }}"
+                class="w-full border rounded-md px-3 py-2 text-sm mb-2 focus:ring-blue-500 focus:border-blue-500">
           <div class="flex justify-between text-sm gap-4">
-            <input type="text" name="customer_signature" placeholder="Signature / eSign" value="{{ old('customer_signature') }}" class="border-b flex-1">
-            <input type="date" name="customer_date" value="{{ old('customer_date') }}" class="border rounded-md px-2 py-1 w-36 text-sm">
+            <input type="text" name="customer_signature" 
+                  placeholder="Signature / eSign" 
+                  value="{{ old('customer_signature') }}" 
+                  class="border-b flex-1">
+            <input type="date" name="customer_date" 
+                  value="{{ old('customer_date', now()->format('Y-m-d')) }}" 
+                  class="border rounded-md px-2 py-1 w-36 text-sm">
           </div>
         </div>
 
         <div>
           <label class="block text-sm text-gray-700 font-medium mb-1">Service Provider Representative</label>
-          <input type="text" name="provider_name" placeholder="Techne Fixer Representative" value="{{ old('provider_name') }}"
-                 class="w-full border rounded-md px-3 py-2 text-sm mb-2 focus:ring-blue-500 focus:border-blue-500">
+          <input type="text" name="provider_name" 
+                placeholder="Techne Fixer Representative" 
+                value="{{ old('provider_name') }}"
+                class="w-full border rounded-md px-3 py-2 text-sm mb-2 focus:ring-blue-500 focus:border-blue-500">
           <div class="flex justify-between text-sm gap-4">
-            <input type="text" name="provider_signature" placeholder="Signature / eSign" value="{{ old('provider_signature') }}" class="border-b flex-1">
-            <input type="date" name="provider_date" value="{{ old('provider_date') }}" class="border rounded-md px-2 py-1 w-36 text-sm">
+            <input type="text" name="provider_signature" 
+                  placeholder="Signature / eSign" 
+                  value="{{ old('provider_signature') }}" 
+                  class="border-b flex-1">
+            <input type="date" name="provider_date" 
+                  value="{{ old('provider_date', now()->format('Y-m-d')) }}" 
+                  class="border rounded-md px-2 py-1 w-36 text-sm">
           </div>
         </div>
       </div>
@@ -267,8 +311,8 @@
       <button type="submit" name="action" value="draft" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">
         Save Draft
       </button>
-      <button type="submit" name="action" value="generate_pdf" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-        Generate PDF
+      <button type="submit" name="action" value="submit_manager" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+        Send To Manager
       </button>
     </div>
 
