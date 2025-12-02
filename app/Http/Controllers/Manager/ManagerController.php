@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
 use App\Models\User;
+use App\Models\Quotation;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ManagerController extends Controller
 {
@@ -15,7 +17,25 @@ class ManagerController extends Controller
     }
 
     public function quotation(){
-        return view('manager.quotation');
+        // Base query
+        $quotations = Quotation::with('technician.user')
+            ->whereIn('status',['pending','approved','rejected'])
+            ->orderByDesc('date_issued')
+            ->paginate(10);
+
+        // Dashboard cards
+        $pendingCount = Quotation::where('status', 'pending')->count();
+
+        $approvedThisWeek = Quotation::where('status', 'approved')
+            ->whereBetween('date_issued', [
+                Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()
+            ])->count();
+
+        $pendingValue = Quotation::where('status', 'pending')->sum('grand_total');
+
+        return view('manager.quotation', compact(
+            'quotations', 'pendingCount', 'approvedThisWeek', 'pendingValue'
+        ));
     }
 
     public function inquiries()
@@ -53,6 +73,18 @@ class ManagerController extends Controller
             ->count();
 
         return view('manager.inquiries', compact('inquiries', 'stats', 'technicians', 'unanswered'));
+    }
+
+    public function approve(Quotation $quotation)
+    {
+        $quotation->update(['status' => 'approved', 'approved_by' => Auth::user()->id]);
+        return back()->with('success','Quotation approved successfully.');
+    }
+
+    public function reject(Quotation $quotation)
+    {
+        $quotation->update(['status' => 'rejected', 'approved_by' => Auth::user()->id]);
+        return back()->with('success','Quotation rejected.');
     }
 
     public function assignTechnician(Request $request, $inquiryId)

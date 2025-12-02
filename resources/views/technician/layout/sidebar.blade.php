@@ -34,7 +34,7 @@
         </li>
 
             <li>
-                <a href="{{ route('technician.inquire') }}"
+                <a href="{{ route('technician.inquire.index') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg transition
                     {{ Route::is('technician.inquire') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
                     <i class="fas fa-question-circle {{ Route::is('technician.inquire') ? 'text-blue-700' : 'text-blue-500' }}"></i>

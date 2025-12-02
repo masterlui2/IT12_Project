@@ -47,7 +47,13 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
     Route::get('/dashboard', [ManagerController::class, 'dashboard'])->name('dashboard');
-    Route::get('/quotation', [ManagerController::class, 'quotation'])->name('quotation');
+
+    Route::prefix('/quotation')->group(function() {
+        Route::get('/index', [ManagerController::class, 'quotation'])->name('quotation');
+        Route::post('/{quotation}/approve', [ManagerController::class,'approve'])->name('manager.quotation.approve');
+        Route::post('/{quotation}/reject', [ManagerController::class,'reject'])->name('manager.quotation.reject');
+    });
+    
 
     Route::prefix('/inquire')->group(function(){
         Route::get('/index', [ManagerController::class, 'inquiries'])->name('inquiries');
@@ -125,7 +131,7 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::get('/reporting', [TechnicianController::class, 'reporting'])->name('technician.reporting');
     
     Route::prefix('/inquire')->group(function(){
-        Route::get('/index', [TechnicianController::class, 'inquire'])->name('technician.inquire');
+        Route::get('/index', [TechnicianController::class, 'inquire'])->name('technician.inquire.index');
         Route::get('/create', [InquiryController::class, 'create'])->name('technician.inquire.create');
         Route::post('/store', [InquiryController::class, 'store'])->name('technician.inquire.store');   
         Route::post('/{id}/claim', [TechnicianController::class, 'claim'])->name('technician.inquire.claim');
