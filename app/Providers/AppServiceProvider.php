@@ -6,7 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use App\Models\User;
 use App\Observers\UserObserver;
-
+use Illuminate\Support\Facades\View;
+use App\Models\Feedback;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -33,5 +34,15 @@ class AppServiceProvider extends ServiceProvider
     
 
         User::observe(UserObserver::class);
+         // Share recent feedback with any view that includes the testimonials partial
+        View::composer('customer.about-feedback', function ($view) {
+            $recentFeedback = Feedback::with('user')
+                ->orderByDesc('Date_Submitted')
+                ->orderByDesc('created_at')
+                ->take(3)
+                ->get();
+
+            $view->with('feedbacks', $recentFeedback);
+        });
     }
 }
