@@ -66,12 +66,12 @@
 
           <div class="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
             <span class="text-sm font-semibold">
-              {{ substr(Auth::user()->name, 0, 1) }}
+              {{ substr(Auth::user()->firstname, 0, 1) }}
             </span>
           </div>
 
           <span class="text-sm font-medium text-gray-100">
-            {{ Auth::user()->name }}
+            {{ Auth::user()->firstname . ' ' . Auth::user()->lastname }}
           </span>
 
           <svg

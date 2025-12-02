@@ -16,8 +16,8 @@ class InquiryController extends Controller
         if(Auth::check()){
             return match(Auth::user()->role){
                 'technician'   => view('technician.contents.inquiries.create'),
-                'customer'     => view('customer.inquiry.create'),
-                default        => view('customer.inquiry.create')
+                'customer'     => view('customer.inquiries.create'),
+                default        => view('customer.inquiries.create')
             };
         }
     }
