@@ -1,7 +1,7 @@
 <x-layouts.app :title="__('Inquiries')">
     <div class="flex h-full w-full flex-1 flex-col gap-6 rounded-xl">
 
-        {{-- Header + primary actions --}}
+        {{-- Header --}}
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
                 <h1 class="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
@@ -34,61 +34,56 @@
             </div>
         </div>
 
-        {{-- Manager-focused Stat cards --}}
+        {{-- Stat cards - now dynamic --}}
         <div class="grid gap-4 md:grid-cols-4">
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Unassigned') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-amber-500">
-                    {{ $stats['inquiries']['unassigned'] ?? 0 }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Need technician assignment') }}
-                </p>
-            </div>
+            @foreach ($stats['inquiries'] as $key => $count)
+                @php
+                    $colors = [
+                        'unassigned' => 'amber',
+                        'assigned' => 'blue',
+                        'ongoing' => 'violet',
+                        'completed' => 'emerald',
+                        'cancelled' => 'rose',
+                        'scheduled' => 'neutral',
+                        'converted' => 'green',
+                    ];
 
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Assigned') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-blue-500">
-                    {{ $stats['inquiries']['assigned'] ?? 0 }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Under assessment') }}
-                </p>
-            </div>
+                    $color = $colors[$key] ?? 'neutral';
+                    $label = ucfirst($key);
+                    $subtitle = [
+                        'unassigned' => 'Need technician assignment',
+                        'assigned' => 'Under assessment',
+                        'ongoing' => 'Technician working',
+                        'completed' => 'Work finished',
+                        'cancelled' => 'Inquiry closed',
+                        'scheduled' => 'For onsite visit',
+                        'converted' => 'Turned into quotations',
+                    ][$key] ?? '';
+                @endphp
 
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Scheduled') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
-                    {{ $stats['inquiries']['scheduled'] ?? 0 }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('For onsite visit') }}
-                </p>
-            </div>
-
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __('Converted') }}</p>
-                <p class="mt-2 text-2xl font-semibold tracking-tight text-emerald-500">
-                    {{ $stats['inquiries']['converted'] ?? 0 }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ __('Turned into quotations') }}
-                </p>
-            </div>
+                <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                    <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400">{{ __($label) }}</p>
+                    <p class="mt-2 text-2xl font-semibold tracking-tight text-{{ $color }}-500">
+                        {{ $count }}
+                    </p>
+                    <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{{ __($subtitle) }}</p>
+                </div>
+            @endforeach
         </div>
 
-        {{-- Quick Actions --}}
+        {{-- Quick Filters --}}
         <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Quick Filters</h3>
                 <span class="text-xs text-neutral-500">Priority</span>
             </div>
+
             <div class="mt-3 flex flex-wrap gap-2">
                 <button class="inline-flex items-center rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-800 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-200">
                     High Priority (3)
                 </button>
                 <button class="inline-flex items-center rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-800 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-200">
-                    Unassigned (8)
+                    Unassigned ({{ $stats['inquiries']['unassigned'] ?? 0 }})
                 </button>
                 <button class="inline-flex items-center rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-200">
                     All Inquiries
@@ -96,11 +91,10 @@
             </div>
         </div>
 
-        {{-- Notification for unanswered inquiries --}}
+        {{-- 48-hour warning --}}
         @if ($unanswered > 0)
             <div class="rounded-lg bg-amber-100 border border-amber-300 text-amber-800 p-3 text-sm">
-                ⚠️ {{ $unanswered }} inquiries have been unattended for more than 48 hours —
-                consider assigning a technician.
+                ⚠️ {{ $unanswered }} inquiries have been unattended for more than 48 hours — consider assigning a technician.
             </div>
         @endif
 
@@ -119,28 +113,26 @@
                             <th class="px-4 py-3 font-medium text-center w-40">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @forelse ($inquiries as $inquiry)
-                            ...
+                            {{-- ... your inquiry rows --}}
                         @empty
-                        
-                        <tr>
-                            <td colspan="7" class="px-4 py-10 text-center text-xs text-neutral-500 dark:text-neutral-400">
-                                <div class="flex flex-col items-center gap-2">
-                                    <x-flux::icon name="inbox" class="h-8 w-8 text-neutral-400" />
-                                    <div>
-                                        <div class="font-medium text-neutral-700 dark:text-neutral-300">No inquiries to manage</div>
-                                        <div class="mt-1">All current inquiries have been assigned and processed</div>
+                            <tr>
+                                <td colspan="7" class="px-4 py-10 text-center text-xs text-neutral-500 dark:text-neutral-400">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <x-flux::icon name="inbox" class="h-8 w-8 text-neutral-400" />
+                                        <div>
+                                            <div class="font-medium text-neutral-700 dark:text-neutral-300">No inquiries to manage</div>
+                                            <div class="mt-1">All current inquiries have been assigned and processed</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {{-- @endforelse --}}
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
-
-
     </div>
 </x-layouts.app>

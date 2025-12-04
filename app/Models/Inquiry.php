@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,44 +10,41 @@ class Inquiry extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        // Customer Info
         'customer_id',
         'name',
         'contact_number',
         'email',
         'service_location',
-
-        // Service Details
         'category',
         'device_details',
         'issue_description',
         'photo_path',
-
-        // Schedule & Priority
         'urgency',
         'preferred_schedule',
-
-        // Tracking & Marketing
         'status',
         'referral_source',
-
-        // Admin Assignment
         'assigned_technician_id',
         'admin_notes',
     ];
 
-    /**
-     * Relationships
-     */
+    // RELATIONSHIPS ---------------------------------
+
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
     }
 
-    public function assignedTechnician()
+    public function technician()
     {
-        return $this->belongsTo(User::class, 'assigned_technician_id');
+        return $this->belongsTo(Technician::class, 'assigned_technician_id');
     }
+
+    public function quotation()
+    {
+        return $this->hasOne(Quotation::class);
+    }
+
+    // SCOPES ----------------------------------------
 
     public function scopeUnassigned($query)
     {

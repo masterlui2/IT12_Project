@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class JobOrder extends Model
 {
@@ -36,10 +35,7 @@ class JobOrder extends Model
         'balance' => 'decimal:2',
     ];
 
-    // -------------------------------------------------------------------------
-    // RELATIONSHIPS
-    // -------------------------------------------------------------------------
-
+    // RELATIONSHIPS ---------------------------------
     public function quotation()
     {
         return $this->belongsTo(Quotation::class);
@@ -50,10 +46,7 @@ class JobOrder extends Model
         return $this->belongsTo(Technician::class);
     }
 
-    // -------------------------------------------------------------------------
-    // COMPUTED ATTRIBUTES
-    // -------------------------------------------------------------------------
-
+    // COMPUTED --------------------------------------
     public function getTotalCostAttribute()
     {
         return $this->diagnostic_fee + $this->materials_cost + $this->professional_fee;
@@ -61,18 +54,15 @@ class JobOrder extends Model
 
     public function getFormattedTotalCostAttribute()
     {
-        return '₱' . number_format((float)$this->total_cost, 2);
+        return '₱' . number_format((float) $this->total_cost, 2);
     }
 
     public function getFormattedBalanceAttribute()
     {
-        return '₱' . number_format((float)$this->balance, 2);
+        return '₱' . number_format((float) $this->balance, 2);
     }
 
-    // -------------------------------------------------------------------------
-    // STATUS HELPERS
-    // -------------------------------------------------------------------------
-
+    // STATUS HELPERS --------------------------------
     public function isInProgress(): bool
     {
         return $this->status === 'in_progress';

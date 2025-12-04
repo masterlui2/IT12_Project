@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Quotation extends Model
 {
@@ -13,6 +12,7 @@ class Quotation extends Model
         'customer_id',
         'technician_id',
         'approved_by',
+        'inquiry_id',
         'project_title',
         'date_issued',
         'labor_estimate',
@@ -27,30 +27,37 @@ class Quotation extends Model
         'timeline_min_days',
         'timeline_max_days',
         'terms_conditions',
-        'inquiry_id',
     ];
 
     protected $casts = [
         'date_issued' => 'date',
     ];
 
-    // -------------------------------------------------------------------------
-    // RELATIONSHIPS
-    // -------------------------------------------------------------------------
-    
+    // RELATIONSHIPS ---------------------------------
+
+    public function inquiry()
+    {
+        return $this->belongsTo(Inquiry::class);
+    }
+
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(User::class, 'customer_id');
     }
 
     public function technician()
     {
-        return $this->belongsTo(Technician::class);
+        return $this->belongsTo(Technician::class, 'technician_id');
     }
 
     public function manager()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function jobOrder()
+    {
+        return $this->hasOne(JobOrder::class);
     }
 
     public function details()
@@ -78,15 +85,11 @@ class Quotation extends Model
         return $this->hasOne(QuotationSignature::class);
     }
 
-    // -------------------------------------------------------------------------
-    // COMPUTED ATTRIBUTES
-    // -------------------------------------------------------------------------
+    // COMPUTED ATTRIBUTES ----------------------------
 
     public function getSubtotalAttribute()
     {
-        return $this->details->sum(function ($detail) {
-            return $detail->quantity * $detail->unit_price;
-        });
+        return $this->details->sum(fn($detail) => $detail->quantity * $detail->unit_price);
     }
 
     public function getTaxAttribute()
@@ -117,20 +120,11 @@ class Quotation extends Model
     public function getTimelineTextAttribute()
     {
         if ($this->timeline_min_days && $this->timeline_max_days) {
-            return "{$this->timeline_min_days}-{$this->timeline_max_days} days";
-        } elseif ($this->timeline_min_days) {
-            return "{$this->timeline_min_days} days";
+            return "{$this->timeline_min_days}‑{$this->timeline_max_days} days";
         }
-        return 'Not specified';
-    }
 
-    public function jobOrder()
-    {
-        return $this->hasOne(JobOrder::class);
-    }
-    
-    public function inquiry()
-    {
-        return $this->belongsTo(Inquiry::class);
+        return $this->timeline_min_days
+            ? "{$this->timeline_min_days} days"
+            : 'Not specified';
     }
 }

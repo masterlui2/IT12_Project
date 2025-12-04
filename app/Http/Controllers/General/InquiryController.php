@@ -26,17 +26,17 @@ class InquiryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'                => 'required|string|max:255',
-            'email'               => 'required|email',
-            'contact_number'      => 'required|string|max:20',
-            'service_location'    => 'required|string',
-            'category'            => 'required|string',
-            'device_details'      => 'nullable|string|max:255',
-            'issue_description'   => 'required|string|max:2000',
-            'urgency'             => 'required|in:Normal,Urgent,Flexible',
-            'preferred_schedule'  => 'nullable|date',
-            'photo'               => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
-            'referral_source'     => 'nullable|string',
+            'name'               => 'required|string|max:255',
+            'email'              => 'required|email',
+            'contact_number'     => 'required|string|max:20',
+            'service_location'   => 'required|string',
+            'category'           => 'required|string',
+            'device_details'     => 'nullable|string|max:255',
+            'issue_description'  => 'required|string|max:2000',
+            'urgency'            => 'required|in:Normal,Urgent,Flexible',
+            'preferred_schedule' => 'nullable|date',
+            'photo'              => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'referral_source'    => 'nullable|string',
         ]);
 
         // Handle photo upload
@@ -45,15 +45,31 @@ class InquiryController extends Controller
             $validated['photo_path'] = $path;
         }
 
-        // Set default status and link to authenticated user if logged in
+        // Default status
         $validated['status'] = 'Pending';
-        if (Auth::check() && Auth::user()->role == 'customer') {
-            $validated['customer_id'] = Auth::id();
+
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // 🔹 Customer submitting an inquiry
+            if ($user->role === 'customer') {
+                $validated['customer_id'] = $user->id;
+            }
+
+            // 🔹 Technician submitting an inquiry (self‑assigned diagnostic)
+            elseif ($user->role === 'technician') {
+                $technician = $user->technician;
+
+                if ($technician) {
+                    $validated['assigned_technician_id'] = $technician->id;
+                    $validated['status'] = 'Acknowledged';  // starts directly as acknowledged/claimed
+                }
+            }
         }
 
         Inquiry::create($validated);
 
-        return redirect()->back()->with('success', 'Inquiry submitted successfully! We will contact you soon.');
+        return redirect()->back()->with('success', 'Inquiry submitted successfully!');
     }
 
     public function index()
