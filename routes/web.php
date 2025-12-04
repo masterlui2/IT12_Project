@@ -36,8 +36,10 @@ Route::middleware(['auth', 'verified', 'role:customer'])
     ->prefix('customer')
     ->group(function () {
         Route::get('/dashboard', fn () => view('customer.welcome'))->name('customer.welcome');
-        Route::post('/inquiry', [InquiryController::class, 'store'])->name('inquiry.store');
-        Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('inquiry.create');
+      Route::get('/inquiry', [InquiryController::class, 'create'])->name('customer.inquiry.form');
+        Route::post('/inquiry', [InquiryController::class, 'store'])->name('customer.inquiry.store');
+        Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('customer.inquiry.create');
+        Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('customer.inquiry.create');
     // 🔹 Customer: Track Repair page
     Route::get('/track-repair', [CustomerController::class, 'track'])->name('customer.track');
 
@@ -69,6 +71,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
     Route::get('/technicians',[ManagerController::class, 'technicians'])->name('technicians');
     Route::get('/services', [ManagerController::class, 'services'])->name('services');
     Route::get('/reports',[ManagerController::class, 'reports'])->name('reports');
+    Route::get('/sales', [ManagerController::class, 'sales'])->name('sales');
 });
 Route::middleware(['auth'])->group(function () {
     // Show the inquiry creation form

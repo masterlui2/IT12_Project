@@ -10,6 +10,7 @@ class Inquiry extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'customer_id',
         'name',
         'contact_number',

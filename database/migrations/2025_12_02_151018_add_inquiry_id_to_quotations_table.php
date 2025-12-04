@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quotations', function (Blueprint $table) {
-            $table->foreignId('inquiry_id')->nullable()->constrained()->onDelete('set null');
         });
     }
 
