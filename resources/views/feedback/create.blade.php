@@ -53,7 +53,7 @@
 
                 <div class="space-y-4">
                     {{-- Hardcoded Card 1 --}}
-                    <article class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
+                    <article class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md feedback-card" data-rating="5">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3">
                                 <div class="h-9 w-9 rounded-full bg-emerald-700/30 flex items-center justify-center text-xs font-semibold text-emerald-100">
@@ -64,13 +64,20 @@
                                     <p class="text-[11px] text-gray-400">Service: Dental chair & CCTVs installation</p>
                                 </div>
                             </div>
-                            <div class="flex flex-col items-end gap-1">
-                                <div class="flex items-center gap-1 text-yellow-400 text-xs">
-                                    @for ($i = 0; $i < 5; $i++)
-                                        <i class="fas fa-star"></i>
+                            <div class="flex flex-col items-end gap-1 relative">
+                                <button type="button" class="card-menu-toggle text-gray-500 hover:text-gray-300 transition" aria-label="Open actions menu">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div class="card-menu hidden absolute right-0 top-7 w-32 rounded-md border border-gray-800 bg-gray-900 shadow-lg">
+                                    <a href="#" class="block px-3 py-2 text-xs text-gray-200 hover:bg-gray-800">Edit</a>
+                                    <button type="button" class="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-gray-800">Delete</button>
+                                </div>
+                                <div class="flex items-center gap-1 text-yellow-400 text-xs rating-stars">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star star-icon" data-star="{{ $i }}"></i>
                                     @endfor
                                 </div>
-                                <span class="text-[11px] text-gray-400">5.0/5</span>
+                                <span class="text-[11px] text-gray-400 rating-score">5.0/5</span>
                             </div>
                         </div>
                         <p class="mt-3 text-sm text-gray-300 leading-relaxed">
@@ -82,7 +89,7 @@
                     </article>
 
                     {{-- Hardcoded Card 2 --}}
-                    <article class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
+                    <article class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md feedback-card" data-rating="4">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3">
                                 <div class="h-9 w-9 rounded-full bg-emerald-700/30 flex items-center justify-center text-xs font-semibold text-emerald-100">
@@ -93,13 +100,20 @@
                                     <p class="text-[11px] text-gray-400">Service: Device repair</p>
                                 </div>
                             </div>
-                            <div class="flex flex-col items-end gap-1">
-                                <div class="flex items-center gap-1 text-yellow-400 text-xs">
-                                    @for ($i = 0; $i < 4; $i++)
-                                        <i class="fas fa-star"></i>
+                          <div class="flex flex-col items-end gap-1 relative">
+                                <button type="button" class="card-menu-toggle text-gray-500 hover:text-gray-300 transition" aria-label="Open actions menu">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div class="card-menu hidden absolute right-0 top-7 w-32 rounded-md border border-gray-800 bg-gray-900 shadow-lg">
+                                    <a href="#" class="block px-3 py-2 text-xs text-gray-200 hover:bg-gray-800">Edit</a>
+                                    <button type="button" class="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-gray-800">Delete</button>
+                                </div>
+                                <div class="flex items-center gap-1 text-yellow-400 text-xs rating-stars">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star star-icon" data-star="{{ $i }}"></i>
                                     @endfor
                                 </div>
-                                <span class="text-[11px] text-gray-400">4.0/5</span>
+                                <span class="text-[11px] text-gray-400 rating-score">4.0/5</span>
                             </div>
                         </div>
                         <p class="mt-3 text-sm text-gray-300 leading-relaxed">
@@ -111,7 +125,7 @@
                     </article>
 
                     {{-- Hardcoded Card 3 --}}
-                    <article class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
+                    <article class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md feedback-card" data-rating="5">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3">
                                 <div class="h-9 w-9 rounded-full bg-emerald-700/30 flex items-center justify-center text-xs font-semibold text-emerald-100">
@@ -122,13 +136,20 @@
                                     <p class="text-[11px] text-gray-400">Service: Computer repair</p>
                                 </div>
                             </div>
-                            <div class="flex flex-col items-end gap-1">
-                                <div class="flex items-center gap-1 text-yellow-400 text-xs">
-                                    @for ($i = 0; $i < 5; $i++)
-                                        <i class="fas fa-star"></i>
+                          <div class="flex flex-col items-end gap-1 relative">
+                                <button type="button" class="card-menu-toggle text-gray-500 hover:text-gray-300 transition" aria-label="Open actions menu">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div class="card-menu hidden absolute right-0 top-7 w-32 rounded-md border border-gray-800 bg-gray-900 shadow-lg">
+                                    <a href="#" class="block px-3 py-2 text-xs text-gray-200 hover:bg-gray-800">Edit</a>
+                                    <button type="button" class="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-gray-800">Delete</button>
+                                </div>
+                                <div class="flex items-center gap-1 text-yellow-400 text-xs rating-stars">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star star-icon" data-star="{{ $i }}"></i>
                                     @endfor
                                 </div>
-                                <span class="text-[11px] text-gray-400">5.0/5</span>
+                                <span class="text-[11px] text-gray-400 rating-score">5.0/5</span>
                             </div>
                         </div>
                         <p class="mt-3 text-sm text-gray-300 leading-relaxed">
@@ -138,7 +159,7 @@
 
                     {{-- Dynamic feedback cards (same design as above) --}}
                     @foreach ($feedbacks as $feedback)
-                        <article class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
+                        <article class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md feedback-card" data-rating="{{ $feedback->rating ?? 0 }}">
                             <div class="flex items-start justify-between gap-3">
                                 {{-- Avatar + name + date + category --}}
                                 <div class="flex items-start gap-3">
@@ -160,17 +181,20 @@
 
                                 {{-- Rating (stars) --}}
                                 @if(!is_null($feedback->rating))
-                                    <div class="flex flex-col items-end gap-1">
-                                        <div class="flex items-center gap-1 text-yellow-400 text-xs">
+                                    <div class="flex flex-col items-end gap-1 relative">
+                                        <button type="button" class="card-menu-toggle text-gray-500 hover:text-gray-300 transition" aria-label="Open actions menu">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <div class="card-menu hidden absolute right-0 top-7 w-32 rounded-md border border-gray-800 bg-gray-900 shadow-lg">
+                                            <a href="#" class="block px-3 py-2 text-xs text-gray-200 hover:bg-gray-800">Edit</a>
+                                            <button type="button" class="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-gray-800">Delete</button>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-yellow-400 text-xs rating-stars">
                                             @for ($i = 1; $i <= 5; $i++)
-                                                @if ($i <= (int) $feedback->rating)
-                                                    <i class="fas fa-star"></i>
-                                                @else
-                                                    <i class="far fa-star text-gray-600"></i>
-                                                @endif
+                                                <i class="fas fa-star star-icon" data-star="{{ $i }}"></i>
                                             @endfor
                                         </div>
-                                        <span class="text-[11px] text-gray-400">
+                                        <span class="text-[11px] text-gray-400 rating-score">
                                             {{ number_format($feedback->rating, 1) }}/5
                                         </span>
                                     </div>
@@ -359,6 +383,7 @@
                 updateRatingHighlight(input.value);
             });
         });
+        
     </script>
 </body>
 </html>

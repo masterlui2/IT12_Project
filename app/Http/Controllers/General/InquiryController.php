@@ -19,7 +19,10 @@ class InquiryController extends Controller
                 'customer'     => view('customer.inquiries.create'),
                 default        => view('customer.inquiries.create')
             };
+            
         }
+                return view('customer.inquiries.create');
+
     }
 
     // Save the inquiry

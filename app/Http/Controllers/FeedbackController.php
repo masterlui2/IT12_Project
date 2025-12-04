@@ -31,7 +31,7 @@ class FeedbackController extends Controller
         Feedback::create([
             'Customer_ID'   => Auth::id(),             // who submitted
             'Comments'      => $validated['message'],  // legacy column
-             'rating'         => $validated['rating'], 
+            'rating'         => $validated['rating'], 
             'category'      => $validated['category'],
             'message'       => $validated['message'],  // new column
             'Date_Submitted'=> now(),                  // required column
