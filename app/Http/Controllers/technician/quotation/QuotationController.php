@@ -25,17 +25,24 @@ class QuotationController extends Controller
     /**
      * Display a listing of quotations
      */
+
+
     public function index(Request $request)
     {
-        $query = Quotation::with(['customer', 'technician']);
+        // Get the authenticated technician record
+        $technician = Auth::user()->technician;
+
+        // Start query scoped to technician
+        $query = Quotation::with(['customer', 'technician'])
+            ->where('technician_id', $technician->id);
 
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('client_name', 'like', "%{$search}%")
-                  ->orWhere('project_title', 'like', "%{$search}%")
-                  ->orWhere('id', 'like', "%{$search}%");
+                ->orWhere('project_title', 'like', "%{$search}%")
+                ->orWhere('id', 'like', "%{$search}%");
             });
         }
 
@@ -44,7 +51,7 @@ class QuotationController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Sorting
+        // Sorting options
         switch ($request->get('sort', 'recent')) {
             case 'oldest':
                 $query->oldest();
@@ -55,15 +62,16 @@ class QuotationController extends Controller
             case 'amount_low':
                 $query->orderBy('grand_total', 'asc');
                 break;
-            default: // recent
+            default:
                 $query->latest();
                 break;
         }
 
-        $quotations = $query->paginate(15)->withQueryString();
+        $quotations = $query->paginate(10)->withQueryString();
 
         return view('technician.contents.quotations.index', compact('quotations'));
     }
+
 
     /**
      * Show the form for creating a new quotation
@@ -137,12 +145,11 @@ class QuotationController extends Controller
             $tax = $subtotal * 0.10;
             $total = $subtotal + $tax;
 
-            $customer = Customer::first();
-            $technician = Technician::first();
-            // Create the main quotation
+            $inquiry = Inquiry::with('technician')->findOrFail($request->inquiry_id);
+            // Now safe to reference both
             $quotation = Quotation::create([
-                'customer_id' => $customer->id,
-                'technician_id' => $technician->id,
+                'inquiry_id' => $inquiry->id,
+                'technician_id' => $inquiry->assigned_technician_id,
                 'project_title' => $validated['project_title'],
                 'date_issued' => $validated['date_issued'],
                 'client_name' => $validated['client_name'],
@@ -258,20 +265,14 @@ class QuotationController extends Controller
 
             // Redirect based on action
             if ($request->action === 'submit_manager') {
-                // Update quotation status to 'pending' so the manager can review it
-                $quotation->update(['status' => 'pending']);
-
-                // Optional: assign technician and issue date if not already done
-                $quotation->technician_id = Auth::user()->id;
-                $quotation->date_issued = now();
-                $quotation->save();
+                $quotation->update([
+                    'status' => 'pending',
+                    'date_issued' => now(),
+                ]);
 
                 return redirect()->route('technician.quotation')
                     ->with('success', 'Quotation sent to manager for approval.');
             }
-
-            return redirect()->route('quotation.show', $quotation->id)
-                ->with('success', 'Quotation saved as draft successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();

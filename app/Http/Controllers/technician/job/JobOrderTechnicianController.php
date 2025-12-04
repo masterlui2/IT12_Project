@@ -17,7 +17,7 @@ class JobOrderTechnicianController extends Controller
         $query = JobOrder::query();
 
         if ($technician) {
-            $query->where('technician_id', $technician->user_id);
+            $query->where('technician_id', $technician->id);
         }
 
         if ($request->filled('search')) {
@@ -37,13 +37,61 @@ class JobOrderTechnicianController extends Controller
         return view('technician.contents.job.index', compact('jobOrders'));
     }
 
-    public function show(){
-        return view('technician.contents.job.index');
+    public function show($id)
+    {
+        $job = JobOrder::with('quotation')->findOrFail($id);
+        return view('technician.contents.job.show', compact('job'));
     }
-    public function edit(){
-        return view('technician.contents.job.index');
+
+    public function edit($id)
+    {
+        $job = JobOrder::with('quotation')->findOrFail($id);
+        return view('technician.contents.job.edit', compact('job'));
     }
-    public function markComplete(){
-        return view('technician.contents.job.index');
+
+    public function update(Request $request, $id)
+    {
+        $job = JobOrder::findOrFail($id);
+
+        $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'contact_number' => 'nullable|string|max:50',
+            'device_type' => 'nullable|string|max:100',
+            'issue_description' => 'nullable|string',
+            'diagnostic_fee' => 'nullable|numeric|min:0',
+            'materials_cost' => 'nullable|numeric|min:0',
+            'professional_fee' => 'nullable|numeric|min:0',
+            'expected_finish_date' => 'nullable|date',
+            'status' => 'required|string|in:scheduled,in_progress,completed,cancelled',
+            'technician_notes' => 'nullable|string',
+            'remarks' => 'nullable|string',
+        ]);
+
+        $job->update($request->only([
+            'customer_name',
+            'contact_number',
+            'device_type',
+            'issue_description',
+            'diagnostic_fee',
+            'materials_cost',
+            'professional_fee',
+            'expected_finish_date',
+            'status',
+            'technician_notes',
+            'remarks',
+        ]));
+
+        return redirect()->route('technician.job.index')->with('success', 'Job order updated successfully!');
+    }
+
+
+    public function markComplete($id)
+    {
+        $job = JobOrder::findOrFail($id);
+        $job->status = 'completed';
+        $job->completed_at = now();
+        $job->save();
+
+        return redirect()->route('technician.job.index')->with('success', 'Job marked as completed!');
     }
 }

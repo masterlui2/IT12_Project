@@ -65,11 +65,6 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    public function customer()
-    {
-        return $this->hasOne(Customer::class);
-    }
-
     public function technician()
     {
         return $this->hasOne(Technician::class);

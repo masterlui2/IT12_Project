@@ -19,8 +19,19 @@ class TechnicianController extends Controller
         return view('technician.contents.reporting');
     }
 
-    public function inquire(){
-        $inquiries = Inquiry::orderByDesc('created_at')->paginate(10);
+    public function inquire()
+    {
+        // Get the current technician record linked to the user
+        $technician = Auth::user()->technician;
+
+        // Build query: show unclaimed or assigned to this technician only
+        $inquiries = Inquiry::where(function ($q) use ($technician) {
+                $q->whereNull('assigned_technician_id')
+                ->orWhere('assigned_technician_id', $technician->id);
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
         return view('technician.contents.inquiries.index', compact('inquiries'));
     }
 
@@ -33,13 +44,19 @@ class TechnicianController extends Controller
             return redirect()->back()->with('error', 'This inquiry is already claimed.');
         }
 
-        $inquiry->assigned_technician_id = Auth::user()->id;
-        $inquiry->status = 'Acknowledged'; // assuming your ENUM workflow
+        // Authenticated user hasOne Technician
+        $technician = Auth::user()->technician;
+
+        if (! $technician) {
+            return redirect()->back()->with('error', 'You are not registered as a technician.');
+        }
+
+        $inquiry->assigned_technician_id = $technician->id; // ✅ use technician ID
+        $inquiry->status = 'Acknowledged';
         $inquiry->save();
 
         return redirect()->route('technician.inquire.index')
-        ->with('success', 'Inquiry INQ-' . str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) . ' claimed successfully.');
-
+            ->with('success', 'Inquiry INQ-' . str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) . ' claimed successfully.');
     }
 
     public function inquireShow(int $id)
