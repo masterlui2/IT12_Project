@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Quotation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ManagerController extends Controller
 {
@@ -18,7 +19,7 @@ class ManagerController extends Controller
 
     public function quotation(){
         // Base query
-        $quotations = Quotation::with('technician.user')
+        $quotations = Quotation::with(['technician.user','inquiry'])
             ->whereIn('status',['pending','approved','rejected'])
             ->orderByDesc('date_issued')
             ->paginate(10);
@@ -40,34 +41,33 @@ class ManagerController extends Controller
 
     public function inquiries()
     {
-        // Fetch inquiries with assigned technician
-        $inquiries = Inquiry::with('assignedTechnician')
+        // Fetch inquiries
+        $inquiries = Inquiry::with('technician')
             ->orderByDesc('created_at')
             ->paginate(10);
 
-        // Stats - accurate count using separate queries
+        // Map statuses dynamically
+        $statusCounts = Inquiry::select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        // Build stats array with explicit dashboard keys
         $stats = [
             'inquiries' => [
                 'unassigned' => Inquiry::whereNull('assigned_technician_id')->count(),
-
-                // Technician has been assigned (status 'Acknowledged')
-                'assigned'   => Inquiry::where('status', 'Acknowledged')->count(),
-
-                // Work in progress, technician actively assessing or repairing
-                'ongoing'    => Inquiry::where('status', 'In Progress')->count(),
-
-                // Successfully finished
-                'completed'  => Inquiry::where('status', 'Completed')->count(),
-
-                // Cancelled by customer or manager
-                'cancelled'  => Inquiry::where('status', 'Cancelled')->count(),
+                'assigned'   => $statusCounts['Acknowledged'] ?? 0,
+                'ongoing'    => $statusCounts['In Progress'] ?? 0,
+                'completed'  => $statusCounts['Completed'] ?? 0,
+                'cancelled'  => $statusCounts['Cancelled'] ?? 0,
+                'scheduled'  => $statusCounts['Scheduled'] ?? 0,
+                'converted'  => $statusCounts['Converted'] ?? 0,
             ],
         ];
 
-        // Fetch technicians list for assignment dropdown
+        // Technician dropdown
         $technicians = User::where('role', 'technician')->get();
 
-        // Identify inquiries that are older than 48 hours without reply
+        // Unanswered inquiries older than 48 hours
         $unanswered = Inquiry::whereNull('assigned_technician_id')
             ->where('created_at', '<', Carbon::now()->subHours(48))
             ->count();

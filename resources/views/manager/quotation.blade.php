@@ -93,7 +93,7 @@
                                     <div class="text-xs text-neutral-500">{{ $quote->project_title }}</div>
                                 </td>
                                 <td class="px-6 py-4 text-neutral-600 dark:text-neutral-400">
-                                    {{ $quote->technician?->user?->firstname ?? '—' }}
+                                    {{ $quote->technician->name ?? '—' }}
                                 </td>
                                 <td class="px-6 py-4 font-medium text-right whitespace-nowrap">
                                     ₱{{ number_format($quote->grand_total, 2) }}

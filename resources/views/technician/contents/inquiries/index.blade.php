@@ -81,9 +81,9 @@
 
         <!-- Assigned Technician -->
         <td class="px-4 py-3 text-neutral-800">
-            @if ($inq->assignedTechnician)
+            @if ($inq->technician)
                 <span class="font-medium text-neutral-900">
-                    {{ $inq->assignedTechnician->firstname }}
+                    {{ $inq->technician->name }}
                 </span>
             @else
                 <span class="text-gray-400">Unassigned</span>
@@ -135,7 +135,7 @@
               <i class="fas fa-eye"></i><span class="sr-only">View</span>
             </a>
 
-            @if(!$inq->assignedTechnician)
+            @if(!$inq->technician)
                 <form action="{{ route('technician.inquire.claim', $inq->id) }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" 
@@ -144,13 +144,13 @@
                         Claim
                     </button>
                 </form>
-            @elseif ($inq->assignedTechnician && $inq->assignedTechnician->id === auth()->id())
+            @elseif ($inq->technician && $inq->technician->user_id === auth()->id())
                 <span class="text-green-600 text-sm font-medium">Assigned to You</span>
             @else
-                <span class="text-gray-500 text-sm">Assigned to {{ $inq->assignedTechnician->firstname }}</span>
+                <span class="text-gray-500 text-sm">Assigned to {{ $inq->technician->name }}</span>
             @endif
 
-            @if($inq->assignedTechnician && $inq->assignedTechnician->id === auth()->id())
+            @if($inq->technician && $inq->technician->user_id === auth()->id())
                 <a href="{{ route('quotation.new', ['inquiry' => $inq->id]) }}" 
                   class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap"
                   title="Convert to Quote">

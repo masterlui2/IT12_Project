@@ -38,15 +38,15 @@ class AppServiceProvider extends ServiceProvider
         // Register model observers
         User::observe(UserObserver::class);
          // Share recent feedback with any view that includes the testimonials partial
-        View::composer('customer.about-feedback', function ($view) {
-            $recentFeedback = Feedback::with('user')
-                ->orderByDesc('Date_Submitted')
-                ->orderByDesc('created_at')
-                ->take(3)
-                ->get();
+        // View::composer('customer.about-feedback', function ($view) {
+        //     $recentFeedback = Feedback::with('user')
+        //         ->orderByDesc('Date_Submitted')
+        //         ->orderByDesc('created_at')
+        //         ->take(3)
+        //         ->get();
 
-            $view->with('feedbacks', $recentFeedback);
-        });
+        //     $view->with('feedbacks', $recentFeedback);
+        // });
         Quotation::observe(QuotationObserver::class);   // 👈 add this line
     }
 }

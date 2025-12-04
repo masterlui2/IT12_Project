@@ -15,7 +15,7 @@ return new class extends Migration
             $table->engine = 'InnoDB';  
             $table->id();
 
-            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('customer_id')->nullable();
             $table->unsignedBigInteger('technician_id');
             $table->unsignedBigInteger('approved_by')->nullable(); // single manager (user with role='manager')
             $table->string('client_logo')->nullable();

@@ -160,10 +160,20 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
         Route::put('/logo', [QuotationController::class, 'uploadLogo'])->name('quotation.uploadLogo');
     });
 
-    Route::prefix('/job')->group(function(){
+    Route::prefix('/job')->group(function () {
+
+        // Job Order List
         Route::get('/index', [JobOrderTechnicianController::class, 'index'])->name('technician.job.index');
-        Route::get('/show', [JobOrderTechnicianController::class, 'show'])->name('technician.job.show');
-        Route::get('/edit', [JobOrderTechnicianController::class, 'edit'])->name('technician.job.edit');
-        Route::put('/mark-complete', [JobOrderTechnicianController::class, 'markComplete'])->name('technician.job.mark-complete');
+
+        // View Job Order Details
+        Route::get('/show/{id}', [JobOrderTechnicianController::class, 'show'])->name('technician.job.show');
+
+        // Edit Job Order
+        Route::get('/edit/{id}', [JobOrderTechnicianController::class, 'edit'])->name('technician.job.edit');
+
+        Route::patch('/update/{id}', [JobOrderTechnicianController::class, 'update'])->name('technician.job.update');
+
+        // Mark Complete (PATCH recommended)
+        Route::patch('/mark-complete/{id}', [JobOrderTechnicianController::class, 'markComplete'])->name('technician.job.mark-complete');
     });
 });
