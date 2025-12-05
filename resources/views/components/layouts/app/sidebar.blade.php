@@ -60,7 +60,13 @@
              <span class="text-md font-medium">Technicians</span>
           </a>
         </li>
-
+          <li>
+          <a href="{{ route('sales') }}"
+             class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ Route::is('sales') ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-blue-50 text-gray-700' }}">
+             <i class="fas fa-hand-holding-dollar {{ Route::is('sales') ? 'text-blue-700' : 'text-blue-500' }}"></i>
+             <span class="text-md font-medium">Sales</span>
+          </a>
+        </li>
         
 
         <li>
