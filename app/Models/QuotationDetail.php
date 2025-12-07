@@ -35,3 +35,4 @@ class QuotationDetail extends Model
         return '₱' . number_format($this->total ?? $this->computed_total, 2);
     }
 }
+    

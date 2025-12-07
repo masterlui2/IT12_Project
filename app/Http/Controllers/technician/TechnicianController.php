@@ -62,7 +62,7 @@ class TechnicianController extends Controller
     public function inquireShow(int $id)
     {
         // Fetch inquiry with necessary relationships
-        $inquiry = Inquiry::with('assignedTechnician', 'customer')->findOrFail($id);
+        $inquiry = Inquiry::with('technician', 'customer')->findOrFail($id);
 
         // Render technician detail view
         return view('technician.contents.inquiries.show', compact('inquiry'));
