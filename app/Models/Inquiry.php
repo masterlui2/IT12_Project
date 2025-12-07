@@ -17,6 +17,7 @@ class Inquiry extends Model
         'email',
         'service_location',
         'category',
+        'device_type',
         'device_details',
         'issue_description',
         'photo_path',
