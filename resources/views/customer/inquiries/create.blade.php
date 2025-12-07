@@ -45,11 +45,15 @@
                             {{ session('success') }}
                         </div>
                     @endif
+                <div class="mb-4 flex justify-end">
+                        <a href="{{ url('/') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:border-emerald-500 hover:text-emerald-300 transition-colors">
+                            ← {{ __('Return Home') }}
+                        </a>
+                    </div>
 
-                    <form method="POST" action="{{ route('inquiry.store') }}" enctype="multipart/form-data" id="inquiryForm">
-                        @csrf
-
+                    <form method="POST" action="{{ route('customer.inquiry.store') }}" enctype="multipart/form-data" id="inquiryForm">
                         {{-- Progress Indicator --}}
+                           @csrf  
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-2">
                                 <button type="button" onclick="goToStep(1)" class="text-xs font-medium step-label cursor-pointer hover:text-emerald-300 transition-colors" data-step="1">

@@ -19,10 +19,7 @@ class InquiryController extends Controller
                 'customer'     => view('customer.inquiries.create'),
                 default        => view('customer.inquiries.create')
             };
-            
         }
-                return view('customer.inquiries.create');
-
     }
 
     // Save the inquiry
@@ -53,6 +50,7 @@ class InquiryController extends Controller
 
         if (Auth::check()) {
             $user = Auth::user();
+            $validated['user_id'] = $user->id;
 
             // 🔹 Customer submitting an inquiry
             if ($user->role === 'customer') {
@@ -68,6 +66,8 @@ class InquiryController extends Controller
                     $validated['status'] = 'Acknowledged';  // starts directly as acknowledged/claimed
                 }
             }
+            } else {
+            $validated['user_id'] = null;
         }
 
         Inquiry::create($validated);

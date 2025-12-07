@@ -126,5 +126,24 @@ class ManagerController extends Controller
     }
     public function reports(){
         return view('manager.reports');
-    }    
+       }
+
+    public function sales()
+    {
+        $stats = [
+            'monthly' => [
+                'total_revenue'    => '₱ 0.00',
+                'avg_ticket'       => '₱ 0.00',
+                'conversion_rate'  => '0%',
+            ],
+            'pipeline' => [
+                'open_quotes' => 0,
+                'won_quotes'  => 0,
+            ],
+        ];
+
+        $recentTransactions = [];
+
+        return view('manager.sales', compact('stats', 'recentTransactions'));
+    }   
 }
