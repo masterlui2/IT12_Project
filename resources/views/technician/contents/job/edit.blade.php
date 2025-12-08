@@ -38,34 +38,37 @@
       </div>
     @endif
 
-    {{-- JOB ORDER INFO --}}
     <div class="bg-gray-50 border rounded-md p-4 grid sm:grid-cols-2 gap-4">
       <div>
         <label class="block text-sm text-gray-600">Job Order Title *</label>
         <input type="text" name="job_title"
-               value="{{ old('job_title', isset($quotation) ? $quotation->project_title : '') }}"
-               required
-               class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+              value="{{ old('job_title', $job->quotation->project_title ?? '') }}"
+              readonly
+              class="w-full border mt-1 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-700">
       </div>
+
       <div>
         <label class="block text-sm text-gray-600">Date Started *</label>
         <input type="date" name="start_date"
-               value="{{ old('start_date', now()->format('Y-m-d')) }}"
-               required
-               class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+              value="{{ old('start_date', $job->start_date ?? now()->format('Y-m-d')) }}"
+              required
+              class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
       </div>
+
       <div>
         <label class="block text-sm text-gray-600">Client *</label>
         <input type="text" name="client_name"
-               value="{{ old('client_name', $quotation->client_name ?? '') }}"
-               required
-               class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+              value="{{ old('client_name', $job->quotation->client_name ?? '') }}"
+              readonly
+              class="w-full border mt-1 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-700">
       </div>
+
       <div>
         <label class="block text-sm text-gray-600">Service Location</label>
         <input type="text" name="service_location"
-               value="{{ old('service_location', $quotation->client_address ?? '') }}"
-               class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+              value="{{ old('service_location', $job->quotation->client_address ?? '') }}"
+              readonly
+              class="w-full border mt-1 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-700">
       </div>
     </div>
 
@@ -84,7 +87,43 @@
               <th class="px-4 py-2 text-right">–</th>
             </tr>
           </thead>
-          <tbody id="itemRows" class="divide-y"></tbody>
+          <tbody id="itemRows" class="divide-y">
+            @if(isset($job->quotation->details) && count($job->quotation->details))
+              @foreach($job->quotation->details as $i => $detail)
+                <tr>
+                  <td class="px-4 py-3 font-medium text-gray-700">
+                    <input type="text" name="items[{{ $i }}][name]"
+                          value="{{ $detail->item_name }}"
+                          readonly
+                          class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700">
+                  </td>
+                  <td class="px-4 py-3">
+                    <textarea rows="2" name="items[{{ $i }}][description]"
+                              readonly
+                              class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700">{{ $detail->description }}</textarea>
+                  </td>
+                  <td class="px-4 py-3 w-20">
+                    <input type="number" name="items[{{ $i }}][quantity]"
+                          value="{{ $detail->quantity }}"
+                          min="1" step="1" required
+                          class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm">
+                  </td>
+                  <td class="px-4 py-3 w-24">
+                    <input type="number" name="items[{{ $i }}][unit_price]"
+                          value="{{ $detail->unit_price }}"
+                          readonly
+                          class="item-price border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700">
+                  </td>
+                  <td class="px-4 py-3 text-gray-700 item-total">
+                    ₱{{ number_format($detail->total,2) }}
+                  </td>
+                  <td class="px-4 py-3 text-right">
+                    <button type="button" class="remove-row text-red-500 hover:text-red-700 text-sm">Remove</button>
+                  </td>
+                </tr>
+              @endforeach
+            @endif
+          </tbody>
         </table>
       </div>
       <div class="flex justify-end mt-3">
@@ -132,9 +171,9 @@
                     <td class="px-4 py-2">{{ $case['name'] ?? '–' }}</td>
                     <td class="px-4 py-2">{{ $case['description'] ?? '' }}</td>
                     <td class="px-4 py-2">
-                    <input type="text" name="scope_status[]" placeholder="e.g. Done / Pending"
-                            class="w-full border rounded-md px-2 py-1 text-xs text-center">
-                    </td>
+                    <input type="text" name="scope_status[]"
+                      placeholder="e.g. Done / Pending"
+                      class="w-full border rounded-md px-2 py-1 text-xs text-center bg-white">
                 </tr>
                 @endforeach
             @endforeach

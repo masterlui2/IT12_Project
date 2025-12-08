@@ -109,7 +109,7 @@
                         @foreach($quotation->details as $i => $detail)
                             <tr>
                                 <td class="px-4 py-3">
-                                    <input type="text" name="items[{{ $i }}][name]" value="{{ $detail->name }}"
+                                    <input type="text" name="items[{{ $i }}][name]" value="{{ $detail->item_name }}"
                                            class="w-full border rounded-md px-2 py-1 text-sm">
                                 </td>
                                 <td class="px-4 py-3">
@@ -121,7 +121,7 @@
                                            class="border rounded-md px-2 py-1 w-full text-center text-sm item-qty">
                                 </td>
                                 <td class="px-4 py-3 w-24">
-                                    <input type="number" name="items[{{ $i }}][unit_price]" value="{{ $detail->price }}"
+                                    <input type="number" name="items[{{ $i }}][unit_price]" value="{{ $detail->unit_price }}"
                                            class="border rounded-md px-2 py-1 w-full text-center text-sm item-price">
                                 </td>
                                 <td class="px-4 py-3 text-right text-gray-700 item-total">₱{{ number_format($detail->total,2) }}</td>

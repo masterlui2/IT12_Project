@@ -273,6 +273,14 @@ class QuotationController extends Controller
                 return redirect()->route('technician.quotation')
                     ->with('success', 'Quotation sent to manager for approval.');
             }
+            if ($request->action === 'draft') {
+                $quotation->update([
+                    'date_issued' => now(),
+                ]);
+
+                return redirect()->route('technician.quotation')
+                    ->with('success', 'Quotation is drafted.');
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
