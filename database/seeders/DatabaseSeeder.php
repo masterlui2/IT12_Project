@@ -22,12 +22,13 @@ class DatabaseSeeder extends Seeder
             ManagerUserSeeder::class,
             TechnicianUserSeeder::class,
             ServiceTemplateSeeder::class,
+            CustomerSeeder::class,
          ]);
-        Technician::factory()->count(2)->create();
+        //Technician::factory()->count(2)->create();
 
         // // 5 customers
 
         // // 20 quotations (customers may repeat, technicians randomly assigned)
-        Quotation::factory()->count(20)->create();
+        //Quotation::factory()->count(20)->create();
     }
 }
