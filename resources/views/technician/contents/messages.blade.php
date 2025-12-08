@@ -5,102 +5,227 @@
 <!-- Top Bar -->
 <nav class="w-full bg-white shadow-sm border-b border-gray-100 px-6 py-3 flex justify-between items-center mb-4">
   <h2 class="text-xl font-semibold text-gray-800">Messages</h2>
-  <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">
-    + New Message
-  </button>
+  <span class="text-sm text-gray-500">Connected to customers</span>
 </nav>
 
 <div class="flex h-[calc(100vh-180px)] bg-white rounded-lg shadow-sm overflow-hidden">
 
-  <!-- Left Panel (Inbox List) -->
-  <aside class="w-1/3 border-r border-gray-100 flex flex-col">
-    <!-- Search -->
-    <div class="p-4 border-b">
-      <input 
-        type="text" 
-        placeholder="Search messages..." 
-        class="w-full px-3 py-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
-      />
-    </div>
-    <!-- Message List -->
-    <ul class="flex-1 overflow-y-auto divide-y">
-      <li class="p-4 hover:bg-blue-50 cursor-pointer transition">
-        <div class="flex justify-between items-center mb-1">
-          <h4 class="font-semibold text-gray-800 text-sm">EV Station #21</h4>
-          <span class="text-xs text-gray-400">2 m ago</span>
-        </div>
-        <p class="text-gray-600 text-sm truncate">Technician, we’re having network issues near bay 3...</p>
-      </li>
+  @if($customerThreads->isNotEmpty())
 
-      <li class="p-4 bg-blue-50 border-l-4 border-blue-600 cursor-pointer">
-        <div class="flex justify-between items-center mb-1">
-          <h4 class="font-semibold text-gray-800 text-sm">Admin - Support Team</h4>
-          <span class="text-xs text-gray-400">15 m ago</span>
-        </div>
-        <p class="text-gray-600 text-sm truncate">Your quotation for RapidEV has been approved.</p>
-      </li>
-
-      <li class="p-4 hover:bg-blue-50 cursor-pointer transition">
-        <div class="flex justify-between items-center mb-1">
-          <h4 class="font-semibold text-gray-800 text-sm">Client - Tesla Energy</h4>
-          <span class="text-xs text-gray-400">1 day ago</span>
-        </div>
-        <p class="text-gray-600 text-sm truncate">Thanks for sending the quotation. Awaiting final...</p>
-      </li>
-    </ul>
-  </aside>
-
-  <!-- Right Panel (Chat / Message View) -->
-  <section class="flex-1 flex flex-col">
-    <!-- Conversation Header -->
-    <div class="flex items-center justify-between p-4 border-b">
-      <div>
-        <h3 class="font-semibold text-gray-800 text-sm">Admin – Support Team</h3>
-        <p class="text-xs text-gray-400">Last message: 15 minutes ago</p>
-      </div>
-      <button class="text-gray-500 hover:text-red-600">
-        <i class="fas fa-trash-alt"></i>
-      </button>
-    </div>
-
-    <!-- Message Area -->
-    <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
-      <!-- Received -->
-      <div class="flex items-start space-x-3">
-        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-semibold">A</div>
-        <div class="bg-white rounded-lg shadow px-4 py-2 max-w-md">
-          <p class="text-sm text-gray-700">Hello Genshirog, please update the quotation report for Metro CSMS.</p>
-        </div>
+    <!-- Left Panel (Inbox List) -->
+    <aside class="w-1/3 border-r border-gray-100 flex flex-col">
+      <!-- Search -->
+      <div class="p-4 border-b">
+        <input 
+          type="text" 
+          placeholder="Search messages..." 
+          class="w-full px-3 py-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+        />
       </div>
 
-      <!-- Sent -->
-      <div class="flex items-start justify-end space-x-3">
-        <div class="bg-blue-600 text-white rounded-lg shadow px-4 py-2 max-w-md">
-          <p class="text-sm">Copy that! I’ll send the report update within the hour.</p>
+      <!-- Thread List -->
+      <ul class="flex-1 overflow-y-auto divide-y">
+        @foreach($customerThreads as $customerId => $thread)
+          <li>
+            <a 
+              href="{{ route('technician.messages', ['customer_id' => $customerId]) }}"
+              class="block p-4 cursor-pointer transition {{ $customerId === $activeCustomerId ? 'bg-blue-50 border-l-4 border-blue-600' : 'hover:bg-blue-50' }}"
+            >
+              <div class="flex justify-between items-center mb-1">
+                <h4 class="font-semibold text-gray-800 text-sm">
+                  {{ $thread->user->name ?? trim(($thread->user->firstname ?? '') . ' ' . ($thread->user->lastname ?? '')) ?: 'Customer' }}
+                </h4>
+                @if($thread->latest_message?->created_at)
+                  <span class="text-xs text-gray-400">
+                    {{ $thread->latest_message->created_at->diffForHumans() }}
+                  </span>
+                @endif
+              </div>
+              <p class="text-gray-600 text-sm truncate">
+                {{ Str::limit($thread->latest_message->body ?? 'No messages yet.', 60) }}
+              </p>
+            </a>
+          </li>
+        @endforeach
+      </ul>
+    </aside>
+
+    <!-- Right Panel (Chat / Message View) -->
+    <section class="flex-1 flex flex-col">
+
+      <!-- Conversation Header -->
+      <div class="flex items-center justify-between p-4 border-b bg-gray-50">
+        <div>
+          <h3 class="font-semibold text-gray-800 text-sm">
+            {{ $activeCustomer?->name 
+                ?? trim(($activeCustomer->firstname ?? '') . ' ' . ($activeCustomer->lastname ?? '')) 
+                ?: 'Customer conversation' }}
+          </h3>
+          <p class="text-xs text-gray-400">
+            @if(isset($messages) && $messages->last())
+              {{ optional($messages->last()->created_at)->toDayDateTimeString() }} ·
+              {{ $messages->last()->user?->name ?? 'Latest activity' }}
+            @else
+              No messages yet
+            @endif
+          </p>
         </div>
+
+        @if($activeCustomerId)
+          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+            Active thread
+          </span>
+        @endif
       </div>
 
-      <!-- Received -->
-      <div class="flex items-start space-x-3">
-        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-semibold">A</div>
-        <div class="bg-white rounded-lg shadow px-4 py-2 max-w-md">
-          <p class="text-sm text-gray-700">Perfect, thanks! You can use the latest numbers from RapidEV.</p>
-        </div>
-      </div>
-    </div>
+      <!-- Messages Area -->
+      @if(isset($messages) && $messages->isNotEmpty())
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
 
-    <!-- Input Bar -->
-    <div class="p-4 border-t flex items-center space-x-3">
-      <input 
-        type="text" 
-        placeholder="Type your message..." 
-        class="flex-1 px-4 py-2 border rounded-full text-sm focus:ring-blue-500 focus:border-blue-500"
-      />
-      <button class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700">
-        <i class="fas fa-paper-plane"></i>
-      </button>
+          {{-- Inquiry card as a "message" from the customer --}}
+          @if($activeInquiry)
+            <div class="flex items-start space-x-3 justify-start">
+              <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                {{ strtoupper(mb_substr($activeInquiry->name ?? ($activeCustomer?->name ?? 'C'), 0, 1)) }}
+              </div>
+
+              <div class="bg-white rounded-lg shadow px-3 py-3 max-w-2xl">
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <p class="text-[11px] uppercase tracking-wide text-gray-500">Inquiry</p>
+                    <p class="text-xs font-semibold text-gray-800">
+                      INQ-{{ str_pad($activeInquiry->id, 5, '0', STR_PAD_LEFT) }}
+                    </p>
+                  </div>
+                  <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
+                    {{ $activeInquiry->status ?? 'Pending' }}
+                  </span>
+                </div>
+
+                <div class="grid gap-1 text-[11px] text-gray-700 md:grid-cols-2">
+                  <p>
+                    <span class="text-gray-500">Name:</span>
+                    {{ $activeInquiry->name ?? ($activeCustomer?->name ?? 'Customer') }}
+                  </p>
+                  <p>
+                    <span class="text-gray-500">Contact:</span>
+                    {{ $activeInquiry->contact_number ?? '—' }}
+                  </p>
+                  <p>
+                    <span class="text-gray-500">Email:</span>
+                    {{ $activeInquiry->email ?? '—' }}
+                  </p>
+                  <p>
+                    <span class="text-gray-500">Location:</span>
+                    {{ $activeInquiry->service_location ?? '—' }}
+                  </p>
+                  <p>
+                    <span class="text-gray-500">Category:</span>
+                    {{ $activeInquiry->category ?? 'General' }}
+                  </p>
+
+                  @if(!empty($activeInquiry->preferred_schedule))
+                    <p>
+                      <span class="text-gray-500">Preferred:</span>
+                      {{ \Illuminate\Support\Carbon::parse($activeInquiry->preferred_schedule)->format('M d, Y') }}
+                    </p>
+                  @endif
+                </div>
+
+                <div class="mt-2">
+                  <p class="text-[10px] uppercase tracking-wide text-gray-500 mb-1">Issue Description</p>
+                  <p class="text-xs text-gray-800 leading-relaxed">
+                    {{ $activeInquiry->issue_description ?? 'No description provided.' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          @endif
+
+          {{-- Normal messages --}}
+          @foreach($messages as $message)
+            @php $isMine = $message->user_id === auth()->id(); @endphp
+
+            <div class="flex items-start space-x-3 {{ $isMine ? 'justify-end text-right' : 'justify-start' }}">
+              @unless($isMine)
+                <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                  {{ strtoupper(mb_substr(optional($message->user)->name ?? 'C', 0, 1)) }}
+                </div>
+              @endunless
+
+              <div class="bg-white rounded-lg shadow px-3 py-2 max-w-2xl {{ $isMine ? 'ml-auto border border-blue-100' : '' }}">
+                <div class="flex items-center justify-between gap-3 mb-1">
+                  <p class="text-xs font-semibold text-gray-800">
+                    {{ $message->user->name 
+                        ?? trim(($message->user->firstname ?? '') . ' ' . ($message->user->lastname ?? '')) 
+                        ?: 'User' }}
+                  </p>
+                  <span class="text-[10px] text-gray-500">
+                    {{ optional($message->created_at)->diffForHumans() }}
+                  </span>
+                </div>
+                <p class="text-sm text-gray-700 whitespace-pre-line">
+                  {{ $message->body }}
+                </p>
+                <p class="text-[10px] text-gray-500 mt-1">
+                  {{ ucfirst($message->user->role ?? 'customer') }}
+                </p>
+              </div>
+
+              @if($isMine)
+                <div class="w-9 h-9 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-semibold">
+                  {{ strtoupper(mb_substr(optional($message->user)->name ?? 'T', 0, 1)) }}
+                </div>
+              @endif
+            </div>
+          @endforeach
+        </div>
+      @else
+        <div class="flex-1 flex items-center justify-center text-gray-500 p-6 bg-gray-50">
+          {{ $activeCustomerId ? 'No messages in this conversation yet.' : 'Select a conversation from the left to start messaging.' }}
+        </div>
+      @endif
+
+      <!-- Composer -->
+      @if($activeCustomerId)
+        <form action="{{ route('messages.store') }}" method="POST" class="p-4 border-t bg-white space-y-2">
+          @csrf
+          <input type="hidden" name="customer_id" value="{{ $activeCustomerId }}">
+
+          <label for="body" class="text-sm text-gray-600">Send a message to the customer</label>
+          <textarea
+            id="body"
+            name="body"
+            rows="3"
+            class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Type your update or question..."
+            required
+          >{{ old('body') }}</textarea>
+
+          @error('body')
+            <p class="text-xs text-red-500">{{ $message }}</p>
+          @enderror
+
+          <div class="flex justify-end">
+            <button 
+              type="submit" 
+              class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 inline-flex items-center gap-2"
+            >
+              <i class="fas fa-paper-plane"></i>
+              Send Message
+            </button>
+          </div>
+        </form>
+      @endif
+
+    </section>
+
+  @else
+    <!-- No threads at all -->
+    <div class="flex-1 flex items-center justify-center text-gray-500 p-6 bg-gray-50">
+      No feedback messages yet.
     </div>
-  </section>
+  @endif
 
 </div>
 

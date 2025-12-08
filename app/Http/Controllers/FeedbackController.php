@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Feedback;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,14 +29,21 @@ class FeedbackController extends Controller
             'message'  => ['required', 'string', 'min:5'],
         ]);
 
-        Feedback::create([
+        $feedback = Feedback::create([
             'Customer_ID'   => Auth::id(),             // who submitted
             'Comments'      => $validated['message'],  // legacy column
-            'rating'         => $validated['rating'], 
+            'rating'         => $validated['rating'],
             'category'      => $validated['category'],
             'message'       => $validated['message'],  // new column
             'Date_Submitted'=> now(),                  // required column
         ]);
+         Message::create([
+            'user_id'     => Auth::id(),
+            'feedback_id' => $feedback->id,
+            'subject'     => 'Customer feedback: ' . $validated['category'],
+            'body'        => $validated['message'],
+        ]);
+
 
         return redirect()
             ->route('feedback.create')
