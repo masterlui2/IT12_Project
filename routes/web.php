@@ -150,6 +150,7 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::prefix('/quotation')->group(function (){
         Route::get('/index', [QuotationController::class, 'index'])->name('technician.quotation');
         Route::get('/new', [QuotationController::class, 'newQuotation'])->name('quotation.new');
+        Route::get('/template/{id}', [QuotationController::class, 'getTemplate']);
         Route::post('/store', [QuotationController::class, 'store'])->name('quotation.store');
         Route::get('/{id}', [QuotationController::class, 'show'])->name('quotation.show');
         Route::get('/{id}/edit', [QuotationController::class, 'edit'])->name('quotation.edit');

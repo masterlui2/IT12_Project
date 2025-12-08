@@ -19,6 +19,7 @@ use App\Models\Customer;
 use App\Models\Technician;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Inquiry;
+use App\Models\ServiceTemplate;
 
 class QuotationController extends Controller
 {
@@ -78,21 +79,32 @@ class QuotationController extends Controller
      */
     public function newQuotation(Request $request)
     {
-        $inquiryId = $request->query('inquiry'); // gets ?inquiry=5 from URL
-
+        $inquiryId = $request->query('inquiry');
         $inquiry = null;
 
         if ($inquiryId) {
             $inquiry = Inquiry::with(['customer'])->find($inquiryId);
-            
+
             if (!$inquiry) {
-                return redirect()->route('technician.inquire.index')
+                return redirect()
+                    ->route('technician.inquire.index')
                     ->with('error', 'Inquiry not found.');
             }
         }
 
-        return view('technician.contents.quotations.create', compact('inquiry'));
+        // 🔹 Load all templates seeded from ServiceTemplateSeeder
+        $templates = ServiceTemplate::select('id', 'name', 'category')->where('is_active', true)->get();
+
+        // Pass both inquiry and templates to the view
+        return view('technician.contents.quotations.create', compact('inquiry', 'templates'));
     }
+
+    public function getTemplate($id)
+    {
+        // Return template with relationships for live loading
+        return ServiceTemplate::with(['scopes.cases', 'waivers.cases', 'deliverables'])->findOrFail($id);
+    }
+
 
     /**
      * Store a newly created quotation
