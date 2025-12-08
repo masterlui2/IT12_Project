@@ -8,7 +8,7 @@
   <div class="flex justify-between items-center border-b pb-3">
     <div>
       <h1 class="text-xl font-bold text-gray-800">Techne Fixer Computer and Laptop Repair Services</h1>
-      <p class="text-sm text-gray-500">007 Manga Street, Toril Davao City</p>
+      <p class="text-sm text-gray-500">007 Manga Street Crossing Bayabas Davao City</p>
       <p class="text-sm text-gray-500">Contact No: 09662406825   TIN 618‑863‑736‑000000</p>
     </div>
     <img src="{{ asset('images/logo.png') }}" class="w-20 h-20 object-contain" alt="Company Logo">

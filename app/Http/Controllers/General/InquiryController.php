@@ -13,11 +13,11 @@ class InquiryController extends Controller
     // Show the inquiry form
     public function create()
     {
-        if(Auth::check()){
-            return match(Auth::user()->role){
-                'technician'   => view('technician.contents.inquiries.create'),
-                'customer'     => view('customer.inquiries.create'),
-                default        => view('customer.inquiries.create')
+        if (Auth::check()) {
+            return match (Auth::user()->role) {
+                'technician' => view('customer.inquiries.create'),
+                'customer'   => view('customer.inquiries.create'),
+                default      => view('customer.inquiries.create')
             };
         }
     }
@@ -59,12 +59,8 @@ class InquiryController extends Controller
 
             // 🔹 Technician submitting an inquiry (self‑assigned diagnostic)
             elseif ($user->role === 'technician') {
-                $technician = $user->technician;
-
-                if ($technician) {
-                    $validated['assigned_technician_id'] = $technician->id;
-                    $validated['status'] = 'Acknowledged';  // starts directly as acknowledged/claimed
-                }
+                $validated['assigned_technician_id'] = $user->id;
+                $validated['status'] = 'Acknowledged';
             }
             } else {
             $validated['user_id'] = null;

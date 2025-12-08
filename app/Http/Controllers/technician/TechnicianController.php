@@ -24,10 +24,9 @@ class TechnicianController extends Controller
         // Get the current technician record linked to the user
         $technician = Auth::user()->technician;
 
-        // Build query: show unclaimed or assigned to this technician only
         $inquiries = Inquiry::where(function ($q) use ($technician) {
                 $q->whereNull('assigned_technician_id')
-                ->orWhere('assigned_technician_id', $technician->id);
+                ->orWhereIn('assigned_technician_id', [optional($technician)->id, Auth::id()]);
             })
             ->orderByDesc('created_at')
             ->paginate(10);
@@ -62,7 +61,7 @@ class TechnicianController extends Controller
     public function inquireShow(int $id)
     {
         // Fetch inquiry with necessary relationships
-        $inquiry = Inquiry::with('assignedTechnician', 'customer')->findOrFail($id);
+        $inquiry = Inquiry::with('technician', 'customer')->findOrFail($id);
 
         // Render technician detail view
         return view('technician.contents.inquiries.show', compact('inquiry'));

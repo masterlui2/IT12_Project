@@ -88,8 +88,8 @@
 
         <div>
             <label class="block text-sm text-gray-600">Assigned Technician</label>
-            @if($inquiry->assignedTechnician)
-                <p class="mt-1 text-gray-900 font-medium">{{ $inquiry->assignedTechnician->firstname }}</p>
+            @if($inquiry->technician)
+                <p class="mt-1 text-gray-900 font-medium">{{ $inquiry->technician->name }}</p>
             @else
                 <p class="mt-1 text-gray-500 italic">No technician assigned yet.</p>
             @endif
@@ -113,7 +113,7 @@
                 Back to List
             </button>
         </a>
-        @if(!$inquiry->assignedTechnician)
+        @if(!$inquiry->technician)
             <form action="{{ route('technician.inquire.claim', $inquiry->id) }}" method="POST" class="inline">
                 @csrf
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
