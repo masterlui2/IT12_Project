@@ -321,6 +321,19 @@ class QuotationController extends Controller
         return view('technician.contents.quotations.show', compact('quotation'));
     }
 
+    public function sendToManager($id,Request $request){
+        $quotation = Quotation::findOrFail($id);
+        if ($request->action === 'submit_manager') {
+                $quotation->update([
+                    'status' => 'pending',
+                    'date_issued' => now(),
+                ]);
+
+                return redirect()->route('technician.quotation')
+                    ->with('success', 'Quotation sent to manager for approval.');
+            }
+    }
+
     /**
      * Show the form for editing the specified quotation
      */

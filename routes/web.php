@@ -155,6 +155,7 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
         Route::get('/{id}', [QuotationController::class, 'show'])->name('quotation.show');
         Route::get('/{id}/edit', [QuotationController::class, 'edit'])->name('quotation.edit');
         Route::put('/{id}', [QuotationController::class, 'update'])->name('quotation.update');
+        Route::put('/send/{id}', [QuotationController::class, 'sendToManager'])->name('quotation.sendToManager');
         Route::delete('/{id}', [QuotationController::class, 'destroy'])->name('quotation.destroy');
         
         // PDF Routes
