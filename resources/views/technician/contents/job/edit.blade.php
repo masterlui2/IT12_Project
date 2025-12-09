@@ -90,39 +90,42 @@
           <tbody id="itemRows" class="divide-y">
             @if(isset($job->quotation->details) && count($job->quotation->details))
               @foreach($job->quotation->details as $i => $detail)
-                <tr>
-                  <td class="px-4 py-3 font-medium text-gray-700">
-                    <input type="text" name="items[{{ $i }}][name]"
-                          value="{{ $detail->item_name }}"
-                          readonly
-                          class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700">
-                  </td>
-                  <td class="px-4 py-3">
-                    <textarea rows="2" name="items[{{ $i }}][description]"
-                              readonly
-                              class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700">{{ $detail->description }}</textarea>
-                  </td>
-                  <td class="px-4 py-3 w-20">
-                    <input type="number" name="items[{{ $i }}][quantity]"
-                          value="{{ $detail->quantity }}"
-                          min="1" step="1" required
-                          class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm">
-                  </td>
-                  <td class="px-4 py-3 w-24">
-                    <input type="number" name="items[{{ $i }}][unit_price]"
-                          value="{{ $detail->unit_price }}"
-                          readonly
-                          class="item-price border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700">
-                  </td>
-                  <td class="px-4 py-3 text-gray-700 item-total">
-                    ₱{{ number_format($detail->total,2) }}
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <button type="button" class="remove-row text-red-500 hover:text-red-700 text-sm">Remove</button>
-                  </td>
-                </tr>
+                  <tr class="bg-gray-50">
+                      <td class="px-4 py-3 font-medium text-gray-700">
+                          <input type="text" name="items[{{ $i }}][name]"
+                                value="{{ $detail->item_name }}"
+                                readonly
+                                class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
+                      </td>
+                      <td class="px-4 py-3">
+                          <textarea rows="2" name="items[{{ $i }}][description]"
+                                    readonly
+                                    class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">{{ $detail->description }}</textarea>
+                      </td>
+                      <td class="px-4 py-3 w-20">
+                          <input type="number" name="items[{{ $i }}][quantity]"
+                                value="{{ $detail->quantity }}"
+                                min="1" step="1"
+                                readonly
+                                class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
+                      </td>
+                      <td class="px-4 py-3 w-24">
+                          <input type="number" name="items[{{ $i }}][unit_price]"
+                                value="{{ $detail->unit_price }}"
+                                readonly
+                                class="item-price border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
+                      </td>
+                      <td class="px-4 py-3 text-gray-700 item-total">
+                          ₱{{ number_format($detail->total, 2) }}
+                      </td>
+                      <td class="px-4 py-3 text-right">
+                          {{-- Immutable items from quotation: no removal --}}
+                          <span class="text-gray-400 text-xs italic">Fixed from quotation</span>
+                      </td>
+                  </tr>
               @endforeach
-            @endif
+          @endif
+
           </tbody>
         </table>
       </div>
@@ -150,50 +153,81 @@
     </div>
 
     <!-- Scope of Work (Reference Only) -->
-    @if(isset($quotation->scope) && count($quotation->scope))
-    <div class="mt-8">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Scope of Work (Reference)</h3>
-        <div class="overflow-x-auto bg-gray-50 border rounded-md">
-        <table class="w-full text-sm text-left">
-            <thead class="bg-gray-100 text-gray-700 border-b">
-            <tr>
-                <th class="px-4 py-2 w-1/4">Scenario</th>
-                <th class="px-4 py-2 w-1/4">Case</th>
-                <th class="px-4 py-2 w-2/4">Description</th>
-                <th class="px-4 py-2 w-1/6 text-center">Status / Remarks</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($quotation->scope as $scenario)
-                @foreach($scenario['cases'] ?? [] as $case)
-                <tr class="border-b">
-                    <td class="px-4 py-2">{{ $scenario['scenario'] ?? '–' }}</td>
-                    <td class="px-4 py-2">{{ $case['name'] ?? '–' }}</td>
-                    <td class="px-4 py-2">{{ $case['description'] ?? '' }}</td>
-                    <td class="px-4 py-2">
-                    <input type="text" name="scope_status[]"
-                      placeholder="e.g. Done / Pending"
-                      class="w-full border rounded-md px-2 py-1 text-xs text-center bg-white">
-                </tr>
-                @endforeach
-            @endforeach
-            </tbody>
-        </table>
-        </div>
-    </div>
+    @if(isset($job->quotation->scopes) && $job->quotation->scopes->count())
+      <div class="mt-8">
+          <h3 class="text-sm font-semibold text-gray-700 mb-2">Scope of Work (Reference)</h3>
+          <div class="overflow-x-auto bg-gray-50 border rounded-md">
+              <table class="w-full text-sm text-left border-collapse">
+                  <thead class="bg-gray-100 text-gray-700 border-b">
+                      <tr>
+                          <th class="px-4 py-2 w-1/4">Scenario</th>
+                          <th class="px-4 py-2 w-1/4">Case</th>
+                          <th class="px-4 py-2 w-2/4">Description</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      @foreach($job->quotation->scopes as $scope)
+                          @php
+                              $caseCount = $scope->cases->count();
+                          @endphp
+                          @foreach($scope->cases as $caseIndex => $case)
+                              <tr class="border-b">
+                                  {{-- Only print scenario name once, merged across its row span --}}
+                                  @if($caseIndex === 0)
+                                      <td rowspan="{{ $caseCount }}"
+                                          class="px-4 py-2 font-semibold text-gray-800 align-top">
+                                          {{ $scope->scenario_name ?? '–' }}
+                                      </td>
+                                  @endif
+
+                                  <td class="px-4 py-2 text-gray-700">{{ $case->case_title ?? '–' }}</td>
+                                  <td class="px-4 py-2 text-gray-700">{{ $case->case_description ?? '–' }}</td>
+                              </tr>
+                          @endforeach
+                      @endforeach
+                  </tbody>
+              </table>
+          </div>
+      </div>
     @endif
 
+
+
     <!-- Scope of Waiver (Reference Only) -->
-    @if(isset($quotation->waiver) && count($quotation->waiver))
-    <div class="mt-8">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Scope of Waiver (Reference)</h3>
-        <div class="bg-gray-50 border rounded-md p-4 text-sm text-gray-700 space-y-1">
-        @foreach($quotation->waiver as $waiver)
-            <p class="border-b pb-1"><strong>{{ $waiver['scenario'] ?? '' }}</strong> — {{ $waiver['cases'][0]['description'] ?? '' }}</p>
-        @endforeach
-        </div>
-    </div>
-    @endif
+    @if(isset($job->quotation->waivers) && $job->quotation->waivers->count())
+      <div class="mt-8">
+          <h3 class="text-sm font-semibold text-gray-700 mb-2">Scope of Waiver (Reference)</h3>
+          <div class="overflow-x-auto bg-gray-50 border rounded-md">
+              <table class="w-full text-sm text-left border-collapse">
+                  <thead class="bg-gray-100 text-gray-700 border-b">
+                      <tr>
+                          <th class="px-4 py-2 w-1/4">Waiver Scenario</th>
+                          <th class="px-4 py-2 w-1/4">Case</th>
+                          <th class="px-4 py-2 w-2/4">Description</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      @foreach($job->quotation->waivers as $waiver)
+                          @php $wCaseCount = $waiver->cases->count(); @endphp
+                          @foreach($waiver->cases as $wIndex => $wCase)
+                              <tr class="border-b">
+                                  @if($wIndex === 0)
+                                      <td rowspan="{{ $wCaseCount }}" class="px-4 py-2 font-semibold text-gray-800 align-top">
+                                          {{ $waiver->waiver_title ?? '–' }}
+                                      </td>
+                                  @endif
+                                  <td class="px-4 py-2 text-gray-700">{{ $wCase->case_title ?? '–' }}</td>
+                                  <td class="px-4 py-2 text-gray-700">{{ $wCase->description ?? '–' }}</td>
+                              </tr>
+                          @endforeach
+                      @endforeach
+                  </tbody>
+              </table>
+          </div>
+      </div>
+      @endif
+
+
 
 
     {{-- TECHNICIAN NOTES --}}
@@ -227,7 +261,7 @@
         <div>
           <label class="block text-sm text-gray-700 font-medium mb-1">Customer Name</label>
           <input type="text" name="customer_name" 
-                 value="{{ old('customer_name', $quotation->client_name ?? '') }}"
+                 value="{{ old('customer_name', $job->quotation->client_name ?? '') }}"
                  class="w-full border rounded-md px-3 py-2 text-sm mb-2 focus:ring-blue-500 focus:border-blue-500">
           <div class="flex justify-between text-sm gap-4">
             <input type="text" name="customer_signature" 
@@ -312,6 +346,7 @@ document.getElementById('addItemBtn').addEventListener('click', e => {
   const tbody = document.getElementById('itemRows');
   const rowCount = tbody.rows.length;
   const row = document.createElement('tr');
+  row.classList.add('editable-row');
   row.innerHTML = `
     <td class="px-4 py-3 font-medium text-gray-700">
       <input type="text" name="items[${rowCount}][name]" placeholder="Item ${rowCount + 1}" required class="w-full border rounded-md px-2 py-1 text-sm">
@@ -337,9 +372,14 @@ document.getElementById('addItemBtn').addEventListener('click', e => {
 
 document.getElementById('itemRows').addEventListener('click', e => {
   if (e.target.classList.contains('remove-row')) {
-    e.preventDefault();
-    e.target.closest('tr').remove();
-    calculateTotals();
+    const row = e.target.closest('tr');
+    if (row.classList.contains('editable-row')) {  // allow removal only on added rows
+      e.preventDefault();
+      row.remove();
+      calculateTotals();
+    } else {
+      alert('Quoted items cannot be removed.');
+    }
   }
 });
 </script>
