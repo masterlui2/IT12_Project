@@ -11,16 +11,13 @@ return new class extends Migration
         Schema::create('quotation_deliverables', function (Blueprint $table) {
             $table->id();
 
-            // Foreign key MUST match quotations.id (bigint unsigned)
+            // Link to quotations table
             $table->foreignId('quotation_id')
-                  ->constrained('quotations')   // make sure the table is named "quotations"
+                  ->constrained('quotations')
                   ->onDelete('cascade');
 
-            // Your other columns:
-            // e.g.
-            $table->string('item_name');
-            $table->integer('quantity')->default(1);
-            $table->decimal('price', 10, 2)->nullable();
+            // 👇 This is what your model and controller use
+            $table->string('deliverable_detail');
 
             $table->timestamps();
         });

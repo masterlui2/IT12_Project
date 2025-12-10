@@ -19,6 +19,7 @@ use App\Models\Customer;
 use App\Models\Technician;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Inquiry;
+use App\Models\ServiceTemplate;
 
 class QuotationController extends Controller
 {
@@ -78,21 +79,32 @@ class QuotationController extends Controller
      */
     public function newQuotation(Request $request)
     {
-        $inquiryId = $request->query('inquiry'); // gets ?inquiry=5 from URL
-
+        $inquiryId = $request->query('inquiry');
         $inquiry = null;
 
         if ($inquiryId) {
             $inquiry = Inquiry::with(['customer'])->find($inquiryId);
-            
+
             if (!$inquiry) {
-                return redirect()->route('technician.inquire.index')
+                return redirect()
+                    ->route('technician.inquire.index')
                     ->with('error', 'Inquiry not found.');
             }
         }
 
-        return view('technician.contents.quotations.create', compact('inquiry'));
+        // 🔹 Load all templates seeded from ServiceTemplateSeeder
+        $templates = ServiceTemplate::select('id', 'name', 'category')->where('is_active', true)->get();
+
+        // Pass both inquiry and templates to the view
+        return view('technician.contents.quotations.create', compact('inquiry', 'templates'));
     }
+
+    public function getTemplate($id)
+    {
+        // Return template with relationships for live loading
+        return ServiceTemplate::with(['scopes.cases', 'waivers.cases', 'deliverables'])->findOrFail($id);
+    }
+
 
     /**
      * Store a newly created quotation
@@ -280,6 +292,14 @@ class QuotationController extends Controller
                 return redirect()->route('technician.quotation')
                     ->with('success', 'Quotation sent to manager for approval.');
             }
+            if ($request->action === 'draft') {
+                $quotation->update([
+                    'date_issued' => now(),
+                ]);
+
+                return redirect()->route('technician.quotation')
+                    ->with('success', 'Quotation is drafted.');
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -306,6 +326,19 @@ class QuotationController extends Controller
         ])->findOrFail($id);
 
         return view('technician.contents.quotations.show', compact('quotation'));
+    }
+
+    public function sendToManager($id,Request $request){
+        $quotation = Quotation::findOrFail($id);
+        if ($request->action === 'submit_manager') {
+                $quotation->update([
+                    'status' => 'pending',
+                    'date_issued' => now(),
+                ]);
+
+                return redirect()->route('technician.quotation')
+                    ->with('success', 'Quotation sent to manager for approval.');
+            }
     }
 
     /**

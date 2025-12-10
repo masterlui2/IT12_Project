@@ -142,5 +142,15 @@
     <p class="text-center text-[11px] text-gray-500 mt-8 border-t pt-2">
         Techne Fixer Computer and Laptop Repair Services | Quotation
     </p>
+
+    <form action="{{ route('quotation.sendToManager', $quotation->id) }}" method="POST">
+        @csrf
+        @method('PUT')
+        <button type="submit" name="action" value="submit_manager" 
+                class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+            Send To Manager
+        </button>
+    </form>
+
 </div>
 @endsection
