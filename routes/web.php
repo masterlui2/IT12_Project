@@ -84,8 +84,16 @@ Route::middleware(['auth'])->group(function () {
         ->name('inquiry.store');
     Route::post('/feedback/create', [FeedbackController::class, 'store'])
         ->name('feedback.store');
-     Route::post('/messages', [MessageController::class, 'store'])
-        ->name('messages.store');
+ Route::get('/messages', function () {
+        $user = Auth::user();
+
+        return match ($user?->role) {
+            'technician' => redirect()->route('technician.messages'),
+            'customer'   => redirect()->route('customer.messages'),
+            default      => redirect()->route('home'),
+        };
+    })->name('messages.index');
+    Route::post('/messages', [MessageController::class, 'store'])        ->name('messages.store');
 });
 
 

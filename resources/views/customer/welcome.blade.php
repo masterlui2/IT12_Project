@@ -12,11 +12,12 @@
 
  
 @include('customer.contact')
+@include('partials.support-widget')
 @include('customer.about-feedback', ['feedbacks' => $feedbacks ?? null])
 
   
   @include('partials.footer')
-
+  @stack('scripts')
 
 </body>
 </html>

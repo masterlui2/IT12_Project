@@ -34,9 +34,7 @@
 
       @auth
         <span class="h-5 w-px bg-white/10"></span>
-        <a href="{{ route('customer.track') }}" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
-          Track Repair
-        </a>
+       
         <a href="{{ route('customer.messages') }}" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
           Messages
         </a>
