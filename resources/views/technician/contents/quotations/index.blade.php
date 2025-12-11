@@ -5,13 +5,6 @@
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-8">
 
   <!-- Header Section -->
-<<<<<<< HEAD
-  <div class="flex justify-between items-center border-b pb-3">
-    <div>
-      <h1 class="text-xl font-bold text-gray-800">Techne Fixer Computer and Laptop Repair Services</h1>
-      <p class="text-sm text-gray-500">007 Manga Street Crossing Bayabas Davao City</p>
-      <p class="text-sm text-gray-500">Contact No: 09662406825   TIN 618‑863‑736‑000000</p>
-=======
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200">
     <div class="space-y-2">
       <h1 class="text-xl font-semibold text-gray-900">Techne Fixer Computer and Laptop Repair Services</h1>
@@ -19,7 +12,6 @@
         <p>007 Manga Street, Toril Davao City</p>
         <p>Contact No: 09662406825 | TIN 618‑863‑736‑000000</p>
       </div>
->>>>>>> e64a7d42cf285e1828b26c2bb2ce29435ee09de9
     </div>
     <img src="{{ asset('images/logo.png') }}" class="w-16 h-16 object-contain" alt="Company Logo">
   </div>
