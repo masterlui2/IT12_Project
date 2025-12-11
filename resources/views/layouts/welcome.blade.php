@@ -8,10 +8,8 @@
 @include('partials.header')
 
 
-
 @include('customer.hero')
 
-@include('customer.about-feedback')
  
 @include('customer.contact')
 

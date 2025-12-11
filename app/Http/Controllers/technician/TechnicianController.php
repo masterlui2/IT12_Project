@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Technician;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inquiry;
-use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
 class TechnicianController extends Controller
 {
@@ -12,49 +11,9 @@ class TechnicianController extends Controller
         return view('technician.contents.dashboard');
     }
 
-   public function messages(Request $request)
-    {
-        $customerThreads = Message::with('user')
-            ->whereHas('user', fn ($query) => $query->where('role', 'customer'))
-            ->latest()
-            ->get()
-            ->groupBy('user_id')
-            ->map(function ($messages) {
-                $latest = $messages->first();
-
-                return (object) [
-                    'user' => $latest?->user,
-                    'latest_message' => $latest,
-                    'count' => $messages->count(),
-                ];
-            })
-            ->sortByDesc(fn ($thread) => optional($thread->latest_message)->created_at);
-
-        $activeCustomerId = $request->integer('customer_id') ?: $customerThreads->keys()->first();
-        $activeCustomer = $activeCustomerId ? optional($customerThreads->get($activeCustomerId))->user : null;
-        $activeInquiry = null;
-
-        $messages = collect();
-
-        if ($activeCustomerId) {
-            $activeInquiry = Inquiry::where('customer_id', $activeCustomerId)
-                ->latest()
-                ->first();
-
-            $messages = Message::with('user')
-                ->whereIn('user_id', [$activeCustomerId, Auth::id()])
-                ->orderBy('created_at')
-                ->get();
-        }
-
-        return view('technician.contents.messages', [
-            'messages' => $messages,
-            'customerThreads' => $customerThreads,
-            'activeCustomer' => $activeCustomer,
-            'activeCustomerId' => $activeCustomerId,
-            'activeInquiry' => $activeInquiry,
-        ]);
-        }
+    public function messages(){
+        return view('technician.contents.messages');
+    }
 
     public function reporting(){
         return view('technician.contents.reporting');
@@ -65,9 +24,10 @@ class TechnicianController extends Controller
         // Get the current technician record linked to the user
         $technician = Auth::user()->technician;
 
+        // Build query: show unclaimed or assigned to this technician only
         $inquiries = Inquiry::where(function ($q) use ($technician) {
                 $q->whereNull('assigned_technician_id')
-                ->orWhereIn('assigned_technician_id', [optional($technician)->id, Auth::id()]);
+                ->orWhere('assigned_technician_id', $technician->id);
             })
             ->orderByDesc('created_at')
             ->paginate(10);
@@ -102,7 +62,7 @@ class TechnicianController extends Controller
     public function inquireShow(int $id)
     {
         // Fetch inquiry with necessary relationships
-        $inquiry = Inquiry::with('technician', 'customer')->findOrFail($id);
+        $inquiry = Inquiry::with('assignedTechnician', 'customer')->findOrFail($id);
 
         // Render technician detail view
         return view('technician.contents.inquiries.show', compact('inquiry'));

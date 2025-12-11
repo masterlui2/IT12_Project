@@ -51,7 +51,7 @@
                         </a>
                     </div>
 
-                    <form method="POST" action="{{ route((Auth::check() && Auth::user()->role === 'technician') ? 'technician.inquire.store' : 'customer.inquiry.store') }}" enctype="multipart/form-data" id="inquiryForm">
+                    <form method="POST" action="{{ route('customer.inquiry.store') }}" enctype="multipart/form-data" id="inquiryForm">
                         {{-- Progress Indicator --}}
                            @csrf  
                         <div class="mb-6">

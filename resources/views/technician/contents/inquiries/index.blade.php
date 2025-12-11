@@ -51,7 +51,7 @@
 
     <tbody class="divide-y">
       @forelse($inquiries as $inq)
-      <tr class="group hover:bg-gray-50 transition">
+      <tr class="hover:bg-gray-50 transition">
         <!-- Inquiry number -->
         <td class="px-4 py-3 font-medium text-neutral-900">
           INQ-{{ str_pad($inq->id, 5, '0', STR_PAD_LEFT) }}
@@ -81,11 +81,10 @@
 
         <!-- Assigned Technician -->
         <td class="px-4 py-3 text-neutral-800">
-            @php $assignedToYou = ($inq->assigned_technician_id === auth()->id()) || ($inq->technician && $inq->technician->user_id === auth()->id()); @endphp
             @if ($inq->technician)
-                <span class="font-medium text-neutral-900">{{ $inq->technician->name }}</span>
-            @elseif($assignedToYou)
-                <span class="font-medium text-neutral-900">You</span>
+                <span class="font-medium text-neutral-900">
+                    {{ $inq->technician->name }}
+                </span>
             @else
                 <span class="text-gray-400">Unassigned</span>
             @endif
@@ -136,41 +135,29 @@
               <i class="fas fa-eye"></i><span class="sr-only">View</span>
             </a>
 
-            @php $assignedToYou = ($inq->assigned_technician_id === auth()->id()) || ($inq->technician && $inq->technician->user_id === auth()->id()); @endphp
-            @if(!$inq->technician && !$assignedToYou)
+            @if(!$inq->technician)
                 <form action="{{ route('technician.inquire.claim', $inq->id) }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" 
-                            class="inline-flex items-center gap-1 text-yellow-600 hover:text-yellow-700 group-hover:text-yellow-700 text-sm font-medium px-2 py-1 rounded transition-colors hover:bg-yellow-50 group-hover:bg-yellow-50 active:bg-yellow-100 focus:outline-none focus:ring-1 focus:ring-yellow-200 focus-visible:ring-yellow-300"
+                            class="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
                             title="Claim this inquiry">
-                        <i class="fas fa-user-check"></i>
-                        <span>Claim</span>
+                        Claim
                     </button>
                 </form>
-            @elseif($assignedToYou)
-                <span class="inline-flex w-8 h-8 items-center justify-center text-green-600" title="Assigned to You">
-                    <i class="fas fa-user-check"></i>
-                </span>
-            @elseif ($inq->technician)
-                <span class="inline-flex items-center gap-1 text-gray-500 text-sm">
-                    <i class="fas fa-user"></i>
-                    <span>Assigned to {{ $inq->technician->name }}</span>
-                </span>
+            @elseif ($inq->technician && $inq->technician->user_id === auth()->id())
+                <span class="text-green-600 text-sm font-medium">Assigned to You</span>
+            @else
+                <span class="text-gray-500 text-sm">Assigned to {{ $inq->technician->name }}</span>
             @endif
 
-            @if($assignedToYou)
+            @if($inq->technician && $inq->technician->user_id === auth()->id())
                 <a href="{{ route('quotation.new', ['inquiry' => $inq->id]) }}" 
-                  class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 group-hover:text-emerald-700 text-sm whitespace-nowrap px-2 py-1 rounded transition-colors hover:bg-emerald-50 group-hover:bg-emerald-50 active:bg-emerald-100 focus:outline-none focus:ring-1 focus:ring-emerald-200 focus-visible:ring-emerald-300"
+                  class="text-emerald-600 hover:text-emerald-700 text-sm whitespace-nowrap"
                   title="Convert to Quote">
-                  <i class="fas fa-file-invoice"></i>
-                  <span>Convert</span>
+                  Convert
                 </a>
             @else
-                <span class="inline-flex items-center gap-1 text-gray-400 text-sm italic px-2 py-1 rounded group-hover:bg-gray-50 group-hover:text-gray-500"
-                      title="Claim this inquiry first">
-                    <i class="fas fa-file-invoice"></i>
-                    <span>Convert</span>
-                </span>
+                <span class="text-gray-400 text-sm italic" title="Claim this inquiry first">Convert</span>
             @endif
 
             <form action="{{ route('technician.inquire.destroy', $inq->id) }}" method="POST" class="inline"

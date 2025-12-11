@@ -6,7 +6,7 @@
       <span class="text-white font-extrabold uppercase tracking-wide text-2xl leading-none">TECHNE FIXER</span>
     </a>
     <div class="hidden lg:flex items-center gap-8">
-      <a href="#about" class="text-gray-300 hover:text-white">About Us</a>
+      <a href="#home" class="text-gray-300 hover:text-white">About Us</a>
       <a href="#services" class="text-gray-300 hover:text-white">Services</a>
       <a href="#contact" class="text-gray-300 hover:text-white">Contact Us</a>
     </div>
@@ -109,20 +109,3 @@
     </div>
   </nav>
 </header>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var links = document.querySelectorAll('a[href^="#"]');
-  links.forEach(function (link) {
-    link.addEventListener('click', function (e) {
-      var href = link.getAttribute('href');
-      if (!href || href.length < 2) return;
-      var id = href.slice(1);
-      var target = document.getElementById(id);
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
-});
-</script>

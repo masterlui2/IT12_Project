@@ -17,7 +17,7 @@ use App\Http\Controllers\General\InquiryController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\FeedbackController;
 use App\Models\JobOrder;
-use App\Http\Controllers\MessageController;
+
 // Generic landing
 Route::get('/', function () {
     if (Auth::check()) {
@@ -84,8 +84,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('inquiry.store');
     Route::post('/feedback/create', [FeedbackController::class, 'store'])
         ->name('feedback.store');
-     Route::post('/messages', [MessageController::class, 'store'])
-        ->name('messages.store');
 });
 
 
@@ -140,7 +138,7 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::prefix('/inquire')->group(function(){
         Route::get('/index', [TechnicianController::class, 'inquire'])->name('technician.inquire.index');
         Route::get('/create', [InquiryController::class, 'create'])->name('technician.inquire.create');
-        Route::post('/store', [InquiryController::class, 'store'])->name('technician.inquire.store')->withoutMiddleware(['verified']);   
+        Route::post('/store', [InquiryController::class, 'store'])->name('technician.inquire.store');   
         Route::post('/{id}/claim', [TechnicianController::class, 'claim'])->name('technician.inquire.claim');
         Route::get('/index/{id}', [TechnicianController::class, 'inquireShow'])->whereNumber('id')->name('technician.inquire.show');
         Route::delete('/index/{id}', [TechnicianController::class, 'inquireDestroy'])->whereNumber('id')->name('technician.inquire.destroy');
