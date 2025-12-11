@@ -17,7 +17,7 @@ use App\Http\Controllers\General\InquiryController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\FeedbackController;
 use App\Models\JobOrder;
-
+use App\Http\Controllers\MessageController;
 // Generic landing
 Route::get('/', function () {
     if (Auth::check()) {
@@ -84,8 +84,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('inquiry.store');
     Route::post('/feedback/create', [FeedbackController::class, 'store'])
         ->name('feedback.store');
-<<<<<<< HEAD
-=======
  Route::get('/messages', function () {
         $user = Auth::user();
 
@@ -96,7 +94,6 @@ Route::middleware(['auth'])->group(function () {
         };
     })->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])        ->name('messages.store');
->>>>>>> e64a7d42cf285e1828b26c2bb2ce29435ee09de9
 });
 
 
