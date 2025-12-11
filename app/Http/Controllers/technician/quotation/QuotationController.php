@@ -113,6 +113,7 @@ class QuotationController extends Controller
     {
         // Validate the request
         $validated = $request->validate([
+            'inquiry_id' => 'required|exists:inquiries,id',
             'project_title' => 'required|string|max:255',
             'client_name' => 'required|string|max:255',
             'date_issued' => 'required|date',
@@ -158,10 +159,17 @@ class QuotationController extends Controller
             $total = $subtotal + $tax;
 
             $inquiry = Inquiry::with('technician')->findOrFail($request->inquiry_id);
+           
+            $customerId = Customer::where('user_id', $inquiry->customer_id ?? $inquiry->user_id)->value('id');
+            $technicianId = optional($inquiry->technician)->id
+                ?? Technician::where('user_id', $inquiry->assigned_technician_id)->value('id')
+                ?? Auth::user()->technician->id;
+
             // Now safe to reference both
             $quotation = Quotation::create([
+                'customer_id' => $customerId,
                 'inquiry_id' => $inquiry->id,
-                'technician_id' => $inquiry->assigned_technician_id,
+                'technician_id' => $technicianId,
                 'project_title' => $validated['project_title'],
                 'date_issued' => $validated['date_issued'],
                 'client_name' => $validated['client_name'],
@@ -175,7 +183,6 @@ class QuotationController extends Controller
                 'grand_total' => $total,
                 'status' => $status,
             ]);
-
             // Handle client logo upload
             if ($request->hasFile('client_logo')) {
                 $path = $request->file('client_logo')->store('logos', 'public');
