@@ -2,8 +2,9 @@
 
 @section('content')
 
-<form action="{{-- route('technician.job.store') --}}" method="POST" enctype="multipart/form-data" id="jobOrderForm">
-  @csrf
+<form action="{{ route('technician.job.update', $job->id) }}" method="POST" enctype="multipart/form-data" id="jobOrderForm">
+    @csrf
+    @method('PATCH')
 
   @if(isset($quotation) && $quotation)
     <input type="hidden" name="quotation_id" value="{{ $quotation->id }}">
@@ -88,45 +89,86 @@
             </tr>
           </thead>
           <tbody id="itemRows" class="divide-y">
+            {{-- Quotation items (immutable) --}}
             @if(isset($job->quotation->details) && count($job->quotation->details))
-              @foreach($job->quotation->details as $i => $detail)
-                  <tr class="bg-gray-50">
-                      <td class="px-4 py-3 font-medium text-gray-700">
-                          <input type="text" name="items[{{ $i }}][name]"
-                                value="{{ $detail->item_name }}"
-                                readonly
-                                class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
-                      </td>
-                      <td class="px-4 py-3">
-                          <textarea rows="2" name="items[{{ $i }}][description]"
-                                    readonly
-                                    class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">{{ $detail->description }}</textarea>
-                      </td>
-                      <td class="px-4 py-3 w-20">
-                          <input type="number" name="items[{{ $i }}][quantity]"
-                                value="{{ $detail->quantity }}"
-                                min="1" step="1"
-                                readonly
-                                class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
-                      </td>
-                      <td class="px-4 py-3 w-24">
-                          <input type="number" name="items[{{ $i }}][unit_price]"
-                                value="{{ $detail->unit_price }}"
-                                readonly
-                                class="item-price border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
-                      </td>
-                      <td class="px-4 py-3 text-gray-700 item-total">
-                          ₱{{ number_format($detail->total, 2) }}
-                      </td>
-                      <td class="px-4 py-3 text-right">
-                          {{-- Immutable items from quotation: no removal --}}
-                          <span class="text-gray-400 text-xs italic">Fixed from quotation</span>
-                      </td>
-                  </tr>
-              @endforeach
-          @endif
+                @foreach($job->quotation->details as $i => $detail)
+                    <tr class="bg-gray-50">
+                        <td class="px-4 py-3 font-medium text-gray-700">
+                            <input type="text"
+                                  name="quotation_items[{{ $i }}][name]"
+                                  value="{{ $detail->item_name }}"
+                                  readonly
+                                  class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
+                        </td>
+                        <td class="px-4 py-3">
+                            <textarea rows="2"
+                                      name="quotation_items[{{ $i }}][description]"
+                                      readonly
+                                      class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">{{ $detail->description }}</textarea>
+                        </td>
+                        <td class="px-4 py-3 w-20">
+                            <input type="number"
+                                  name="quotation_items[{{ $i }}][quantity]"
+                                  value="{{ $detail->quantity }}"
+                                  readonly
+                                  class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
+                        </td>
+                        <td class="px-4 py-3 w-24">
+                            <input type="number"
+                                  name="quotation_items[{{ $i }}][unit_price]"
+                                  value="{{ $detail->unit_price }}"
+                                  readonly
+                                  class="item-price border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
+                        </td>
+                        <td class="px-4 py-3 text-gray-700 item-total">
+                            ₱{{ number_format($detail->total, 2) }}
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <span class="text-gray-400 text-xs italic">Fixed from quotation</span>
+                        </td>
+                    </tr>
+                @endforeach
+            @endif
 
-          </tbody>
+            {{-- Technician‑added / editable items --}}
+            @foreach($job->items as $index => $item)
+                <tr class="bg-white editable-row">
+                    <td class="px-4 py-3 font-medium text-gray-700">
+                        <input type="text"
+                              name="items[{{ $index }}][name]"
+                              value="{{ $item->name }}"
+                              class="w-full border rounded-md px-2 py-1 text-sm">
+                    </td>
+                    <td class="px-4 py-3">
+                        <textarea rows="2"
+                                  name="items[{{ $index }}][description]"
+                                  class="w-full border rounded-md px-2 py-1 text-sm">{{ $item->description }}</textarea>
+                    </td>
+                    <td class="px-4 py-3 w-20">
+                        <input type="number"
+                              name="items[{{ $index }}][quantity]"
+                              value="{{ $item->quantity }}"
+                              min="1" step="1"
+                              class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm">
+                    </td>
+                    <td class="px-4 py-3 w-24">
+                        <input type="number"
+                              name="items[{{ $index }}][unit_price]"
+                              value="{{ $item->unit_price }}"
+                              min="0" step="0.01"
+                              class="item-price border rounded-md px-2 py-1 w-full text-center text-sm">
+                    </td>
+                    <td class="px-4 py-3 text-gray-700 item-total">
+                        ₱{{ number_format($item->total, 2) }}
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <button type="button" class="remove-row text-red-500 hover:text-red-700 text-sm">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
         </table>
       </div>
       <div class="flex justify-end mt-3">

@@ -45,6 +45,19 @@ return new class extends Migration
             // workflow status
             $table->enum('status', ['scheduled', 'in_progress', 'completed', 'cancelled'])
                 ->default('scheduled');
+            
+
+            $table->date('expected_finish_date')->nullable();
+            $table->text('remarks')->nullable();    
+            $table->text('materials_specifications')->nullable();
+
+            // 🆕 add these lines
+            $table->text('technician_notes')->nullable();
+            $table->timestamp('completed_at')->nullable();
+
+            // optionally record timeline range
+            $table->unsignedInteger('timeline_min_days')->nullable();
+            $table->unsignedInteger('timeline_max_days')->nullable();
 
             $table->timestamps();
         });
