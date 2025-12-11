@@ -14,7 +14,6 @@
         <div class="hidden lg:flex items-center gap-8">
         <a href="#home" class="nav-link">Home</a>
         <a href="#about" class="nav-link">About Us</a>
-        <a href="#track" class="nav-link">Track Repair</a>
         <a href="{{ route('feedback.create') }}" class="nav-link">Feedback</a>
         <a href="#contact" class="nav-link">Contact</a>
         </div>

@@ -162,6 +162,24 @@
       </div>
     </div>
 
+    <div class="mt-8">
+      <label class="block text-sm text-gray-700 font-semibold mb-2">
+        Load Template *
+      </label>
+
+      <select id="templateSelect"
+              name="template_id"
+              class="border rounded-md px-3 py-2 w-full text-sm focus:ring-blue-500 focus:border-blue-500">
+          <option value="">— Select Service Template —</option>
+          @foreach($templates as $template)
+              <option value="{{ $template->id }}">{{ $template->name }} ({{ $template->category }})</option>
+          @endforeach
+      </select>
+
+      <p class="text-xs text-gray-500 mt-1">Selecting a template will auto-fill scopes, waivers, and deliverables.</p>
+    </div>
+
+
     <!-- Scope of Work -->
     <div>
       <h3 class="block text-sm text-gray-700 font-semibold mb-2">Scope of Work</h3>
@@ -509,14 +527,18 @@ document.getElementById('scopeScenarioRows').addEventListener('click', function(
     const caseCount = caseTable.querySelectorAll('tr').length;
 
     const caseRow = document.createElement('tr');
+    caseRow.classList.add('case-row');
     caseRow.innerHTML = `
       <td class="px-4 py-2 w-1/4">
         <input type="text" name="scope[${scenarioIndex}][cases][${caseCount}][name]" placeholder="Case ${caseCount + 1}"
-               class="w-full border rounded-md px-2 py-1 text-sm">
+              class="w-full border rounded-md px-2 py-1 text-sm">
       </td>
       <td class="px-4 py-2">
         <textarea rows="2" name="scope[${scenarioIndex}][cases][${caseCount}][description]" placeholder="Description"
                   class="w-full border rounded-md px-2 py-1 text-sm"></textarea>
+      </td>
+      <td class="px-4 py-2 text-right">
+        <button type="button" class="remove-case text-red-500 hover:text-red-700 text-xs">Remove</button>
       </td>
     `;
     caseTable.appendChild(caseRow);
@@ -525,6 +547,13 @@ document.getElementById('scopeScenarioRows').addEventListener('click', function(
   if (e.target.classList.contains('remove-scenario')) {
     e.preventDefault();
     e.target.closest('tr').remove();
+    reindexScopes();
+  }
+
+  if (e.target.classList.contains('remove-case')) {
+    e.preventDefault();
+    const caseRow = e.target.closest('tr');
+    caseRow.remove();
     reindexScopes();
   }
 });
@@ -566,20 +595,31 @@ document.getElementById('waiverScenarioRows').addEventListener('click', function
     const caseCount = caseTable.querySelectorAll('tr').length;
 
     const caseRow = document.createElement('tr');
+    caseRow.classList.add('waiver-case-row');
     caseRow.innerHTML = `
       <td class="px-4 py-2 w-1/4">
         <input type="text" name="waiver[${scenarioIndex}][cases][${caseCount}][name]" placeholder="Case ${caseCount + 1}"
-               class="w-full border rounded-md px-2 py-1 text-sm">
+              class="w-full border rounded-md px-2 py-1 text-sm">
       </td>
       <td class="px-4 py-2">
         <textarea rows="2" name="waiver[${scenarioIndex}][cases][${caseCount}][description]" placeholder="Description"
                   class="w-full border rounded-md px-2 py-1 text-sm"></textarea>
       </td>
+      <td class="px-4 py-2 text-right">
+        <button type="button" class="remove-waiver-case text-red-500 hover:text-red-700 text-xs">Remove</button>
+      </td>
     `;
+
     caseTable.appendChild(caseRow);
   }
 
   if (e.target.classList.contains('remove-waiver-scenario')) {
+    e.preventDefault();
+    e.target.closest('tr').remove();
+    reindexWaivers();
+  }
+
+  if (e.target.classList.contains('remove-waiver-case')) {
     e.preventDefault();
     e.target.closest('tr').remove();
     reindexWaivers();
@@ -685,6 +725,120 @@ document.addEventListener('DOMContentLoaded', function() {
     dateInput.value = today;
   }
 });
+
+document.getElementById('templateSelect').addEventListener('change', async function() {
+  const templateId = this.value;
+  if (!templateId) return;
+
+  try {
+    const response = await fetch(`/technician/quotation/template/${templateId}`);
+    const template = await response.json();
+
+    // Clear previous table rows
+    document.getElementById('scopeScenarioRows').innerHTML = '';
+    document.getElementById('waiverScenarioRows').innerHTML = '';
+    document.getElementById('deliverableRows').innerHTML = '';
+
+    // ✅ Populate Scopes
+    template.scopes.forEach((scope, sIndex) => {
+      const scenarioRow = document.createElement('tr');
+      scenarioRow.classList.add('scenario-row');
+      scenarioRow.innerHTML = `
+        <td class="px-4 py-3 font-semibold text-gray-800">
+          <input type="text" name="scope[${sIndex}][scenario]" value="${scope.scenario_name}" class="w-full border rounded-md px-2 py-1 text-sm">
+        </td>
+        <td colspan="2" class="px-4 py-3">
+          <table class="w-full text-sm border bg-white rounded-md case-table mb-2">
+              <tbody></tbody>
+          </table>
+          <button type="button" class="add-case text-blue-600 hover:underline text-xs" data-scenario="${sIndex}">+ Add Case</button>
+        </td>
+        <td class="px-4 py-3 text-right"><button type="button" class="remove-scenario text-red-500 hover:text-red-700 text-sm">Remove</button></td>
+      `;
+      document.getElementById('scopeScenarioRows').appendChild(scenarioRow);
+
+      const caseTableBody = scenarioRow.querySelector('tbody');
+      scope.cases.forEach((caseItem, cIndex) => {
+        const tr = document.createElement('tr');
+        tr.classList.add('case-row');
+        tr.innerHTML = `
+          <td class="px-4 py-2 w-1/4">
+            <input type="text" name="scope[${sIndex}][cases][${cIndex}][name]" 
+                  value="${caseItem.case_title}" class="w-full border rounded-md px-2 py-1 text-sm">
+          </td>
+          <td class="px-4 py-2">
+            <textarea rows="2" name="scope[${sIndex}][cases][${cIndex}][description]" 
+                      class="w-full border rounded-md px-2 py-1 text-sm">${caseItem.case_description}</textarea>
+          </td>
+          <td class="px-4 py-2 text-right">
+            <button type="button" class="remove-case text-red-500 hover:text-red-700 text-xs">Remove</button>
+          </td>
+        `;
+        caseTableBody.appendChild(tr);
+      });
+    });
+
+    // ✅ Populate Waivers
+    template.waivers.forEach((waiver, wIndex) => {
+      const waiverRow = document.createElement('tr');
+      waiverRow.classList.add('waiver-scenario-row');
+      waiverRow.innerHTML = `
+        <td class="px-4 py-3 font-semibold text-gray-800">
+          <input type="text" name="waiver[${wIndex}][scenario]" value="${waiver.waiver_title}" class="w-full border rounded-md px-2 py-1 text-sm">
+        </td>
+        <td colspan="2" class="px-4 py-3">
+          <table class="w-full text-sm border bg-white rounded-md waiver-case-table mb-2">
+              <tbody></tbody>
+          </table>
+          <button type="button" class="add-waiver-case text-blue-600 hover:underline text-xs" data-scenario="${wIndex}">+ Add Case</button>
+        </td>
+        <td class="px-4 py-3 text-right"><button type="button" class="remove-waiver-scenario text-red-500 hover:text-red-700 text-sm">Remove</button></td>
+      `;
+      document.getElementById('waiverScenarioRows').appendChild(waiverRow);
+
+      const waiverBody = waiverRow.querySelector('tbody');
+      waiver.cases.forEach((caseItem, cIndex) => {
+        const tr = document.createElement('tr');
+        tr.classList.add('waiver-case-row');
+        tr.innerHTML = `
+          <td class="px-4 py-2 w-1/4">
+            <input type="text" name="waiver[${wIndex}][cases][${cIndex}][name]" 
+                  value="${caseItem.case_title}" class="w-full border rounded-md px-2 py-1 text-sm">
+          </td>
+          <td class="px-4 py-2">
+            <textarea rows="2" name="waiver[${wIndex}][cases][${cIndex}][description]" 
+                      class="w-full border rounded-md px-2 py-1 text-sm">${caseItem.description}</textarea>
+          </td>
+          <td class="px-4 py-2 text-right">
+            <button type="button" class="remove-waiver-case text-red-500 hover:text-red-700 text-xs">Remove</button>
+          </td>
+        `;
+        waiverBody.appendChild(tr);
+      });
+
+    });
+
+    // ✅ Populate Deliverables
+    template.deliverables.forEach((del, dIndex) => {
+      const deliverableRow = document.createElement('tr');
+      deliverableRow.innerHTML = `
+        <td class="px-4 py-3 text-gray-600">${dIndex + 1}</td>
+        <td class="px-4 py-3">
+          <input type="text" name="deliverables[${dIndex}][detail]" value="${del.deliverable_detail}" class="w-full border rounded-md px-2 py-1 text-sm">
+        </td>
+        <td class="px-4 py-3 text-right">
+          <button type="button" class="remove-deliverable text-red-500 hover:text-red-700 text-sm">Remove</button>
+        </td>
+      `;
+      document.getElementById('deliverableRows').appendChild(deliverableRow);
+    });
+
+  } catch (error) {
+    console.error(error);
+    alert('Error loading template.');
+  }
+});
+
 </script>
 
 @endsection

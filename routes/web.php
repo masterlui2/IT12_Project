@@ -84,6 +84,19 @@ Route::middleware(['auth'])->group(function () {
         ->name('inquiry.store');
     Route::post('/feedback/create', [FeedbackController::class, 'store'])
         ->name('feedback.store');
+<<<<<<< HEAD
+=======
+ Route::get('/messages', function () {
+        $user = Auth::user();
+
+        return match ($user?->role) {
+            'technician' => redirect()->route('technician.messages'),
+            'customer'   => redirect()->route('customer.messages'),
+            default      => redirect()->route('home'),
+        };
+    })->name('messages.index');
+    Route::post('/messages', [MessageController::class, 'store'])        ->name('messages.store');
+>>>>>>> e64a7d42cf285e1828b26c2bb2ce29435ee09de9
 });
 
 
@@ -148,10 +161,12 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
     Route::prefix('/quotation')->group(function (){
         Route::get('/index', [QuotationController::class, 'index'])->name('technician.quotation');
         Route::get('/new', [QuotationController::class, 'newQuotation'])->name('quotation.new');
+        Route::get('/template/{id}', [QuotationController::class, 'getTemplate']);
         Route::post('/store', [QuotationController::class, 'store'])->name('quotation.store');
         Route::get('/{id}', [QuotationController::class, 'show'])->name('quotation.show');
         Route::get('/{id}/edit', [QuotationController::class, 'edit'])->name('quotation.edit');
         Route::put('/{id}', [QuotationController::class, 'update'])->name('quotation.update');
+        Route::put('/send/{id}', [QuotationController::class, 'sendToManager'])->name('quotation.sendToManager');
         Route::delete('/{id}', [QuotationController::class, 'destroy'])->name('quotation.destroy');
         
         // PDF Routes

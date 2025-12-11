@@ -12,11 +12,11 @@
 
  
 @include('customer.contact')
-
+@include('partials.support-widget')
 
   
   @include('partials.footer')
-
+  @stack('scripts')
 
 </body>
 </html>

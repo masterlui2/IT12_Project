@@ -77,4 +77,8 @@ class JobOrder extends Model
     {
         $this->update(['status' => 'completed']);
     }
+
+    public function items() {
+        return $this->hasMany(JobOrderItem::class);
+    }
 }

@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\Customer;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class CustomerSeeder extends Seeder
 {
@@ -13,6 +15,15 @@ class CustomerSeeder extends Seeder
      */
     public function run(): void
     {
-        
+        User::updateOrCreate(
+            ['email' => 'imbaxgx1fromyt@gmail.com'],  // lookup
+            [
+                'firstname' => 'Tom German',
+                'lastname' => 'Arizobal',
+                'password' => Hash::make('12345678'), // change this
+                'birthday' => '2005-04-12', // change this
+                'role' => 'customer', // requires you added this column
+            ]
+        );
     }
 }

@@ -5,10 +5,37 @@
       <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-20 w-auto object-contain">
       <span class="text-white font-extrabold uppercase tracking-wide text-2xl leading-none">TECHNE FIXER</span>
     </a>
+<<<<<<< HEAD
     <div class="hidden lg:flex items-center gap-8">
       <a href="#home" class="text-gray-300 hover:text-white">About Us</a>
       <a href="#services" class="text-gray-300 hover:text-white">Services</a>
       <a href="#contact" class="text-gray-300 hover:text-white">Contact Us</a>
+=======
+
+    <!-- Center: Nav Links -->
+    <div class="hidden lg:flex items-center gap-6">
+      <a href="#home" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+        About Us
+      </a>
+      <a href="{{ route('feedback.create') }}" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+
+        Feedbacks
+      </a>
+      <a href="#services" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+        Services
+      </a>
+      <a href="#contact" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+        Contact Us
+      </a>
+
+      @auth
+        <span class="h-5 w-px bg-white/10"></span>
+       
+        <a href="{{ route('customer.messages') }}" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+          Messages
+        </a>
+      @endauth
+>>>>>>> e64a7d42cf285e1828b26c2bb2ce29435ee09de9
     </div>
     <div class="hidden lg:flex items-center gap-4">
   @if (Route::has('login'))

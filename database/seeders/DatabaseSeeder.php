@@ -20,13 +20,15 @@ class DatabaseSeeder extends Seeder
         // Call your manager seeder
         $this->call([
             ManagerUserSeeder::class,
-            TechnicianUserSeeder::class
-        ]);
-        Technician::factory()->count(2)->create();
+            TechnicianUserSeeder::class,
+            ServiceTemplateSeeder::class,
+            CustomerSeeder::class,
+         ]);
+        //Technician::factory()->count(2)->create();
 
-        // 5 customers
+        // // 5 customers
 
-        // 20 quotations (customers may repeat, technicians randomly assigned)
-        Quotation::factory()->count(20)->create();
+        // // 20 quotations (customers may repeat, technicians randomly assigned)
+        //Quotation::factory()->count(20)->create();
     }
 }

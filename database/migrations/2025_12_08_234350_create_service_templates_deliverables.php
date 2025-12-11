@@ -11,7 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('quotations', function (Blueprint $table) {
+        Schema::create('service_template_deliverables', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('template_id')->constrained('service_templates')->onDelete('cascade');
+            $table->text('deliverable_detail');
+            $table->timestamps();
         });
     }
 
@@ -20,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('quotations', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('service_templates_deliverables');
     }
 };
