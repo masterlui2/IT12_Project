@@ -9,20 +9,26 @@ class QuotationObserver
 {
     public function updated(Quotation $quotation): void
     {
-        if ($quotation->isDirty(attributes: 'status') && $quotation->status === 'approved') {
-            JobOrder::create([
+        if ($quotation->isDirty('status') && $quotation->status === 'approved') {
+            // Create job order
+            $jobOrder = JobOrder::create([
                 'quotation_id' => $quotation->id,
                 'technician_id' => $quotation->technician_id,
-                'customer_name' => $quotation->client_name,
-                'contact_number' => $quotation->inquiry->contact_number ?? null,
-                'device_type' => $quotation->inquiry->device_details ?? null,
-                'issue_description' => $quotation->inquiry->issue_description ?? null,
-                'diagnostic_fee' => $quotation->diagnostic_fee,
-                'materials_cost' => $quotation->parts_estimate ?? 0,
-                'professional_fee' => $quotation->labor_estimate ?? 0,
                 'expected_finish_date' => now()->addDays($quotation->timeline_max_days ?? 5),
                 'status' => 'scheduled',
             ]);
+
+            // Optionally copy quotation items as initial job order items
+            // (Technician can modify these later)
+            foreach ($quotation->details as $detail) {
+                $jobOrder->items()->create([
+                    'name' => $detail->item_name,
+                    'description' => $detail->description,
+                    'quantity' => $detail->quantity,
+                    'unit_price' => $detail->unit_price,
+                    'total' => $detail->total,
+                ]);
+            }
         }
     }
 }
