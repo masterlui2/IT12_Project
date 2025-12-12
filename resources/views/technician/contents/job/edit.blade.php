@@ -49,13 +49,15 @@
       </div>
 
       <div>
-        <label class="block text-sm text-gray-600">Date Started *</label>
-          <input type="date"
-            name="start_date"
-            value="{{ old('start_date', $job->start_date ? $job->start_date->format('Y-m-d') : ($job->expected_finish_date ? $job->expected_finish_date->format('Y-m-d') : '')) }}"
-            placeholder="{{ now()->format('Y-m-d') }}"
-            required
-            class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+          <label class="block text-sm text-gray-600">Date Started *</label>
+            <input type="date"
+                name="start_date"
+                value="{{ old('start_date', $job->start_date ? $job->start_date->format('Y-m-d') : '') }}"
+                placeholder="{{ now()->format('Y-m-d') }}"
+                required
+                @if($job->start_date) readonly class="w-full border mt-1 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
+                @else class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                @endif>
       </div>
 
       <div>
