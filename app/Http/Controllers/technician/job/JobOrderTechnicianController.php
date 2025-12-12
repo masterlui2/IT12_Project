@@ -67,31 +67,53 @@ class JobOrderTechnicianController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
+        // ► update the job order main record
         $job->update($request->only([
-            'customer_name',
-            'contact_number',
-            'device_type',
-            'issue_description',
-            'diagnostic_fee',
-            'materials_cost',
-            'professional_fee',
-            'expected_finish_date',
-            'status',
-            'technician_notes',
-            'remarks',
+            'customer_name','contact_number','device_type','issue_description',
+            'diagnostic_fee','materials_cost','professional_fee',
+            'expected_finish_date','status','technician_notes','remarks',
         ]));
 
-        return redirect()->route('technician.job.index')->with('success', 'Job order updated successfully!');
+        // ✅ handle the items array from your form
+        if ($request->has('items')) {
+            // Remove existing job_order_items so we can re‑add (you can skip this line if you prefer editing)
+            $job->items()->delete();
+
+            foreach ($request->items as $item) {
+                if (!empty($item['name'])) {
+                    $job->items()->create([
+                        'name'        => $item['name'],
+                        'description' => $item['description'] ?? '',
+                        'quantity'    => (int) ($item['quantity'] ?? 1),
+                        'unit_price'  => (float) ($item['unit_price'] ?? 0),
+                        'total'       => (float) ($item['quantity'] ?? 1) * (float) ($item['unit_price'] ?? 0),
+                    ]);
+                }
+            }
+        }
+
+        // handle completion button
+        if ($request->action === 'complete') {
+            $job->status = 'completed';
+            $job->completed_at = now();
+            $job->save();
+            return redirect()->route('technician.job.index')
+                            ->with('success', 'Job marked as completed!');
+        }
+
+        // handle save button
+        return redirect()->route('technician.job.index')
+                        ->with('success', 'Job order updated successfully!');
     }
+
 
 
     public function markComplete($id)
     {
         $job = JobOrder::findOrFail($id);
-        $job->status = 'completed';
-        $job->completed_at = now();
-        $job->save();
+        $job->markAsCompleted();
 
-        return redirect()->route('technician.job.index')->with('success', 'Job marked as completed!');
+        return redirect()->route('technician.job.index')
+            ->with('success', 'Job marked as completed!');
     }
 }
