@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\JobOrder;
+use Carbon\Carbon;
 
 class JobOrderTechnicianController extends Controller
 {
@@ -66,10 +67,17 @@ class JobOrderTechnicianController extends Controller
             'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
+        $expectedFinishDate = null;
+        if ($request->start_date && $request->timeline_max_days) {
+            $expectedFinishDate = Carbon::parse($request->start_date)
+                ->addDays((int)$request->timeline_max_days)
+                ->format('Y-m-d'); // store as normal date
+        }
+
         // Update job order main fields
         $job->update([
             'start_date' => $request->start_date,
-            'expected_finish_date' => $request->expected_finish_date,
+            'expected_finish_date' => $expectedFinishDate,
             'timeline_min_days' => $request->timeline_min_days,
             'timeline_max_days' => $request->timeline_max_days,
             'technician_notes' => $request->technician_notes,

@@ -67,7 +67,7 @@
                     @forelse ($jobOrders as $job)
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 py-3 font-medium text-neutral-900">JO-{{ str_pad($job->id, 5, '0', STR_PAD_LEFT) }}</td>
-                        <td class="px-4 py-3">{{ $job->customer_name }}</td>
+                        <td class="px-4 py-3">{{ $job->quotation->client_name }}</td>
                         <td class="px-4 py-3 text-neutral-800">{{ optional($job->quotation)->project_title ?? 'N/A' }}</td>
                         <td class="px-4 py-3 text-right text-neutral-700">{{ $job->created_at->format('M d, Y') }}</td>
                         <td class="px-4 py-3 text-right text-neutral-700">

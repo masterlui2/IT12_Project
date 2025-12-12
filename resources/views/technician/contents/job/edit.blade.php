@@ -50,10 +50,12 @@
 
       <div>
         <label class="block text-sm text-gray-600">Date Started *</label>
-        <input type="date" name="start_date"
-              value="{{ old('start_date', $job->start_date ?? now()->format('Y-m-d')) }}"
-              required
-              class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+          <input type="date"
+            name="start_date"
+            value="{{ old('start_date', $job->start_date ? $job->start_date->format('Y-m-d') : ($job->expected_finish_date ? $job->expected_finish_date->format('Y-m-d') : '')) }}"
+            placeholder="{{ now()->format('Y-m-d') }}"
+            required
+            class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
       </div>
 
       <div>
@@ -277,17 +279,17 @@
       <label class="block text-sm text-gray-700 font-semibold mb-2">Technician Notes / Progress</label>
       <textarea rows="4" name="technician_notes"
                 placeholder="Record observations, parts replaced, diagnostics, etc."
-                class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('technician_notes') }}</textarea>
+                class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('technician_notes', $job->technician_notes) }}</textarea>
     </div>
 
     {{-- TIMELINE --}}
     <div>
       <label class="block text-sm text-gray-700 font-semibold mb-2">Actual Timeline / Completion</label>
       <div class="flex items-center gap-2">
-        <input id="minDays" name="timeline_min_days" type="number" min="1" placeholder="Min" value="{{ old('timeline_min_days') }}"
+        <input id="minDays" name="timeline_min_days" type="number" min="1" placeholder="Min" value="{{ old('timeline_min_days',$job->timeline_min_days) }}"
                class="w-24 border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
         <span class="text-gray-500">to</span>
-        <input id="maxDays" name="timeline_max_days" type="number" min="1" placeholder="Max" value="{{ old('timeline_max_days') }}"
+        <input id="maxDays" name="timeline_max_days" type="number" min="1" placeholder="Max" value="{{ old('timeline_max_days',$job->timeline_max_days) }}"
                class="w-24 border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
         <span class="text-gray-700 text-sm">days</span>
       </div>
