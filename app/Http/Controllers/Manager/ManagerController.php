@@ -7,10 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
 use App\Models\User;
 use App\Models\Quotation;
+use App\Models\Technician;
+use App\Models\JobOrder;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 class ManagerController extends Controller
 {
     public function dashboard(){
@@ -119,8 +122,115 @@ class ManagerController extends Controller
         return view('manager.services');
     }
     public function technicians(){
-        return view('manager.technicians');
+ $technicians = Technician::with(['user', 'jobOrders' => function ($query) {
+            $query->latest();
+        }, 'jobOrders.quotation'])
+        ->withCount('jobOrders')
+        ->get();
+
+        $approvedQuotations = Quotation::where('status', 'approved')
+            ->orderByDesc('date_issued')
+            ->get();
+
+        return view('manager.technicians', compact('technicians', 'approvedQuotations'));
     }
+    public function editTechnician(Technician $technician)
+{
+    $technician->load('user');
+    return view('manager.technicians-edit', compact('technician'));
+}
+
+public function updateTechnician(Request $request, Technician $technician)
+{
+    $validated = $request->validate([
+        'firstname'        => 'required|string|max:255',
+        'lastname'         => 'required|string|max:255',
+        'email'            => 'required|email|unique:users,email,' . $technician->user_id,
+        'specialization'   => 'nullable|string|max:255',
+        'certifications'   => 'nullable|string|max:255',
+    ]);
+
+    // update user
+    $technician->user->update([
+        'firstname' => $validated['firstname'],
+        'lastname'  => $validated['lastname'],
+        'email'     => $validated['email'],
+    ]);
+
+    // update technician
+    $technician->update([
+        'specialization'  => $validated['specialization'] ?? null,
+        'certifications'  => $validated['certifications'] ?? null,
+    ]);
+
+    return redirect()->route('technicians')->with('status', 'Technician updated successfully.');
+}
+
+public function destroyTechnician(Technician $technician)
+{
+    // delete technician + linked user (optional but usually correct)
+    $user = $technician->user;
+    $technician->delete();
+    if ($user) $user->delete();
+
+    return redirect()->route('technicians')->with('status', 'Technician deleted successfully.');
+}
+
+    public function storeTechnician(Request $request)
+    
+    {
+        
+        $validated = $request->validate([
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'birthday' => 'required|date',
+            'password' => 'nullable|string|min:8',
+            'specialization' => 'nullable|string|max:255',
+            'certifications' => 'nullable|string|max:255',
+        ]);
+
+        $user = User::create([
+            'firstname' => $validated['firstname'],
+            'lastname' => $validated['lastname'],
+            'email' => $validated['email'],
+            'birthday' => $validated['birthday'],
+            'password' => Hash::make($validated['password'] ?? Str::random(12)),
+            'role' => 'technician',
+        ]);
+
+        $user->technician()->create([
+            'specialization' => $validated['specialization'] ?? null,
+            'certifications' => $validated['certifications'] ?? null,
+        ]);
+
+        return redirect()->route('technicians')->with('status', 'Technician added successfully.');
+    }
+
+    public function storeJobOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'technician_id' => 'required|exists:technicians,id',
+            'quotation_id' => 'required|exists:quotations,id',
+            'customer_name' => 'required|string|max:255',
+            'contact_number' => 'required|string|max:50',
+            'device_type' => 'nullable|string|max:255',
+            'issue_description' => 'required|string',
+            'diagnostic_fee' => 'nullable|numeric|min:0',
+            'materials_cost' => 'nullable|numeric|min:0',
+            'professional_fee' => 'nullable|numeric|min:0',
+            'downpayment' => 'nullable|numeric|min:0',
+            'balance' => 'nullable|numeric|min:0',
+            'expected_finish_date' => 'nullable|date',
+            'remarks' => 'nullable|string',
+            'materials_specifications' => 'nullable|string',
+            'status' => 'required|string|in:scheduled,in_progress,completed,cancelled',
+        ]);
+
+        JobOrder::create($validated);
+
+        return redirect()->route('technicians')->with('status', 'Job order assigned to technician successfully.');
+        }
     public function customers(){
         return view('manager.customers');
     }
@@ -141,7 +251,7 @@ class ManagerController extends Controller
                 'won_quotes'  => 0,
             ],
         ];
-
+        
         $recentTransactions = [];
 
         return view('manager.sales', compact('stats', 'recentTransactions'));

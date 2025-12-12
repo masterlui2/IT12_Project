@@ -3,7 +3,7 @@
         use Illuminate\Support\Facades\Auth;
         use App\Models\Inquiry;
         use App\Models\Message;
-
+        use Illuminate\Support\Facades\Storage;
         $supportUser = Auth::user();
         $latestInquiry = null;
         $recentMessages = collect();
@@ -104,13 +104,28 @@
                                     $roleLabel = $message->user->role ?? ($isMine ? 'customer' : 'technician');
                                 @endphp
                                 <div class="flex {{ $isMine ? 'justify-end' : 'justify-start' }}">
-                                      <div class="max-w-xs md:max-w-sm rounded-2xl px-3 py-2 shadow text-sm {{ $isMine ? 'bg-blue-500/20 border border-blue-400/50' : 'bg-white/5 border border-white/10' }}">
-                                        <div class="flex items-center justify-between gap-2 mb-1">
+                                      <div class="max-w-xs md:max-w-sm rounded-2xl px-3 py-2 shadow text-sm space-y-2 {{ $isMine ? 'bg-blue-500/20 border border-blue-400/50' : 'bg-white/5 border border-white/10' }}">                                        <div class="flex items-center justify-between gap-2 mb-1">
                                             <p class="font-semibold text-white text-sm">{{ $displayName }}</p>
                                             <span class="text-[11px] text-gray-400">{{ $message->created_at->diffForHumans() }}</span>
                                         </div>
-                                        <p class="text-gray-100 leading-relaxed">{{ $message->body }}</p>
-                                        <p class="text-[10px] text-gray-400 mt-1">{{ ucfirst($roleLabel === 'customer' ? 'Customer' : 'Technician') }}</p>
+  @if($message->body)
+                                            <p class="text-gray-100 leading-relaxed">{{ $message->body }}</p>
+                                        @endif
+                                        @if($message->attachment_path)
+                                            <div class="rounded-xl overflow-hidden border border-white/10 bg-black/20">
+                                                <img
+                                                    src="{{ Storage::url($message->attachment_path) }}"
+                                                    alt="{{ $message->attachment_name ?? 'Message attachment' }}"
+                                                    class="max-h-52 w-full object-cover"
+                                                >
+                                                @if($message->attachment_name)
+                                                    <p class="text-[11px] text-gray-300 px-3 py-2 bg-black/30 border-t border-white/5">
+                                                        {{ $message->attachment_name }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        @endif
+                              <p class="text-[10px] text-gray-400 mt-1">{{ ucfirst($roleLabel === 'customer' ? 'Customer' : 'Technician') }}</p>
                                     </div>
                                 </div>
                             @empty
@@ -123,8 +138,7 @@
 
             @auth
                 @if ($latestInquiry)
-                    <form action="{{ route('messages.store') }}" method="POST" class="border-t border-white/10 px-4 py-3 space-y-2 bg-white/5">
-                        @csrf
+ <form action="{{ route('messages.store') }}" method="POST" enctype="multipart/form-data" class="border-t border-white/10 px-4 py-3 space-y-3 bg-white/5">                        @csrf
                         <label for="widget-message" class="text-xs text-gray-300">Send a message</label>
                         <textarea
                             id="widget-message"
@@ -132,8 +146,24 @@
                             rows="2"
                               class="w-full rounded-xl border border-white/15 bg-gray-950/70 text-white text-sm px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                             placeholder="Share updates, add details, or ask a question..."
-                            required
                         ></textarea>
+                          @error('body')
+                            <p class="text-xs text-red-400">{{ $message }}</p>
+                        @enderror
+                        <div class="space-y-1">
+                            <label for="widget-attachment" class="text-xs text-gray-300">Attach an image (optional)</label>
+                            <input
+                                id="widget-attachment"
+                                name="attachment"
+                                type="file"
+                                accept="image/*"
+                                class="block w-full text-sm text-gray-200 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:text-sm file:font-semibold hover:file:bg-blue-500"
+                            >
+                            @error('attachment')
+                                <p class="text-xs text-red-400">{{ $message }}</p>
+                            @enderror
+                            <p class="text-[11px] text-gray-400">Upload a photo or screenshot to give more context.</p>
+                        </div>
                         <div class="flex justify-end">
                               <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition">
                                 <i class="fas fa-paper-plane text-xs"></i>
