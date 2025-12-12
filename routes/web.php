@@ -18,6 +18,8 @@ use App\Http\Controllers\PdfController;
 use App\Http\Controllers\FeedbackController;
 use App\Models\JobOrder;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Manager\TechnicianController as ManagerTechnicianController;
+
 // Generic landing
 Route::get('/', function () {
     if (Auth::check()) {
@@ -67,11 +69,19 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
     });
 
     // ⭐ Added missing components (same style, same method)
-    Route::get('/customers', [ManagerController::class, 'customers'])->name('customers');
     Route::get('/technicians',[ManagerController::class, 'technicians'])->name('technicians');
+    Route::post('/technicians', [ManagerController::class, 'storeTechnician'])->name('manager.technicians.store');
+    Route::get('/technicians/{technician}/edit', [ManagerController::class, 'editTechnician'])
+    ->name('manager.technicians.edit');
+
+Route::put('/technicians/{technician}', [ManagerController::class, 'updateTechnician'])
+    ->name('manager.technicians.update');
+
+Route::delete('/technicians/{technician}', [ManagerController::class, 'destroyTechnician'])
+    ->name('manager.technicians.destroy');
+    Route::post('/job-orders', [ManagerController::class, 'storeJobOrder'])->name('manager.job-orders.store');
     Route::get('/services', [ManagerController::class, 'services'])->name('services');
     Route::get('/reports',[ManagerController::class, 'reports'])->name('reports');
-    Route::get('/sales', [ManagerController::class, 'sales'])->name('sales');
 });
 Route::middleware(['auth'])->group(function () {
     // Show the inquiry creation form

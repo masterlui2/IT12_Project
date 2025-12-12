@@ -12,6 +12,8 @@ class Message extends Model
     protected $fillable = [
         'user_id',
         'body',
+        'attachment_path',
+        'attachment_name',
     ];
 
     public function user()
