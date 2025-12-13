@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\JobOrder;
-
+use Carbon\Carbon;
 class JobOrderTechnicianController extends Controller
 {
     public function index(Request $request)
@@ -52,68 +52,71 @@ class JobOrderTechnicianController extends Controller
     public function update(Request $request, $id)
     {
         $job = JobOrder::findOrFail($id);
-
         $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'contact_number' => 'nullable|string|max:50',
-            'device_type' => 'nullable|string|max:100',
-            'issue_description' => 'nullable|string',
-            'diagnostic_fee' => 'nullable|numeric|min:0',
-            'materials_cost' => 'nullable|numeric|min:0',
-            'professional_fee' => 'nullable|numeric|min:0',
+            'start_date' => 'required|date',
             'expected_finish_date' => 'nullable|date',
-            'status' => 'required|string|in:scheduled,in_progress,completed,cancelled',
+            'timeline_min_days' => 'nullable|integer|min:1',
+            'timeline_max_days' => 'nullable|integer|min:1',
             'technician_notes' => 'nullable|string',
-            'remarks' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.name' => 'required|string|max:255',
+            'items.*.description' => 'nullable|string',
+            'items.*.quantity' => 'required|numeric|min:0',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        // ► update the job order main record
-        $job->update($request->only([
-            'customer_name','contact_number','device_type','issue_description',
-            'diagnostic_fee','materials_cost','professional_fee',
-            'expected_finish_date','status','technician_notes','remarks',
-        ]));
+        $expectedFinishDate = null;
+        if ($request->start_date && $request->timeline_max_days) {
+            $expectedFinishDate = Carbon::parse($request->start_date)
+                ->addDays((int)$request->timeline_max_days)
+                ->format('Y-m-d'); // store as normal date
+        }
 
-        // ✅ handle the items array from your form
-        if ($request->has('items')) {
-            // Remove existing job_order_items so we can re‑add (you can skip this line if you prefer editing)
-            $job->items()->delete();
+        // Update job order main fields
+        $job->update([
+            'start_date' => $request->start_date,
+            'expected_finish_date' => $expectedFinishDate,
+            'timeline_min_days' => $request->timeline_min_days,
+            'timeline_max_days' => $request->timeline_max_days,
+            'technician_notes' => $request->technician_notes,
+        ]);
 
-            foreach ($request->items as $item) {
-                if (!empty($item['name'])) {
-                    $job->items()->create([
-                        'name'        => $item['name'],
-                        'description' => $item['description'] ?? '',
-                        'quantity'    => (int) ($item['quantity'] ?? 1),
-                        'unit_price'  => (float) ($item['unit_price'] ?? 0),
-                        'total'       => (float) ($item['quantity'] ?? 1) * (float) ($item['unit_price'] ?? 0),
-                    ]);
-                }
+        // Handle items: Delete all and recreate (simpler approach)
+        $job->items()->delete();
+
+        foreach ($request->items as $itemData) {
+            if (!empty($itemData['name'])) {
+                $quantity = (float) ($itemData['quantity'] ?? 0);
+                $unitPrice = (float) ($itemData['unit_price'] ?? 0);
+                
+                $job->items()->create([
+                    'name' => $itemData['name'],
+                    'description' => $itemData['description'] ?? '',
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'total' => $quantity * $unitPrice,
+                ]);
             }
         }
 
-        // handle completion button
-        if ($request->action === 'complete') {
-            $job->status = 'completed';
-            $job->completed_at = now();
-            $job->save();
+        // Handle action buttons
+        if ($request->action === 'review') {
+            $job->update([
+                'status' => 'review',
+                'completed_at' => now(),
+            ]);
             return redirect()->route('technician.job.index')
-                            ->with('success', 'Job marked as completed!');
+                ->with('success', 'Job order marked as completed!');
         }
 
-        // handle save button
+        // Default save action
         return redirect()->route('technician.job.index')
-                        ->with('success', 'Job order updated successfully!');
+            ->with('success', 'Job order updated successfully!');
     }
 
-
-
-    public function markComplete($id)
-    {
-        $job = JobOrder::findOrFail($id);
-        $job->markAsCompleted();
-
-        return redirect()->route('technician.job.index')
-            ->with('success', 'Job marked as completed!');
+    public function in_progress($id){
+       $job = JobOrder::findOrFail($id);
+       $job->update(['status' => 'in_progress']);
+       return redirect()->route('technician.job.index');
     }
 }

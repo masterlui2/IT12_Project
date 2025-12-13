@@ -31,7 +31,6 @@ class InquiryController extends Controller
             'contact_number'     => 'required|string|max:20',
             'service_location'   => 'required|string',
             'category'           => 'required|string',
-            'device_type'        => 'nullable|string|max:255',
             'device_details'     => 'nullable|string|max:255',
             'issue_description'  => 'required|string|max:2000',
             'urgency'            => 'required|in:Normal,Urgent,Flexible',
@@ -45,10 +44,6 @@ class InquiryController extends Controller
             $path = $request->file('photo')->store('inquiry-photos', 'public');
             $validated['photo_path'] = $path;
         }
-           // Map device_type to device_details when not explicitly provided to
-        // satisfy older database schemas that expect the column.
-        $validated['device_type'] = $validated['device_type']
-            ?? ($validated['device_details'] ?? null);
 
         // Default status
         $validated['status'] = 'Pending';

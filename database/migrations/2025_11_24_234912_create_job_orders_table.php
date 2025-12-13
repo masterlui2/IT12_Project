@@ -6,67 +6,44 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('job_orders', function (Blueprint $table) {
             $table->id();
 
-            // link quotation that generated this job order
+            // Link to quotation that generated this job order
             $table->foreignId('quotation_id')
                 ->constrained()
                 ->onDelete('cascade');
 
-            // technician assigned
+            // Technician assigned
             $table->foreignId('technician_id')
                 ->constrained()
                 ->onDelete('cascade');
 
-            // customer details
-            $table->string('customer_name');
-            $table->string('contact_number');
-            $table->string('device_type')->nullable();
-            $table->text('issue_description');
-            
-            // cost summary (copied or adjusted from quotation)
-            $table->decimal('diagnostic_fee', 12, 2)->default(0);
-            $table->decimal('materials_cost', 12, 2)->default(0);
-            $table->decimal('professional_fee', 12, 2)->default(0);
-            $table->decimal('downpayment', 12, 2)->default(0);
-            $table->decimal('balance', 12, 2)->default(0);
-
-            // work control fields
+            // Work control
+            $table->date('start_date')->nullable();
             $table->date('expected_finish_date')->nullable();
-            $table->text('remarks')->nullable();
-            $table->text('materials_specifications')->nullable();
-
-            // workflow status
-            $table->enum('status', ['scheduled', 'in_progress', 'completed', 'cancelled'])
-                ->default('scheduled');
             
-
-            $table->date('expected_finish_date')->nullable();
-            $table->text('remarks')->nullable();    
-            $table->text('materials_specifications')->nullable();
-
-            // 🆕 add these lines
-            $table->text('technician_notes')->nullable();
-            $table->timestamp('completed_at')->nullable();
-
-            // optionally record timeline range
+            // Timeline estimate (actual days worked)
             $table->unsignedInteger('timeline_min_days')->nullable();
             $table->unsignedInteger('timeline_max_days')->nullable();
 
+            // Technician work notes
+            $table->text('technician_notes')->nullable();
+
+            // Workflow status
+            $table->enum('status', ['scheduled', 'in_progress', 'review', 'completed', 'cancelled'])
+                ->default('scheduled');
+            
+            $table->timestamp('completed_at')->nullable();
+
+            // Completion signatures
+
             $table->timestamps();
         });
-
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('job_orders');

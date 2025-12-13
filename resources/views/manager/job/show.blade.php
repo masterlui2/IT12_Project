@@ -1,6 +1,4 @@
-@extends('technician.layout.app')
-
-@section('content')
+<x-layouts.app :title="__('Job Order')">
 
 <div class="max-w-4xl mx-auto bg-white p-8 text-[13px] text-gray-800 font-[DejaVu Sans] shadow-sm">
 
@@ -173,4 +171,4 @@
     </p>
 </div>
 
-@endsection
+</x-layouts.app>

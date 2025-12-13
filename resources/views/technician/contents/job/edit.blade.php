@@ -49,11 +49,15 @@
       </div>
 
       <div>
-        <label class="block text-sm text-gray-600">Date Started *</label>
-        <input type="date" name="start_date"
-              value="{{ old('start_date', $job->start_date ?? now()->format('Y-m-d')) }}"
-              required
-              class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+          <label class="block text-sm text-gray-600">Date Started *</label>
+            <input type="date"
+                name="start_date"
+                value="{{ old('start_date', $job->start_date ? $job->start_date->format('Y-m-d') : '') }}"
+                placeholder="{{ now()->format('Y-m-d') }}"
+                required
+                @if($job->start_date) readonly class="w-full border mt-1 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
+                @else class="w-full border mt-1 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                @endif>
       </div>
 
       <div>
@@ -277,17 +281,17 @@
       <label class="block text-sm text-gray-700 font-semibold mb-2">Technician Notes / Progress</label>
       <textarea rows="4" name="technician_notes"
                 placeholder="Record observations, parts replaced, diagnostics, etc."
-                class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('technician_notes') }}</textarea>
+                class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('technician_notes', $job->technician_notes) }}</textarea>
     </div>
 
     {{-- TIMELINE --}}
     <div>
       <label class="block text-sm text-gray-700 font-semibold mb-2">Actual Timeline / Completion</label>
       <div class="flex items-center gap-2">
-        <input id="minDays" name="timeline_min_days" type="number" min="1" placeholder="Min" value="{{ old('timeline_min_days') }}"
+        <input id="minDays" name="timeline_min_days" type="number" min="1" placeholder="Min" value="{{ old('timeline_min_days',$job->timeline_min_days) }}"
                class="w-24 border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
         <span class="text-gray-500">to</span>
-        <input id="maxDays" name="timeline_max_days" type="number" min="1" placeholder="Max" value="{{ old('timeline_max_days') }}"
+        <input id="maxDays" name="timeline_max_days" type="number" min="1" placeholder="Max" value="{{ old('timeline_max_days',$job->timeline_max_days) }}"
                class="w-24 border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
         <span class="text-gray-700 text-sm">days</span>
       </div>
@@ -346,9 +350,9 @@
               class="px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">
         Save Job Order
       </button>
-      <button type="submit" name="action" value="complete"
+      <button type="submit" name="action" value="review"
               class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-        Mark as Completed
+        Mark as For Review
       </button>
     </div>
 

@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\General\InquiryController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\Manager\JobOrderController;
 use App\Models\JobOrder;
 use App\Http\Controllers\MessageController;
-use App\Http\Controllers\Manager\TechnicianController as ManagerTechnicianController;
 
 // Generic landing
 Route::get('/', function () {
@@ -66,6 +66,12 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
         Route::get('/index/{id}', [ManagerController::class, 'inquireShow'])->whereNumber('id')->name('inquiries.show');
         Route::delete('/index/{id}', [ManagerController::class, 'inquireDestroy'])->whereNumber('id')->name('inquiries.destroy');
         Route::post('/{id}/assign', [ManagerController::class, 'assignTechnician'])->name('manager.inquiries.assign');
+    });
+
+    Route::prefix('/job')->group(function(){
+        Route::get('/index', [JobOrderController::class, 'index'])->name('manager.job.index');
+        Route::patch('/markComplete/{id}',[JobOrderController::class, 'markComplete'])->name('manager.job.markComplete');
+        Route::get('/show/{id}', [JobOrderController::class, 'show'])->name('manager.job.show');
     });
 
     // ⭐ Added missing components (same style, same method)
@@ -199,6 +205,10 @@ Route::middleware(['auth','verified','role:technician'])->prefix('/technician')-
         Route::patch('/update/{id}', [JobOrderTechnicianController::class, 'update'])->name('technician.job.update');
 
         // Mark Complete (PATCH recommended)
-        Route::patch('/mark-complete/{id}', [JobOrderTechnicianController::class, 'markComplete'])->name('technician.job.mark-complete');
+        Route::patch('/in_progress/{id}', [JobOrderTechnicianController::class, 'in_progress'])->name('technician.job.in_progress');
     });
+
+    Route::post('/technician/job/{id}/test-email', [JobOrderTechnicianController::class, 'testEmailToClient'])
+    ->name('technician.testEmailToClient');
+
 });

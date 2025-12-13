@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,31 +12,22 @@ class JobOrder extends Model
     protected $fillable = [
         'quotation_id',
         'technician_id',
-        'customer_name',
-        'contact_number',
-        'device_type',
-        'issue_description',
-        'diagnostic_fee',
-        'materials_cost',
-        'professional_fee',
-        'downpayment',
-        'balance',
+        'start_date',
         'expected_finish_date',
-        'remarks',
-        'materials_specifications',
+        'timeline_min_days',
+        'timeline_max_days',
+        'technician_notes',
         'status',
+        'completed_at',
     ];
 
     protected $casts = [
+        'start_date' => 'date',
         'expected_finish_date' => 'date',
-        'diagnostic_fee' => 'decimal:2',
-        'materials_cost' => 'decimal:2',
-        'professional_fee' => 'decimal:2',
-        'downpayment' => 'decimal:2',
-        'balance' => 'decimal:2',
+        'completed_at' => 'datetime',
     ];
 
-    // RELATIONSHIPS ---------------------------------
+    // Relationships
     public function quotation()
     {
         return $this->belongsTo(Quotation::class);
@@ -46,23 +38,17 @@ class JobOrder extends Model
         return $this->belongsTo(Technician::class);
     }
 
-    // COMPUTED --------------------------------------
-    public function getTotalCostAttribute()
+    public function items()
     {
-        return $this->diagnostic_fee + $this->materials_cost + $this->professional_fee;
+        return $this->hasMany(JobOrderItem::class);
     }
 
-    public function getFormattedTotalCostAttribute()
+    // Status helpers
+    public function isScheduled(): bool
     {
-        return '₱' . number_format((float) $this->total_cost, 2);
+        return $this->status === 'scheduled';
     }
 
-    public function getFormattedBalanceAttribute()
-    {
-        return '₱' . number_format((float) $this->balance, 2);
-    }
-
-    // STATUS HELPERS --------------------------------
     public function isInProgress(): bool
     {
         return $this->status === 'in_progress';
@@ -75,10 +61,9 @@ class JobOrder extends Model
 
     public function markAsCompleted()
     {
-        $this->update(['status' => 'completed']);
-    }
-
-    public function items() {
-        return $this->hasMany(JobOrderItem::class);
+        $this->update([
+            'status' => 'completed',
+            'completed_at' => now(),
+        ]);
     }
 }

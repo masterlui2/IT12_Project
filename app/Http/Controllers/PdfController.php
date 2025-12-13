@@ -40,6 +40,8 @@ class PdfController extends Controller
         // Generate PDF
         $pdf = Pdf::loadView('technician.contents.quotations.pdf.pdf', $data);
         $pdf->setPaper('A4', 'portrait');
+        
+        // Stream or download
         return $pdf->stream('quotation_' . ($id ?? 'preview') . '.pdf');
     }
 
@@ -63,6 +65,7 @@ class PdfController extends Controller
 
         $pdf = Pdf::loadView('technician.contents.quotations.pdf.pdf', $data);
         $pdf->setPaper('A4', 'portrait');
+        
         return $pdf->download('quotation_' . $quotation->id . '.pdf');
     }
 
