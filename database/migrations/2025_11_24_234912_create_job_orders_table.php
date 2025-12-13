@@ -33,7 +33,7 @@ return new class extends Migration
             $table->text('technician_notes')->nullable();
 
             // Workflow status
-            $table->enum('status', ['scheduled', 'in_progress', 'completed', 'cancelled'])
+            $table->enum('status', ['scheduled', 'in_progress', 'review', 'completed', 'cancelled'])
                 ->default('scheduled');
             
             $table->timestamp('completed_at')->nullable();

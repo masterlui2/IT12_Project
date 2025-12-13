@@ -66,6 +66,21 @@
              <span class="text-sm font-medium">Inquiries</span>
           </a>
         </li>
+        
+        <!-- job -->
+        <li>
+          <a href="{{ route('manager.job.index') }}"
+             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative
+             {{ Route::is('manager.job.*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'hover:bg-gray-50 text-gray-700' }}">
+             <div class="relative">
+               <div class="w-8 h-8 flex items-center justify-center rounded-lg
+                 {{ Route::is('manager*') ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }}">
+                 <i class="fas fa-question-circle text-sm"></i>
+               </div>
+             </div>
+             <span class="text-sm font-medium">Job Order</span>
+          </a>
+        </li>
 
        
 

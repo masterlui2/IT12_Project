@@ -1,6 +1,4 @@
-@extends('technician.layout.app')
-
-@section('content')
+<x-layouts.app :title="__('Job Order')">
 
 <div class="bg-white rounded-xl shadow-sm border p-8 space-y-8">
 
@@ -88,13 +86,12 @@
                         </td>
                         <td class="px-4 py-3 text-center">
                             <div class="inline-flex gap-2 justify-center">
-                                <form action="{{ route('technician.job.in_progress', $job->id) }}" method="POST" class="text-green-600 hover:text-green-800" title="Start">
+                                <form action="{{ route('manager.job.markComplete', $job->id) }}" method="POST" class="text-green-600 hover:text-green-800" title="Start">
                                     @csrf 
                                     @method('PATCH')
-                                    <button type="submit" name="button" action="in_progress"><i class="fas fa-wrench"></i></button>
+                                    <button type="submit" name="button" action="in_progress"><i class="fas fa-check"></i></button>
                                 </form>
-                                <a href="{{ route('technician.job.show', $job->id) }}" class="text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i></a>
-                                <a href="{{ route('technician.job.edit', $job->id) }}" class="text-yellow-600 hover:text-yellow-700" title="Update"><i class="fas fa-pen-to-square"></i></a>
+                                <a href="{{ route('manager.job.show', $job->id) }}" class="text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i></a>
                             </div>
                         </td>
                     </tr>
@@ -129,5 +126,4 @@
         </div>
     </div>
 </div>
-
-@endsection
+</x-layouts.app>

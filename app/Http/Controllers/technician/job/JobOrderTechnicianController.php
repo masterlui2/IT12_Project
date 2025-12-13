@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\JobOrder;
 use Carbon\Carbon;
-
 class JobOrderTechnicianController extends Controller
 {
     public function index(Request $request)
@@ -53,7 +52,6 @@ class JobOrderTechnicianController extends Controller
     public function update(Request $request, $id)
     {
         $job = JobOrder::findOrFail($id);
-
         $request->validate([
             'start_date' => 'required|date',
             'expected_finish_date' => 'nullable|date',
@@ -102,9 +100,9 @@ class JobOrderTechnicianController extends Controller
         }
 
         // Handle action buttons
-        if ($request->action === 'complete') {
+        if ($request->action === 'review') {
             $job->update([
-                'status' => 'completed',
+                'status' => 'review',
                 'completed_at' => now(),
             ]);
             return redirect()->route('technician.job.index')
@@ -116,13 +114,9 @@ class JobOrderTechnicianController extends Controller
             ->with('success', 'Job order updated successfully!');
     }
 
-
-    public function markComplete($id)
-    {
-        $job = JobOrder::findOrFail($id);
-        $job->markAsCompleted();
-
-        return redirect()->route('technician.job.index')
-            ->with('success', 'Job marked as completed!');
+    public function in_progress($id){
+       $job = JobOrder::findOrFail($id);
+       $job->update(['status' => 'in_progress']);
+       return redirect()->route('technician.job.index');
     }
 }
