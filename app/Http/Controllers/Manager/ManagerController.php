@@ -16,8 +16,85 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 class ManagerController extends Controller
 {
-    public function dashboard(){
-        return view('manager.dashboard');
+    public function dashboard(Request $request)
+    {
+        $range = $request->input('range', 'today');
+        $now   = Carbon::now();
+
+        switch ($range) {
+            case 'week':
+                $start = $now->copy()->startOfWeek();
+                break;
+            case 'month':
+                $start = $now->copy()->startOfMonth();
+                break;
+            case 'quarter':
+                $start = $now->copy()->startOfQuarter();
+                break;
+            case 'year':
+                $start = $now->copy()->startOfYear();
+                break;
+            default:
+                $start = $now->copy()->startOfDay();
+        }
+
+        $end = $now;
+
+        $inquiriesRange = Inquiry::whereBetween('created_at', [$start, $end]);
+        $quotationsRange = Quotation::whereBetween('created_at', [$start, $end]);
+        $jobsRange = JobOrder::whereBetween('created_at', [$start, $end]);
+
+        $recentJobs = JobOrder::with(['quotation.customer', 'quotation.inquiry', 'technician.user'])
+            ->latest()
+            ->take(8)
+            ->get()
+            ->map(function (JobOrder $job) {
+                $customer = optional($job->quotation?->customer);
+                $technicianUser = optional($job->technician?->user);
+                $inquiry = $job->quotation?->inquiry;
+
+                return [
+                    'id'         => $job->id,
+                    'customer'   => trim($customer?->firstname . ' ' . $customer?->lastname) ?: 'Customer',
+                    'device'     => $inquiry?->device_type ?? $inquiry?->issue_description ?? '—',
+                    'technician' => trim($technicianUser?->firstname . ' ' . $technicianUser?->lastname) ?: 'Unassigned',
+                    'status'     => $job->status ?? 'pending',
+                    'quoted'     => $job->quotation?->grand_total ?? 0,
+                ];
+            })
+            ->toArray();
+
+        $totalQuotations = (clone $quotationsRange)->count();
+
+        $stats = [
+            'inquiries' => [
+                'total'     => (clone $inquiriesRange)->count(),
+                'converted' => (clone $inquiriesRange)->where('status', 'Converted')->count(),
+            ],
+            'quotations' => [
+                'sent'           => $totalQuotations,
+                'approved'       => (clone $quotationsRange)->where('status', 'approved')->count(),
+                'rejected'       => (clone $quotationsRange)->where('status', 'rejected')->count(),
+                'approval_rate'  => $totalQuotations > 0
+                    ? round(((clone $quotationsRange)->where('status', 'approved')->count() / $totalQuotations) * 100, 1)
+                    : null,
+            ],
+            'jobs' => [
+                'total'     => (clone $jobsRange)->count(),
+                'active'    => (clone $jobsRange)->whereIn('status', ['scheduled', 'in_progress'])->count(),
+                'ongoing'   => (clone $jobsRange)->where('status', 'in_progress')->count(),
+                'pending'   => (clone $jobsRange)->where('status', 'pending')->count(),
+                'completed' => (clone $jobsRange)->where('status', 'completed')->count(),
+            ],
+            'revenue' => [
+                'approved_total' => Quotation::where('status', 'approved')
+                    ->whereBetween('created_at', [$start, $end])
+                    ->sum('grand_total'),
+            ],
+            'recent_jobs' => $recentJobs,
+        ];
+
+        return view('manager.dashboard', compact('stats', 'range'));
     }
 
     public function quotation(){
@@ -42,12 +119,39 @@ class ManagerController extends Controller
         ));
     }
 
-    public function inquiries()
-    {
-        // Fetch inquiries
-        $inquiries = Inquiry::with('technician')
-            ->orderByDesc('created_at')
-            ->paginate(10);
+    public function inquiries(Request $request)    {
+         $filters = [
+            'search'      => $request->input('search'),
+            'status'      => $request->input('status'),
+            'technician'  => $request->input('technician'),
+        ];
+
+        $inquiriesQuery = Inquiry::with(['technician.user', 'customer'])
+            ->orderByDesc('created_at');
+
+        if ($filters['search']) {
+            $search = $filters['search'];
+            $numericId = (int) str_replace(['INQ-', 'inq-', ' '], '', $search);
+
+            $inquiriesQuery->where(function ($query) use ($search, $numericId) {
+                $query->when($numericId > 0, fn ($q) => $q->orWhere('id', $numericId))
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('service_location', 'like', "%{$search}%")
+                    ->orWhere('issue_description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($filters['status']) {
+            $inquiriesQuery->where('status', $filters['status']);
+        }
+
+        if ($filters['technician']) {
+            $inquiriesQuery->where('assigned_technician_id', $filters['technician']);
+        }
+       $inquiries = $inquiriesQuery
+            ->paginate(10)
+            ->appends($filters);
 
         // Map statuses dynamically
         $statusCounts = Inquiry::select('status', DB::raw('COUNT(*) as total'))
@@ -58,6 +162,7 @@ class ManagerController extends Controller
         $stats = [
             'inquiries' => [
                 'unassigned' => Inquiry::whereNull('assigned_technician_id')->count(),
+                'pending'    => $statusCounts['Pending'] ?? 0,
                 'assigned'   => $statusCounts['Acknowledged'] ?? 0,
                 'ongoing'    => $statusCounts['In Progress'] ?? 0,
                 'completed'  => $statusCounts['Completed'] ?? 0,
@@ -68,15 +173,13 @@ class ManagerController extends Controller
         ];
 
         // Technician dropdown
-        $technicians = User::where('role', 'technician')->get();
-
+        $technicians = Technician::with('user')->get();
         // Unanswered inquiries older than 48 hours
         $unanswered = Inquiry::whereNull('assigned_technician_id')
             ->where('created_at', '<', Carbon::now()->subHours(48))
             ->count();
 
-        return view('manager.inquiries', compact('inquiries', 'stats', 'technicians', 'unanswered'));
-    }
+        return view('manager.inquiries', compact('inquiries', 'stats', 'technicians', 'unanswered', 'filters'));    }
 
     public function approve(Quotation $quotation)
     {
@@ -230,13 +333,59 @@ public function destroyTechnician(Technician $technician)
         JobOrder::create($validated);
 
         return redirect()->route('technicians')->with('status', 'Job order assigned to technician successfully.');
-        }
-    public function customers(){
+        
+    }
+    
+
+    public function customers()
+    {
         return view('manager.customers');
     }
-    public function reports(){
-        return view('manager.reports');
-       }
+    public function reports()
+    {
+        $now = Carbon::now();
+
+        // Monetary stats
+        $approvedThisMonth = Quotation::where('status', 'approved')
+            ->whereMonth('date_issued', $now->month)
+            ->whereYear('date_issued', $now->year)
+            ->sum('grand_total');
+
+        $averageQuotation = Quotation::avg('grand_total') ?? 0;
+        $diagnosticFees   = Quotation::sum('diagnostic_fee');
+
+        // Volume metrics
+        $totalQuotations = Quotation::count();
+        $approvedCount   = Quotation::where('status', 'approved')->count();
+        $pendingCount    = Quotation::where('status', 'pending')->count();
+        $rejectedCount   = Quotation::where('status', 'rejected')->count();
+
+        $approvalRate = $totalQuotations > 0
+            ? round(($approvedCount / $totalQuotations) * 100, 1)
+            : 0;
+
+        $stats = [
+            'reports' => [
+                'quotation_sales_month' => $approvedThisMonth,
+                'average_quotation'     => $averageQuotation,
+                'diagnostic_fees'       => $diagnosticFees,
+                'approval_rate'         => $approvalRate,
+            ],
+            'counts' => [
+                'total'    => $totalQuotations,
+                'approved' => $approvedCount,
+                'pending'  => $pendingCount,
+                'rejected' => $rejectedCount,
+            ],
+        ];
+
+       $reportRows = Quotation::with(['customer', 'inquiry'])
+    ->orderByDesc('date_issued')
+    ->paginate(12);
+
+
+        return view('manager.reports', compact('stats', 'reportRows'));
+    }
 
     public function sales()
     {

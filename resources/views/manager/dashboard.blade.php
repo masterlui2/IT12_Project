@@ -1,375 +1,227 @@
 <x-layouts.app :title="__('Dashboard')">
-    
     @php
-        $range = request('range', 'today');
-
         $rangeLabels = [
-            'today'     => 'Today',
-            'week'      => 'This week',
-            'month'     => 'This month',
-            'quarter'   => 'This quarter',
-            'year'      => 'This year',
+            'today'   => 'Today',
+            'week'    => 'This week',
+            'month'   => 'This month',
+            'quarter' => 'This quarter',
+            'year'    => 'This year',
         ];
 
         $rangeLabel = $rangeLabels[$range] ?? 'Custom';
     @endphp
 
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-        {{-- Global Filter --}}
-        <div class="flex items-center justify-end gap-2">
+
+        {{-- Filter --}}
+        <div class="flex items-center justify-end">
             <form method="GET" class="flex items-center gap-2">
                 <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                    Filter period:
+                    {{ __('Filter period:') }}
                 </span>
 
                 <select
                     name="range"
-                    class="rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs
-                           dark:border-neutral-700 dark:bg-neutral-900"
+                    class="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs
+                           focus:outline-none focus:ring-2 focus:ring-neutral-200
+                           dark:border-neutral-700 dark:bg-neutral-900 dark:focus:ring-neutral-700"
                     onchange="this.form.submit()"
                 >
-                    <option value="today"   @selected($range === 'today')>Today</option>
-                    <option value="week"    @selected($range === 'week')>This week</option>
-                    <option value="month"   @selected($range === 'month')>This month</option>
-                    <option value="quarter" @selected($range === 'quarter')>This quarter</option>
-                    <option value="year"    @selected($range === 'year')>This year</option>
+                    <option value="today"   @selected($range === 'today')>{{ __('Today') }}</option>
+                    <option value="week"    @selected($range === 'week')>{{ __('This week') }}</option>
+                    <option value="month"   @selected($range === 'month')>{{ __('This month') }}</option>
+                    <option value="quarter" @selected($range === 'quarter')>{{ __('This quarter') }}</option>
+                    <option value="year"    @selected($range === 'year')>{{ __('This year') }}</option>
                 </select>
             </form>
         </div>
 
-        {{-- Primary KPIs --}}
+        {{-- Core KPIs --}}
         <div class="grid gap-4 md:grid-cols-4">
             {{-- Inquiries --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-start justify-between">
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">New Inquiries</p>
+                <div class="flex items-start justify-between gap-3">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ __('New inquiries') }}</p>
                     <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $rangeLabel }}</span>
                 </div>
-                <p class="mt-2 text-2xl font-semibold tracking-tight">
-                    {{ number_format($stats['inquiries']['today'] ?? 0) }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    {{ number_format($stats['inquiries']['week'] ?? 0) }} this week •
-                    Conv. {{ $stats['inquiries']['conversion_rate'] ?? '—' }}
+
+                <p class="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+                    {{ number_format($stats['inquiries']['total'] ?? 0) }}
                 </p>
 
-                {{-- progress --}}
-                <div class="mt-4 progress h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <div
-                        class="progress__bar h-full bg-neutral-900 dark:bg-neutral-100"
-                        style="--progress: {{ $stats['inquiries']['progress'] ?? 0 }};"
-                    ></div>
-                </div>
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    {{ __('Converted') }} {{ number_format($stats['inquiries']['converted'] ?? 0) }}
+                </p>
             </div>
 
             {{-- Quotations --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-start justify-between">
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Quotations Sent</p>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                        {{ $rangeLabel }} • Approval {{ $stats['quotations']['approval_rate'] ?? '—' }}
-                    </span>
-                </div>
-                <p class="mt-2 text-2xl font-semibold tracking-tight">
-                    {{ number_format($stats['quotations']['sent'] ?? 0) }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    Accepted {{ number_format($stats['quotations']['accepted'] ?? 0) }} •
-                    Rejected {{ number_format($stats['quotations']['rejected'] ?? 0) }}
-                </p>
-
-                {{-- progress --}}
-                <div class="mt-4 progress h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <div
-                        class="progress__bar h-full bg-neutral-900 dark:bg-neutral-100"
-                        style="--progress: {{ $stats['quotations']['approval_progress'] ?? 0 }};"
-                    ></div>
-                </div>
-            </div>
-
-            {{-- Job Orders Overview --}}
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-start justify-between">
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Job Orders</p>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                        {{ $rangeLabel }} • Active: {{ $stats['jobs']['active'] ?? 0 }}
-                    </span>
-                </div>
-                <p class="mt-2 text-2xl font-semibold tracking-tight">
-                    {{ number_format($stats['jobs']['total'] ?? 0) }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    Completed {{ number_format($stats['jobs']['completed'] ?? 0) }} •
-                    Ongoing {{ number_format($stats['jobs']['ongoing'] ?? 0) }}
-                </p>
-
-                {{-- progress --}}
-                <div class="mt-4 progress h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <div
-                        class="progress__bar h-full bg-neutral-900 dark:bg-neutral-100"
-                        style="--progress: {{ $stats['jobs']['completion_rate'] ?? 0 }};"
-                    ></div>
-                </div>
-            </div>
-
-            {{-- Payments (Collections) --}}
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-start justify-between">
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Collections</p>
+                <div class="flex items-start justify-between gap-3">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ __('Quotations approved') }}</p>
                     <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $rangeLabel }}</span>
                 </div>
-                <p class="mt-2 text-2xl font-semibold tracking-tight">
-                    ₱{{ number_format($stats['payments']['downpayments_month'] ?? 0, 2) }}
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    Receivables ₱{{ number_format($stats['payments']['receivables'] ?? 0, 2) }} •
-                    Refunded {{ number_format($stats['payments']['refunded_count'] ?? 0) }}
+
+                <p class="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+                    {{ number_format($stats['quotations']['approved'] ?? 0) }}
                 </p>
 
-                {{-- progress --}}
-                <div class="mt-4 progress h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <div
-                        class="progress__bar h-full bg-neutral-900 dark:bg-neutral-100"
-                        style="--progress: {{ $stats['payments']['collection_progress'] ?? 0 }};"
-                    ></div>
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    {{ __('Sent') }} {{ number_format($stats['quotations']['sent'] ?? 0) }}
+                    • {{ __('Approval rate') }}
+                    {{ $stats['quotations']['approval_rate'] !== null ? $stats['quotations']['approval_rate'] . '%' : '—' }}
+                </p>
+            </div>
+
+            {{-- Active Jobs --}}
+            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ __('Active job orders') }}</p>
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $rangeLabel }}</span>
                 </div>
+
+                <p class="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+                    {{ number_format($stats['jobs']['active'] ?? 0) }}
+                </p>
+
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    {{ __('Includes ongoing + pending jobs') }}
+                </p>
+            </div>
+
+            {{-- Revenue --}}
+            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ __('Approved revenue') }}</p>
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $rangeLabel }}</span>
+                </div>
+
+                <p class="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+                    ₱{{ number_format($stats['revenue']['approved_total'] ?? 0, 2) }}
+                </p>
+
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    {{ __('From approved quotations') }}
+                </p>
             </div>
         </div>
 
-        {{-- Job Orders Status Breakdown --}}
-        <div class="grid gap-4 md:grid-cols-4">
-            {{-- Ongoing Jobs --}}
+        {{-- Job Status Cards --}}
+        <div class="grid gap-4 md:grid-cols-3">
+            {{-- Ongoing --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Ongoing Jobs</h3>
+                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">{{ __('Ongoing jobs') }}</h3>
                     <x-flux::icon name="wrench" class="h-5 w-5 text-blue-500" />
                 </div>
                 <p class="mt-2 text-2xl font-semibold text-blue-600">
                     {{ number_format($stats['jobs']['ongoing'] ?? 0) }}
                 </p>
                 <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    In progress {{ number_format($stats['jobs']['in_progress'] ?? 0) }} •
-                    Pending {{ number_format($stats['jobs']['pending'] ?? 0) }}
+                    {{ __('Technicians currently assigned') }}
                 </p>
             </div>
 
-            {{-- Completed Jobs --}}
+            {{-- Completed --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Completed Jobs</h3>
+                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">{{ __('Completed jobs') }}</h3>
                     <x-flux::icon name="check-circle" class="h-5 w-5 text-emerald-500" />
                 </div>
                 <p class="mt-2 text-2xl font-semibold text-emerald-600">
                     {{ number_format($stats['jobs']['completed'] ?? 0) }}
                 </p>
                 <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    This week {{ number_format($stats['jobs']['completed_week'] ?? 0) }} •
-                    For pickup {{ number_format($stats['jobs']['for_pickup'] ?? 0) }}
+                    {{ __('Finished successfully') }}
                 </p>
             </div>
 
-            {{-- Refunded Jobs --}}
+            {{-- Pending --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Refunded Jobs</h3>
-                    <x-flux::icon name="arrow-path" class="h-5 w-5 text-amber-500" />
+                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">{{ __('Pending jobs') }}</h3>
+                    <x-flux::icon name="clock" class="h-5 w-5 text-amber-500" />
                 </div>
                 <p class="mt-2 text-2xl font-semibold text-amber-600">
-                    {{ number_format($stats['jobs']['refunded'] ?? 0) }}
+                    {{ number_format($stats['jobs']['pending'] ?? 0) }}
                 </p>
                 <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    This month {{ number_format($stats['jobs']['refunded_month'] ?? 0) }} •
-                    Value ₱{{ number_format($stats['jobs']['refunded_value'] ?? 0, 2) }}
+                    {{ __('Queued and waiting to start') }}
                 </p>
-            </div>
-
-            {{-- Job Performance --}}
-            <div class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Job Performance</h3>
-                    <x-flux::icon name="chart-bar" class="h-5 w-5 text-neutral-500" />
-                </div>
-                <p class="mt-2 text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
-                    {{ $stats['jobs']['completion_rate'] ?? '—' }}%
-                </p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    Avg TAT {{ $stats['jobs']['avg_turnaround'] ?? '—' }} •
-                    Success Rate {{ $stats['jobs']['success_rate'] ?? '—' }}%
-                </p>
-            </div>
-        </div>
-
-        {{-- Secondary: Attendance/Payroll, Pipeline, Expenses --}}
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-            {{-- Attendance & Payroll --}}
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Attendance & Payroll</h3>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $rangeLabel }}</span>
-                </div>
-                <dl class="mt-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Compliance</dt>
-                        <dd class="text-sm font-semibold">
-                            {{ $stats['attendance']['compliance_rate'] ?? '—' }}
-                        </dd>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Late/Absences</dt>
-                        <dd class="text-sm font-semibold">
-                            {{ number_format($stats['attendance']['late'] ?? 0) }}/{{ number_format($stats['attendance']['absent'] ?? 0) }}
-                        </dd>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Payroll Due</dt>
-                        <dd class="text-sm font-semibold">
-                            ₱{{ number_format($stats['payroll']['due'] ?? 0, 2) }}
-                        </dd>
-                    </div>
-                </dl>
-            </div>
-
-            {{-- Service Pipeline --}}
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Service Pipeline</h3>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $rangeLabel }}</span>
-                </div>
-                <ul class="mt-4 space-y-3">
-                    <li class="flex items-center justify-between">
-                        <span class="text-sm text-neutral-600 dark:text-neutral-300">Inquiries</span>
-                        <span class="text-sm font-semibold">
-                            {{ number_format($stats['pipeline']['inquiries'] ?? 0) }}
-                        </span>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span class="text-sm text-neutral-600 dark:text-neutral-300">Quotations</span>
-                        <span class="text-sm font-semibold">
-                            {{ number_format($stats['pipeline']['quotations'] ?? 0) }}
-                        </span>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span class="text-sm text-neutral-600 dark:text-neutral-300">Jobs Created</span>
-                        <span class="text-sm font-semibold">
-                            {{ number_format($stats['pipeline']['jobs'] ?? 0) }}
-                        </span>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span class="text-sm text-neutral-600 dark:text-neutral-300">Paid</span>
-                        <span class="text-sm font-semibold">
-                            {{ number_format($stats['pipeline']['paid'] ?? 0) }}
-                        </span>
-                    </li>
-                </ul>
-            </div>
-
-            {{-- Expenses Snapshot --}}
-            <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Expenses Snapshot</h3>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $rangeLabel }}</span>
-                </div>
-                <dl class="mt-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Materials</dt>
-                        <dd class="text-sm font-semibold">
-                            ₱{{ number_format($stats['expenses']['materials'] ?? 0, 2) }}
-                        </dd>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Utilities &amp; Rent</dt>
-                        <dd class="text-sm font-semibold">
-                            ₱{{ number_format($stats['expenses']['overhead'] ?? 0, 2) }}
-                        </dd>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm text-neutral-600 dark:text-neutral-300">Taxes (Quarterly est.)</dt>
-                        <dd class="text-sm font-semibold">
-                            ₱{{ number_format($stats['expenses']['tax_est'] ?? 0, 2) }}
-                        </dd>
-                    </div>
-                </dl>
             </div>
         </div>
 
         {{-- Recent Job Orders --}}
-        <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+        <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <div class="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-neutral-700">
-                <div class="flex flex-col">
+                <div>
                     <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                        Recent Job Orders
+                        {{ __('Recent Job Orders') }}
                     </h3>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                        {{ $rangeLabel }}
-                    </span>
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $rangeLabel }}</span>
                 </div>
-                <button
-                    type="button"
-                    class="text-xs text-neutral-500 underline-offset-2 hover:underline dark:text-neutral-400 cursor-default"
-                    aria-disabled="true"
-                >
-                    View all
-                </button>
+
+                <span class="text-xs text-neutral-400">{{ __('Latest activity') }}</span>
             </div>
 
-            <div class="overflow-x-auto p-4">
-                <table class="min-w-full text-left text-sm">
-                    <thead class="text-xs text-neutral-500 dark:text-neutral-400">
-                        <tr>
-                            <th class="py-2 pr-4">Job #</th>
-                            <th class="py-2 pr-4">Customer</th>
-                            <th class="py-2 pr-4">Device/Issue</th>
-                            <th class="py-2 pr-4">Technician</th>
-                            <th class="py-2 pr-4">Status</th>
-                            <th class="py-2 pr-4 text-right">Quoted</th>
-                            <th class="py-2 pr-4 text-right">Downpayment</th>
-                            <th class="py-2 pr-0 text-right">Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
-                        @foreach(($stats['recent_jobs'] ?? []) as $job)
-                            <tr>
-                                <td class="py-3 pr-4 font-medium">{{ $job['id'] }}</td>
-                                <td class="py-3 pr-4">{{ $job['customer'] }}</td>
-                                <td class="py-3 pr-4">{{ $job['device'] ?? $job['issue'] ?? '—' }}</td>
-                                <td class="py-3 pr-4">{{ $job['technician'] ?? '—' }}</td>
-                                <td class="py-3 pr-4">
-                                    @php($status = strtolower($job['status'] ?? ''))
-                                    <span
-                                        @class([
-                                            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                                            'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300' => $status === 'pending',
-                                            'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' => $status === 'in-progress',
-                                            'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' => $status === 'completed',
-                                            'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' => $status === 'for pickup',
-                                            'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' => $status === 'refunded',
-                                            'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300' => !in_array($status, ['pending','in-progress','completed','for pickup','refunded']),
-                                        ])>
-                                        {{ ucfirst($status) ?: '—' }}
-                                    </span>
-                                </td>
-                                <td class="py-3 pr-4 text-right">
-                                    ₱{{ number_format($job['quoted'] ?? 0, 2) }}
-                                </td>
-                                <td class="py-3 pr-4 text-right">
-                                    ₱{{ number_format($job['downpayment'] ?? 0, 2) }}
-                                </td>
-                                <td class="py-3 pr-0 text-right font-semibold">
-                                    ₱{{ number_format(($job['quoted'] ?? 0) - ($job['downpayment'] ?? 0) - ($job['paid'] ?? 0), 2) }}
-                                </td>
+            <div class="p-4">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm">
+                        <thead class="text-xs text-neutral-500 dark:text-neutral-400">
+                            <tr class="border-b border-neutral-200 dark:border-neutral-800">
+                                <th class="py-2 pr-4">{{ __('Job #') }}</th>
+                                <th class="py-2 pr-4">{{ __('Customer') }}</th>
+                                <th class="py-2 pr-4">{{ __('Device/Issue') }}</th>
+                                <th class="py-2 pr-4">{{ __('Technician') }}</th>
+                                <th class="py-2 pr-4">{{ __('Status') }}</th>
+                                <th class="py-2 pr-0 text-right">{{ __('Quote') }}</th>
                             </tr>
-                        @endforeach
+                        </thead>
 
-                        @if(empty($stats['recent_jobs']))
-                            <tr>
-                                <td colspan="8" class="py-6 text-center text-neutral-500 dark:text-neutral-400">
-                                    No recent jobs yet.
-                                </td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
+                        <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
+                            @forelse(($stats['recent_jobs'] ?? []) as $job)
+                                @php($status = strtolower($job['status'] ?? 'pending'))
+
+                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40">
+                                    <td class="py-3 pr-4 font-medium text-neutral-900 dark:text-neutral-50">
+                                        {{ $job['id'] }}
+                                    </td>
+                                    <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100">
+                                        {{ $job['customer'] ?? '—' }}
+                                    </td>
+                                    <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100">
+                                        {{ $job['device'] ?? '—' }}
+                                    </td>
+                                    <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100">
+                                        {{ $job['technician'] ?? '—' }}
+                                    </td>
+                                    <td class="py-3 pr-4">
+                                        <span
+                                            @class([
+                                                'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+                                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300' => $status === 'pending',
+                                                'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' => $status === 'in_progress',
+                                                'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' => $status === 'completed',
+                                                'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300' => !in_array($status, ['pending','in_progress','completed']),
+                                            ])>
+                                            {{ ucfirst(str_replace('_', ' ', $status)) }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 pr-0 text-right font-semibold text-neutral-900 dark:text-neutral-50">
+                                        ₱{{ number_format($job['quote'] ?? 0, 2) }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                                        {{ __('No recent jobs yet.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
     </div>
 </x-layouts.app>

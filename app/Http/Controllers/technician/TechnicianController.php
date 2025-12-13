@@ -5,12 +5,57 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inquiry;
 use App\Models\Message;
+use App\Models\JobOrder;
+use App\Models\Quotation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 class TechnicianController extends Controller
 {
     public function dashboard(){
-        return view('technician.contents.dashboard');
-    }
+ $technicianId = optional(Auth::user()->technician)->id;
+
+        $jobOrdersQuery = JobOrder::query()
+            ->where('technician_id', $technicianId ?? 0);
+
+        $metrics = [
+            'active_jobs' => (clone $jobOrdersQuery)->whereIn('status', ['scheduled', 'in_progress'])->count(),
+            'completed_jobs' => (clone $jobOrdersQuery)->where('status', 'completed')->count(),
+            'open_inquiries' => Inquiry::query()
+                ->where('assigned_technician_id', $technicianId ?? 0)
+                ->where(function ($query) {
+                    $query->whereNull('status')->orWhere('status', '!=', 'closed');
+                })
+                ->count(),
+            'quotations' => Quotation::query()
+                ->where('technician_id', $technicianId ?? 0)
+                ->count(),
+        ];
+
+        $recentJobOrders = $jobOrdersQuery
+            ->with('quotation')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $recentInquiries = Inquiry::query()
+            ->where('assigned_technician_id', $technicianId ?? 0)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        $recentQuotations = Quotation::query()
+            ->where('technician_id', $technicianId ?? 0)
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('technician.contents.dashboard', [
+            'metrics' => $metrics,
+            'recentJobOrders' => $recentJobOrders,
+            'recentInquiries' => $recentInquiries,
+            'recentQuotations' => $recentQuotations,
+        ]);
+        }
 
    public function messages(Request $request)
     {
@@ -57,8 +102,53 @@ class TechnicianController extends Controller
         }
 
     public function reporting(){
-        return view('technician.contents.reporting');
-    }
+ $technician = Auth::user()->technician;
+
+        if (!$technician) {
+            return redirect()->route('technician.dashboard')
+                ->with('error', 'No technician profile found for this account.');
+        }
+
+        $quotationQuery = Quotation::where('technician_id', $technician->id);
+        $jobOrderQuery = JobOrder::where('technician_id', $technician->id);
+        $inquiryQuery = Inquiry::where('assigned_technician_id', $technician->id);
+
+        $stats = [
+            'totals' => [
+                'quotations' => $quotationQuery->count(),
+                'inquiries' => $inquiryQuery->count(),
+                'approved_quotes' => (clone $quotationQuery)->where('status', 'approved')->count(),
+            ],
+            'jobs' => [
+                'active' => (clone $jobOrderQuery)->whereIn('status', ['scheduled', 'in_progress'])->count(),
+                'completed' => (clone $jobOrderQuery)->where('status', 'completed')->count(),
+                'cancelled' => (clone $jobOrderQuery)->where('status', 'cancelled')->count(),
+            ],
+            'revenue' => [
+                'quotations' => (clone $quotationQuery)->where('status', 'approved')->sum('grand_total'),
+                'jobs' => (clone $jobOrderQuery)->sum(DB::raw('COALESCE(diagnostic_fee,0)+COALESCE(materials_cost,0)+COALESCE(professional_fee,0)')),
+            ],
+        ];
+
+        $stats['revenue']['overall'] = $stats['revenue']['quotations'] + $stats['revenue']['jobs'];
+
+        $recentJobs = (clone $jobOrderQuery)
+            ->with('quotation')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $recentQuotations = (clone $quotationQuery)
+            ->with('inquiry')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('technician.contents.reporting', compact(
+            'stats',
+            'recentJobs',
+            'recentQuotations',
+        ));    }
 
     public function inquire()
     {

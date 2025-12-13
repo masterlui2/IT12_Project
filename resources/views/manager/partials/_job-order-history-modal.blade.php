@@ -69,7 +69,7 @@
                                 <tr class="border-t text-xs text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
                                     <td class="px-4 py-3 font-medium">JO-00012</td>
                                     <td class="px-4 py-3">Red Xavier</td>
-                                    <td class="px-4 py-3">Luigi Ednilan</td>
+                                    <td class="px-4 py-3">Luigi Ednilan</td>    
                                     <td class="px-4 py-3 text-neutral-500 dark:text-neutral-400">
                                         Network repair & configuration
                                     </td>

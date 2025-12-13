@@ -78,7 +78,6 @@
                             <th class="px-6 py-4 font-medium text-right">Amount</th>
                             <th class="px-6 py-4 font-medium text-right">Submitted</th>
                             <th class="px-6 py-4 font-medium text-center">Status</th>
-                            <th class="px-6 py-4 font-medium text-center w-40">Actions</th>
                         </tr>
                     </thead>
 
@@ -118,14 +117,9 @@
                                 </td>
 
                                 {{-- Actions --}}
-                                <td class="px-6 py-4 text-center align-middle">
-                                    <div class="inline-flex items-center justify-center gap-2">
-                                        <a href="{{ route('quotation.show', $quote->id) }}"
-                                           class="text-blue-600 hover:text-blue-800"
-                                           title="View">
-                                           <i class="fas fa-eye"></i>
-                                        </a>
-
+                                <td class="px-6 py-5 text-center align-middle">
+                                    <div class="inline-flex items-center justify-center gap-4">
+                                        
                                         @if ($quote->status === 'pending')
                                             <form action="{{ route('manager.quotation.approve', $quote->id) }}"
                                                   method="POST" class="inline">

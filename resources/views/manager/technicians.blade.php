@@ -75,7 +75,6 @@
                         <tr class="border-b border-neutral-100 bg-neutral-50 text-[11px] uppercase tracking-wide text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
                             <th class="px-4 py-3 font-medium">{{ __('Technician') }}</th>
                             <th class="px-4 py-3 font-medium">{{ __('Contact') }}</th>
-                            <th class="px-4 py-3 font-medium">{{ __('Specialization') }}</th>
                             <th class="px-4 py-3 font-medium">{{ __('Current Job') }}</th>
                             <th class="px-4 py-3 text-center font-medium">{{ __('Status') }}</th>
                             <th class="px-4 py-3 text-center font-medium w-40">{{ __('Actions') }}</th>
@@ -130,13 +129,7 @@
                                     </div>
                                 </td>
 
-                                {{-- Specialization --}}
-                                <td class="px-4 py-3 align-top">
-                                    <span class="text-xs">
-                                        {{ $tech->specialization ?? __('Not set') }}
-                                    </span>
-                                </td>
-
+                               
                                 {{-- Current Job --}}
                                 <td class="px-4 py-3 align-top">
                                     @if($latestJob)
