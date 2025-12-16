@@ -31,17 +31,18 @@
             <h2 class="text-lg font-semibold text-gray-800">Job Order Management</h2>
 
             <div class="flex flex-wrap items-center gap-3">
-                <form method="GET" action="#" class="flex gap-3">
+                                <form method="GET" action="{{ route('manager.job.index') }}" class="flex gap-3">
                     <input type="text" name="search" placeholder="Search by client or JO ID"
+                                               value="{{ $filters['search'] ?? '' }}"
                            class="px-3 py-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 w-52" />
 
                     <select name="status"
                             class="px-3 py-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
                         <option value="">All Status</option>
-                        <option value="scheduled">Scheduled</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
+                          <option value="scheduled" @selected(($filters['status'] ?? '') === 'scheduled')>Scheduled</option>
+                        <option value="in_progress" @selected(($filters['status'] ?? '') === 'in_progress')>In Progress</option>
+                        <option value="completed" @selected(($filters['status'] ?? '') === 'completed')>Completed</option>
+                        <option value="cancelled" @selected(($filters['status'] ?? '') === 'cancelled')>Cancelled</option>
                     </select>
                 </form>
             </div>
@@ -108,21 +109,16 @@
         <!-- Summary -->
         <div class="flex justify-between items-center mt-4 border-t pt-3 text-sm text-gray-700">
             <div>Total Job Orders:
-                <span class="text-blue-600 font-semibold">3</span>
-            </div>
+                <span class="text-blue-600 font-semibold">{{ $stats['total'] }}</span>            </div>
             <div>Currently Active:
-                <span class="text-yellow-600 font-semibold">1</span>
+                                <span class="text-yellow-600 font-semibold">{{ $stats['active'] }}</span>
             </div>
         </div>
 
         <!-- Pagination -->
         <div class="border-t mt-4 pt-2 flex justify-between items-center text-sm text-gray-500">
-            <p>Showing 1–3 of 3 job orders</p>
-            <div class="space-x-1">
-                <button class="px-2 py-1 border rounded bg-gray-100 text-gray-400 cursor-not-allowed" disabled>Prev</button>
-                <button class="px-2 py-1 border rounded bg-blue-600 text-white">1</button>
-                <button class="px-2 py-1 border rounded bg-gray-100 text-gray-400 cursor-not-allowed" disabled>Next</button>
-            </div>
+            <p>Showing {{ $jobOrders->firstItem() }}–{{ $jobOrders->lastItem() }} of {{ $jobOrders->total() }} job orders</p>
+            {{ $jobOrders->withQueryString()->links() }}
         </div>
     </div>
 </div>

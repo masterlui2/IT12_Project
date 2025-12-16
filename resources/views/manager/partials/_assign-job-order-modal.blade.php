@@ -62,7 +62,16 @@
     <input type="hidden" name="technician_id" value="{{ $tech->id }}">
 
     <div class="grid grid-cols-1 gap-4 text-sm">
-
+      {{-- Start Date --}}
+        <div>
+            <label class="mb-1 block text-neutral-500">Start Date</label>
+            <input
+                type="date"
+                name="start_date"
+                value="{{ now()->toDateString() }}"
+                class="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 focus:border-emerald-500 focus:ring-1 dark:border-neutral-700 dark:bg-neutral-900"
+            />
+        </div>
         {{-- Select Quotation --}}
         <div>
             <label class="mb-1 block text-neutral-500">Approved Quotation</label>
@@ -96,7 +105,7 @@
         <div>
             <label class="mb-1 block text-neutral-500">Instructions / Notes (Optional)</label>
             <textarea
-                name="remarks"
+                name="technician_notes"
                 rows="3"
                 class="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 focus:border-emerald-500 focus:ring-1 dark:border-neutral-700 dark:bg-neutral-900"
                 placeholder="Any instructions for the technician..."

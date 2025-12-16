@@ -70,7 +70,7 @@
 
     <div class="w-1/2 ml-auto mb-4 text-sm space-y-0.5">
         <div class="flex justify-between"><span>Subtotal:</span><span>₱{{ number_format($quotation->labor_estimate, 2) }}</span></div>
-        <div class="flex justify-between"><span>Tax / Diagnostic Fee:</span><span>₱{{ number_format($quotation->diagnostic_fee, 2) }}</span></div>
+        <div class="flex justify-between"><span>Tax:</span><span>₱{{ number_format($quotation->diagnostic_fee, 2) }}</span></div>
         <div class="flex justify-between font-semibold"><span>Total:</span><span>₱{{ number_format($quotation->grand_total, 2) }}</span></div>
     </div>
     @endif

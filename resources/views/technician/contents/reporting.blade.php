@@ -156,52 +156,72 @@
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse($recentJobs as $job)
-                            @php
-                                $jobTotal = ($job->diagnostic_fee ?? 0) + ($job->materials_cost ?? 0) + ($job->professional_fee ?? 0);
-                                $statusClass = match($job->status) {
-                                    'completed'   => 'bg-emerald-100 text-emerald-700',
-                                    'in_progress' => 'bg-amber-100 text-amber-700',
-                                    'scheduled'   => 'bg-blue-100 text-blue-700',
-                                    'cancelled'   => 'bg-rose-100 text-rose-700',
-                                    default       => 'bg-gray-100 text-gray-700'
-                                };
-                            @endphp
+                  <tbody class="divide-y divide-gray-100">
+    @forelse($recentJobs as $job)
+        @php
+            // ✅ Total should come from quotation grand_total (not job_orders fees)
+            $jobTotal = (float) ($job->quotation?->grand_total ?? 0);
 
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-5 py-3 font-semibold text-gray-900">
-                                    JOB-{{ str_pad($job->id, 4, '0', STR_PAD_LEFT) }}
-                                </td>
-                                <td class="px-5 py-3 text-gray-800">
-                                    {{ $job->customer_name ?? '—' }}
-                                </td>
-                                <td class="px-5 py-3 text-gray-800">
-                                    {{ $job->quotation?->project_title ?? '—' }}
-                                </td>
-                                <td class="px-5 py-3 text-center">
-                                    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
-                                        {{ ucfirst(str_replace('_', ' ', $job->status ?? 'pending')) }}
-                                    </span>
-                                </td>
-                                <td class="px-5 py-3 text-right font-semibold text-gray-900">
-                                    {{ $formatCurrency($jobTotal) }}
-                                </td>
-                                <td class="px-5 py-3 text-center">
-                                    <a href="{{ route('technician.job.show', $job->id) }}"
-                                       class="text-blue-600 hover:underline text-sm">
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-5 py-8 text-center text-gray-500">
-                                    No job orders assigned yet.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
+            // ✅ Customer name: try customer relation, then fallbacks
+            $customerFullName = trim(
+                ($job->quotation?->customer?->firstname ?? '') . ' ' .
+                ($job->quotation?->customer?->lastname ?? '')
+            );
+
+            $customerName = $customerFullName
+                ?: ($job->quotation?->customer_name
+                    ?? $job->quotation?->client_name
+                    ?? $job->quotation?->inquiry?->name
+                    ?? '—');
+
+            $statusClass = match($job->status) {
+                'completed'   => 'bg-emerald-100 text-emerald-700',
+                'in_progress' => 'bg-amber-100 text-amber-700',
+                'scheduled'   => 'bg-blue-100 text-blue-700',
+                'cancelled'   => 'bg-rose-100 text-rose-700',
+                default       => 'bg-gray-100 text-gray-700'
+            };
+        @endphp
+
+        <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3 font-semibold text-gray-900">
+                JOB-{{ str_pad($job->id, 4, '0', STR_PAD_LEFT) }}
+            </td>
+
+            <td class="px-5 py-3 text-gray-800">
+                {{ $customerName }}
+            </td>
+
+            <td class="px-5 py-3 text-gray-800">
+                {{ $job->quotation?->project_title ?? $job->quotation?->inquiry?->device_type ?? '—' }}
+            </td>
+
+            <td class="px-5 py-3 text-center">
+                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
+                    {{ ucfirst(str_replace('_', ' ', $job->status ?? 'pending')) }}
+                </span>
+            </td>
+
+            <td class="px-5 py-3 text-right font-semibold text-gray-900">
+                ₱{{ number_format($jobTotal, 2) }}
+            </td>
+
+            <td class="px-5 py-3 text-center">
+                <a href="{{ route('technician.job.show', $job->id) }}"
+                   class="text-blue-600 hover:underline text-sm">
+                    View
+                </a>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="6" class="px-5 py-8 text-center text-gray-500">
+                No job orders assigned yet.
+            </td>
+        </tr>
+    @endforelse
+</tbody>
+
                 </table>
             </div>
         </div>

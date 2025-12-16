@@ -41,7 +41,6 @@ Route::middleware(['auth', 'verified', 'role:customer'])
       Route::get('/inquiry', [InquiryController::class, 'create'])->name('customer.inquiry.form');
         Route::post('/inquiry', [InquiryController::class, 'store'])->name('customer.inquiry.store');
         Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('customer.inquiry.create');
-        Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('customer.inquiry.create');
     // 🔹 Customer: Track Repair page
     Route::get('/track-repair', [CustomerController::class, 'track'])->name('customer.track');
 
@@ -53,6 +52,8 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
     Route::get('/dashboard', [ManagerController::class, 'dashboard'])->name('dashboard');
+    Route::patch('/job/update/{id}', [JobOrderController::class, 'update'])
+    ->name('manager.job.update');
 
     Route::prefix('/quotation')->group(function() {
         Route::get('/index', [ManagerController::class, 'quotation'])->name('quotation');

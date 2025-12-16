@@ -12,21 +12,34 @@ class JobOrderController extends Controller
     {  // optional filters from search & status
         $query = JobOrder::query();
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+       $filters = [
+            'search' => $request->input('search'),
+            'status' => $request->input('status'),
+        ];
+
+        if ($filters['search']) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('customer_name', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%");
+              $q->where('id', 'like', "%{$search}%")
+                    ->orWhereHas('quotation', function ($sub) use ($search) {
+                        $sub->where('project_title', 'like', "%{$search}%")
+                            ->orWhere('client_name', 'like', "%{$search}%");
+                    });
             });
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        if ($filters['status']) {
+            $query->where('status', $filters['status']);
         }
 
         $jobOrders = $query->with('quotation')->latest()->paginate(10);
 
-        return view('manager.job.index', compact('jobOrders'));
+        $stats = [
+            'total'    => JobOrder::count(),
+            'active'   => JobOrder::whereIn('status', ['scheduled', 'in_progress'])->count(),
+        ];
+
+        return view('manager.job.index', compact('jobOrders', 'stats', 'filters'));
     }
 
     public function markComplete($id)
@@ -43,4 +56,22 @@ class JobOrderController extends Controller
         $job = JobOrder::with('quotation')->findOrFail($id);
         return view('manager.job.show', compact('job'));
     }
+    public function update(Request $request, $id)
+{
+    $job = \App\Models\JobOrder::findOrFail($id);
+
+    $validated = $request->validate([
+        'technician_notes' => 'nullable|string',
+        'status' => 'required|string|in:scheduled,in_progress,review,completed,cancelled',
+    ]);
+
+    $job->update([
+        'technician_notes' => $validated['technician_notes'] ?? $job->technician_notes,
+        'status' => $validated['status'],
+        'completed_at' => $validated['status'] === 'completed' ? now() : null,
+    ]);
+
+    return back()->with('status', 'Job updated successfully.');
+}
+
 }

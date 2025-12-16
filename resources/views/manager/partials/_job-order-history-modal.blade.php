@@ -1,5 +1,5 @@
-<div x-data="{ open:false }" class="relative">
-
+<div x-data="{ open: false }" class="relative">
+    {{-- Trigger button --}}
     {{-- Orange History Button --}}
     <button
         type="button"
@@ -23,16 +23,11 @@
         <div class="absolute inset-0 bg-black/50" @click="open = false"></div>
 
         {{-- Panel --}}
-        <div
-            class="relative w-full max-w-5xl overflow-hidden rounded-xl bg-white shadow-lg dark:bg-neutral-900"
-            @click.stop
-        >
+        <div class="relative w-full max-w-5xl overflow-hidden rounded-xl bg-white shadow-lg dark:bg-neutral-900" @click.stop>
             {{-- Header --}}
             <div class="flex items-start justify-between gap-4 border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
                 <div>
-                    <h2 class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
-                        Job Order History
-                    </h2>
+                                      <h2 class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">Job Order History</h2>
                     <p class="text-[11px] text-neutral-500 dark:text-neutral-400">
                         Quick view of recent job orders. Open full history for complete list.
                     </p>
@@ -48,7 +43,7 @@
                 </button>
             </div>
 
-            {{-- Body (UI preview only) --}}
+                        {{-- Body (dynamic history) --}}
             <div class="px-5 py-4">
                 <div class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
                     <div class="overflow-x-auto">
@@ -65,27 +60,39 @@
                             </thead>
 
                             <tbody>
-                                {{-- Sample rows (replace later with real loop if you want) --}}
-                                <tr class="border-t text-xs text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
-                                    <td class="px-4 py-3 font-medium">JO-00012</td>
-                                    <td class="px-4 py-3">Red Xavier</td>
-                                    <td class="px-4 py-3">Luigi Ednilan</td>    
-                                    <td class="px-4 py-3 text-neutral-500 dark:text-neutral-400">
-                                        Network repair & configuration
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:bg-green-900/40 dark:text-green-200">
-                                            Completed
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-neutral-500 dark:text-neutral-400">Dec 11, 2025</td>
-                                </tr>
+                                @forelse($jobOrderHistory as $history)
+                                    @php
+                                        $statusColors = [
+                                            'scheduled'    => 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200',
+                                            'in_progress'  => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200',
+                                            'review'       => 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200',
+                                            'completed'    => 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200',
+                                            'cancelled'    => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200',
+                                        ];
+                                        $statusClass = $statusColors[$history->status] ?? 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200';
+                                    @endphp
 
-                                <tr>
-                                    <td colspan="6" class="px-4 py-10 text-center text-xs text-neutral-400">
-                                        (Preview) Hook your job orders here if you want.
-                                    </td>
-                                </tr>
+                                 <tr class="border-t text-xs text-neutral-700 dark:border-neutral-800 dark:text-neutral-100">
+                                        <td class="px-4 py-3 font-medium">JO-{{ str_pad($history->id, 5, '0', STR_PAD_LEFT) }}</td>
+                                        <td class="px-4 py-3">{{ $history->technician?->name ?? '—' }}</td>
+                                        <td class="px-4 py-3">{{ optional($history->quotation?->customer)->firstname ?? 'Client' }}</td>
+                                        <td class="px-4 py-3 text-neutral-500 dark:text-neutral-400">
+                                            {{ $history->quotation?->inquiry?->issue_description ?? 'No issue recorded' }}
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium {{ $statusClass }}">
+                                                {{ ucfirst(str_replace('_',' ', $history->status)) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-neutral-500 dark:text-neutral-400">{{ optional($history->created_at)->format('M d, Y') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-4 py-10 text-center text-xs text-neutral-400">
+                                            No job orders recorded yet.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -94,9 +101,8 @@
 
             {{-- Footer --}}
             <div class="flex items-center justify-between gap-3 border-t border-neutral-200 px-5 py-4 dark:border-neutral-800">
-                <p class="text-[11px] text-neutral-500 dark:text-neutral-400">
-                    Tip: Use full history to search and filter.
-                </p>
+               <p class="text-[11px] text-neutral-500 dark:text-neutral-400">Tip: Use full history to search and filter.</p>
+
 
                 <div class="flex items-center gap-2">
                     <button

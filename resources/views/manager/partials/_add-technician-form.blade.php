@@ -141,13 +141,35 @@
 
                     {{-- Specialization --}}
                     <div class="md:col-span-1">
-                       
+                    <label class="mb-1 block text-[11px] text-neutral-500 dark:text-neutral-400">
+                            Specialization
+                        </label>
+                        <input
+                            name="specialization"
+                            value="{{ old('specialization') }}"
+                            class="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50"
+                            placeholder="Networking, hardware, etc."
+                        />
+                        @error('specialization')
+                            <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                        @enderror
                        
                     </div>
 
                     {{-- Certifications --}}
                     <div class="md:col-span-1">
-                      
+                       <label class="mb-1 block text-[11px] text-neutral-500 dark:text-neutral-400">
+                            Certifications
+                        </label>
+                        <input
+                            name="certifications"
+                            value="{{ old('certifications') }}"
+                            class="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50"
+                            placeholder="CompTIA A+, etc."
+                        />
+                        @error('certifications')
+                            <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
                 </div>

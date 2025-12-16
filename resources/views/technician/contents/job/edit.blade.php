@@ -188,7 +188,7 @@
           <span id="subtotal">₱0.00</span>
         </div>
         <div class="flex justify-between text-sm py-1">
-          <span>Diagnostic Fee (10%)</span>
+          <span>Tax (10%)</span>
           <span id="tax">₱0.00</span>
         </div>
         <div class="flex justify-between text-sm font-semibold border-t mt-2 pt-2">

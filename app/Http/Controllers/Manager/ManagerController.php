@@ -225,17 +225,23 @@ class ManagerController extends Controller
         return view('manager.services');
     }
     public function technicians(){
- $technicians = Technician::with(['user', 'jobOrders' => function ($query) {
-            $query->latest();
-        }, 'jobOrders.quotation'])
-        ->withCount('jobOrders')
-        ->get();
+$technicians = Technician::with(['user', 'jobOrders' => function ($query) {
+                                   $query->latest()->take(1); // ✅ only latest job per technician
+
+                }, 'jobOrders.quotation'])
+                ->withCount('jobOrders')
+                ->get();
 
         $approvedQuotations = Quotation::where('status', 'approved')
             ->orderByDesc('date_issued')
             ->get();
 
-        return view('manager.technicians', compact('technicians', 'approvedQuotations'));
+         $jobOrderHistory = JobOrder::with(['technician.user', 'quotation.customer'])
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('manager.technicians', compact('technicians', 'approvedQuotations', 'jobOrderHistory'));
     }
     public function editTechnician(Technician $technician)
 {
@@ -310,31 +316,31 @@ public function destroyTechnician(Technician $technician)
         return redirect()->route('technicians')->with('status', 'Technician added successfully.');
     }
 
-    public function storeJobOrder(Request $request)
-    {
-        $validated = $request->validate([
-            'technician_id' => 'required|exists:technicians,id',
-            'quotation_id' => 'required|exists:quotations,id',
-            'customer_name' => 'required|string|max:255',
-            'contact_number' => 'required|string|max:50',
-            'device_type' => 'nullable|string|max:255',
-            'issue_description' => 'required|string',
-            'diagnostic_fee' => 'nullable|numeric|min:0',
-            'materials_cost' => 'nullable|numeric|min:0',
-            'professional_fee' => 'nullable|numeric|min:0',
-            'downpayment' => 'nullable|numeric|min:0',
-            'balance' => 'nullable|numeric|min:0',
-            'expected_finish_date' => 'nullable|date',
-            'remarks' => 'nullable|string',
-            'materials_specifications' => 'nullable|string',
-            'status' => 'required|string|in:scheduled,in_progress,completed,cancelled',
-        ]);
+   public function storeJobOrder(Request $request)
+{
+    abort_unless(Auth::check(), 403, 'Not authenticated.');
 
-        JobOrder::create($validated);
+    $validated = $request->validate([
+        'technician_id'         => 'required|exists:technicians,id',
+        'quotation_id'          => 'required|exists:quotations,id',
+        'start_date'            => 'nullable|date',
+        'expected_finish_date'  => 'nullable|date|after_or_equal:start_date',
+        'timeline_min_days'     => 'nullable|integer|min:1',
+        'timeline_max_days'     => 'nullable|integer|min:1',
+        'technician_notes'      => 'nullable|string',
+        'status'                => 'nullable|string|in:scheduled,in_progress,review,completed,cancelled',
+    ]);
 
-        return redirect()->route('technicians')->with('status', 'Job order assigned to technician successfully.');
-        
-    }
+    JobOrder::create([
+        ...$validated,
+        'user_id' => (int) Auth::id(),
+        'status'  => $validated['status'] ?? 'scheduled',
+    ]);
+
+    return redirect()->route('technicians')
+        ->with('status', 'Job order assigned to technician successfully.');
+}
+
     
 
     public function customers()

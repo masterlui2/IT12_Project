@@ -129,7 +129,7 @@
                     <span id="subtotal">₱{{ number_format($quotation->labor_estimate,2) }}</span>
                 </div>
                 <div class="flex justify-between text-sm py-1">
-                    <span>Diagnostic Fee (10%)</span>
+                    <span>Tax (10%)</span>
                     <span id="tax">₱{{ number_format($quotation->diagnostic_fee,2) }}</span>
                 </div>
                 <div class="flex justify-between text-sm font-semibold border-t mt-2 pt-2">
