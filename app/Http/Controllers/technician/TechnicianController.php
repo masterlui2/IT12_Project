@@ -32,10 +32,11 @@ class TechnicianController extends Controller
         ];
 
         $recentJobOrders = $jobOrdersQuery
-            ->with('quotation')
-            ->latest()
-            ->take(5)
-            ->get();
+    ->with(['quotation.customer', 'quotation.inquiry'])
+    ->latest()
+    ->take(5)
+    ->get();
+
 
         $recentInquiries = Inquiry::query()
             ->where('assigned_technician_id', $technicianId ?? 0)
@@ -101,54 +102,69 @@ class TechnicianController extends Controller
         ]);
         }
 
-    public function reporting(){
- $technician = Auth::user()->technician;
+   public function reporting()
+{
+    $technician = Auth::user()->technician;
 
-        if (!$technician) {
-            return redirect()->route('technician.dashboard')
-                ->with('error', 'No technician profile found for this account.');
-        }
+    if (!$technician) {
+        return redirect()->route('technician.dashboard')
+            ->with('error', 'No technician profile found for this account.');
+    }
 
-        $quotationQuery = Quotation::where('technician_id', $technician->id);
-        $jobOrderQuery = JobOrder::where('technician_id', $technician->id);
-        $inquiryQuery = Inquiry::where('assigned_technician_id', $technician->id);
+    $quotationQuery = Quotation::where('technician_id', $technician->id);
+    $jobOrderQuery  = JobOrder::where('technician_id', $technician->id);
+    $inquiryQuery   = Inquiry::where('assigned_technician_id', $technician->id);
 
-        $stats = [
-            'totals' => [
-                'quotations' => $quotationQuery->count(),
-                'inquiries' => $inquiryQuery->count(),
-                'approved_quotes' => (clone $quotationQuery)->where('status', 'approved')->count(),
-            ],
-            'jobs' => [
-                'active' => (clone $jobOrderQuery)->whereIn('status', ['scheduled', 'in_progress'])->count(),
-                'completed' => (clone $jobOrderQuery)->where('status', 'completed')->count(),
-                'cancelled' => (clone $jobOrderQuery)->where('status', 'cancelled')->count(),
-            ],
-            'revenue' => [
-                'quotations' => (clone $quotationQuery)->where('status', 'approved')->sum('grand_total'),
-                'jobs' => (clone $jobOrderQuery)->sum(DB::raw('COALESCE(diagnostic_fee,0)+COALESCE(materials_cost,0)+COALESCE(professional_fee,0)')),
-            ],
-        ];
+    // ✅ Revenue from JOBS should come from QUOTATIONS linked to those job orders
+    $jobsRevenue = Quotation::whereIn(
+    'id',
+    (clone $jobOrderQuery)
+        ->where('status', 'completed')
+        ->pluck('quotation_id')
+        ->filter()
+        ->unique()
+)->sum('grand_total');
 
-        $stats['revenue']['overall'] = $stats['revenue']['quotations'] + $stats['revenue']['jobs'];
 
-        $recentJobs = (clone $jobOrderQuery)
-            ->with('quotation')
-            ->latest()
-            ->take(5)
-            ->get();
+    $stats = [
+        'totals' => [
+            'quotations'     => (clone $quotationQuery)->count(),
+            'inquiries'      => (clone $inquiryQuery)->count(),
+            'approved_quotes'=> (clone $quotationQuery)->where('status', 'approved')->count(),
+        ],
+        'jobs' => [
+            'active'    => (clone $jobOrderQuery)->whereIn('status', ['scheduled', 'in_progress'])->count(),
+            'completed' => (clone $jobOrderQuery)->where('status', 'completed')->count(),
+            'cancelled' => (clone $jobOrderQuery)->where('status', 'cancelled')->count(),
+        ],
+        'revenue' => [
+            'quotations' => (clone $quotationQuery)->where('status', 'approved')->sum('grand_total'),
+            'jobs'       => $jobsRevenue,
+        ],
+    ];
 
-        $recentQuotations = (clone $quotationQuery)
-            ->with('inquiry')
-            ->latest()
-            ->take(5)
-            ->get();
+    $stats['revenue']['overall'] = $stats['revenue']['quotations'] ?? 0;
 
-        return view('technician.contents.reporting', compact(
-            'stats',
-            'recentJobs',
-            'recentQuotations',
-        ));    }
+
+    $recentJobs = (clone $jobOrderQuery)
+        ->with(['quotation.customer', 'quotation.inquiry'])
+        ->latest()
+        ->take(5)
+        ->get();
+
+    $recentQuotations = (clone $quotationQuery)
+        ->with('inquiry')
+        ->latest()
+        ->take(5)
+        ->get();
+
+    return view('technician.contents.reporting', compact(
+        'stats',
+        'recentJobs',
+        'recentQuotations'
+    ));
+}
+
 
     public function inquire()
     {

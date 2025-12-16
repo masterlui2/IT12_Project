@@ -344,7 +344,7 @@ public function destroyTechnician(Technician $technician)
     public function reports()
     {
         $now = Carbon::now();
-
+        
         // Monetary stats
         $approvedThisMonth = Quotation::where('status', 'approved')
             ->whereMonth('date_issued', $now->month)
@@ -382,7 +382,6 @@ public function destroyTechnician(Technician $technician)
        $reportRows = Quotation::with(['customer', 'inquiry'])
     ->orderByDesc('date_issued')
     ->paginate(12);
-
 
         return view('manager.reports', compact('stats', 'reportRows'));
     }
