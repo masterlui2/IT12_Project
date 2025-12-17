@@ -353,7 +353,9 @@ public function destroyTechnician(Technician $technician)
 
         $averageQuotation = Quotation::avg('grand_total') ?? 0;
         $diagnosticFees   = Quotation::sum('diagnostic_fee');
-
+          $grandTotalSum    = Quotation::sum(
+            DB::raw('COALESCE(NULLIF(grand_total, 0), labor_estimate + diagnostic_fee)')
+        );
         // Volume metrics
         $totalQuotations = Quotation::count();
         $approvedCount   = Quotation::where('status', 'approved')->count();
@@ -369,6 +371,7 @@ public function destroyTechnician(Technician $technician)
                 'quotation_sales_month' => $approvedThisMonth,
                 'average_quotation'     => $averageQuotation,
                 'diagnostic_fees'       => $diagnosticFees,
+                'grand_total_sum'       => $grandTotalSum,
                 'approval_rate'         => $approvalRate,
             ],
             'counts' => [
@@ -379,12 +382,16 @@ public function destroyTechnician(Technician $technician)
             ],
         ];
 
-       $reportRows = Quotation::with(['customer', 'inquiry'])
-    ->orderByDesc('date_issued')
-    ->paginate(12);
+              $grandTotal = Quotation::sum('grand_total');;
 
-        return view('manager.reports', compact('stats', 'reportRows'));
-    }
+ $grandTotal = Quotation::selectRaw('SUM(grand_total + COALESCE(diagnostic_fee, 0)) as aggregate')
+            ->value('aggregate');
+
+             $reportRows = Quotation::with(['customer', 'inquiry'])
+            ->orderByDesc('date_issued')
+            ->paginate(12);
+
+        return view('manager.reports', compact('stats', 'reportRows', 'grandTotal'));    }
 
     public function sales()
     {

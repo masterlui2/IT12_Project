@@ -71,7 +71,7 @@ class InquiryController extends Controller
         }
 
         Inquiry::create($validated);
-
+                    
         return redirect()->back()->with('success', 'Inquiry submitted successfully!');
     }
 

@@ -254,6 +254,7 @@
                             <span>{{ __('Diagnostic fees') }}</span>
                             <span class="font-medium">₱{{ number_format($stats['reports']['diagnostic_fees'] ?? 0, 2) }}</span>
                         </div>
+                          
                     </div>
                 </div>
             </div>

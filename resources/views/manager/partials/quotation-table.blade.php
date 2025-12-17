@@ -18,6 +18,10 @@
                     {{ __('Total:') }}
                     <span class="font-semibold text-neutral-800 dark:text-neutral-200">{{ $reportRows->total() }}</span>
                 </div>
+                <div class="mt-0.5">
+                    {{ __('Grand total:') }}
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">₱{{ number_format($grandTotal ?? 0, 2) }}</span>
+                </div>
                 @if(method_exists($reportRows,'firstItem') && $reportRows->firstItem())
                     <div class="mt-0.5">
                         {{ __('Showing') }}
@@ -90,9 +94,13 @@
                             <div class="mt-1 space-y-1 text-[11px] text-neutral-500 dark:text-neutral-400 sm:hidden">
                                 <div class="flex items-center justify-between">
                                     <span>{{ __('Quotation Total') }}</span>
+                                      @php
+                                        $rowTotal = $row->grand_total
+                                            ?? (($row->labor_estimate ?? 0) + ($row->diagnostic_fee ?? 0));
+                                    @endphp
                                     <span class="font-semibold text-neutral-800 dark:text-neutral-200">
-                                        ₱{{ number_format($row->grand_total ?? 0, 2) }}
-                                    </span>
+                                        ₱{{ number_format($rowTotal, 2) }}
+                                                                        </span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span>{{ __('Diagnostic Fee') }}</span>
@@ -110,7 +118,7 @@
                         </td>
 
                         <td class="hidden px-4 py-3 text-right text-xs font-semibold text-neutral-900 dark:text-neutral-50 whitespace-nowrap sm:table-cell">
-                            ₱{{ number_format($row->grand_total ?? 0, 2) }}
+                                                       ₱{{ number_format($rowTotal, 2) }}
                         </td>
 
                         <td class="hidden px-4 py-3 text-right text-xs font-semibold text-neutral-900 dark:text-neutral-50 whitespace-nowrap sm:table-cell">
