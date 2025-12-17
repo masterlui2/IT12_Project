@@ -57,4 +57,8 @@ class Inquiry extends Model
     {
         return $query->where('status', $status);
     }
+
+    public function service(){
+        return $this->belongsTo(Service::class,'category','name');
+    }
 }
