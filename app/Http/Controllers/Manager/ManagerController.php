@@ -342,73 +342,136 @@ public function destroyTechnician(Technician $technician)
         return view('manager.customers');
     }
     public function reports()
-    {
-        $now = Carbon::now();
-        
-        // Monetary stats
-        $approvedThisMonth = Quotation::where('status', 'approved')
-            ->whereMonth('date_issued', $now->month)
-            ->whereYear('date_issued', $now->year)
-            ->sum('grand_total');
+{
+    $now = Carbon::now();
+    
+    // ===== JOB ORDER REVENUE (Real Sales) =====
+    $jobOrdersThisMonth = JobOrder::whereMonth('created_at', $now->month)
+        ->whereYear('created_at', $now->year)
+        ->sum('subtotal');
+    
+    $completedJobsRevenue = JobOrder::where('status', 'completed')
+        ->sum('subtotal');
+    
+    $downpaymentsReceived = JobOrder::where('status', 'completed')
+        ->sum('downpayment');
+    
+    $remainingBalance = JobOrder::where('status', 'completed')
+        ->sum('total_amount');
+    
+    // ===== DIAGNOSTIC FEES (Upfront Collection) =====
+    $diagnosticFeesThisMonth = Quotation::whereMonth('date_issued', $now->month)
+        ->whereYear('date_issued', $now->year)
+        ->sum('diagnostic_fee');
+    
+    $totalDiagnosticFees = Quotation::sum('diagnostic_fee');
+    
+    // ===== EXPECTED DOWNPAYMENTS (50% from approved quotations not yet converted to jobs) =====
+    $approvedQuotationsNotConverted = Quotation::where('status', 'approved')
+        ->whereDoesntHave('jobOrders') // Quotations that haven't been converted to job orders yet
+        ->sum('grand_total');
+    
+    $expectedDownpayments = $approvedQuotationsNotConverted * 0.50;
+    
+    // ===== APPROVAL METRICS =====
+    $totalQuotations = Quotation::count();
+    $approvedCount = Quotation::where('status', 'approved')->count();
+    $pendingCount = Quotation::where('status', 'pending')->count();
+    $rejectedCount = Quotation::where('status', 'rejected')->count();
+    
+    $approvalRate = $totalQuotations > 0
+        ? round(($approvedCount / $totalQuotations) * 100, 1)
+        : 0;
+    
+    // ===== TOTAL REVENUE CALCULATION =====
+    // Total Revenue = Completed Job Orders + Diagnostic Fees Collected
+    $totalRevenue = $completedJobsRevenue + $totalDiagnosticFees;
+    
+    $stats = [
+        'reports' => [
+            // Main revenue metrics (from job orders)
+            'job_order_sales_month' => $jobOrdersThisMonth, // Job orders created this month
+            'completed_jobs_revenue' => $completedJobsRevenue, // Total from completed jobs
+            'downpayments_received' => $downpaymentsReceived, // 50% already collected
+            'remaining_balance' => $remainingBalance, // 50% still to collect
+            
+            // Diagnostic fees (upfront collections)
+            'diagnostic_fees_month' => $diagnosticFeesThisMonth,
+            'diagnostic_fees' => $totalDiagnosticFees,
+            
+            // Expected future revenue
+            'expected_downpayments' => $expectedDownpayments,
+            
+            // Overall metrics
+            'total_revenue' => $totalRevenue,
+            'approval_rate' => $approvalRate,
+        ],
+        'counts' => [
+            'total_quotations' => $totalQuotations,
+            'approved' => $approvedCount,
+            'pending' => $pendingCount,
+            'rejected' => $rejectedCount,
+            'total_jobs' => JobOrder::count(),
+            'completed_jobs' => JobOrder::where('status', 'completed')->count(),
+            'active_jobs' => JobOrder::whereIn('status', ['scheduled', 'in_progress'])->count(),
+        ],
+    ];
+    
+    // Get job orders with pagination for the main table
+    $recentJobOrders = JobOrder::with(['quotation.customer'])
+        ->orderByDesc('created_at')
+        ->paginate(12);
+    
+    // Optional: Keep quotations table if you want both
+    $reportRows = Quotation::with(['customer', 'inquiry'])
+        ->orderByDesc('date_issued')
+        ->paginate(12);
+    
+    return view('manager.reports', compact('stats', 'recentJobOrders', 'reportRows'));
+}
 
-        $averageQuotation = Quotation::avg('grand_total') ?? 0;
-        $diagnosticFees   = Quotation::sum('diagnostic_fee');
-          $grandTotalSum    = Quotation::sum(
-            DB::raw('COALESCE(NULLIF(grand_total, 0), labor_estimate + diagnostic_fee)')
-        );
-        // Volume metrics
-        $totalQuotations = Quotation::count();
-        $approvedCount   = Quotation::where('status', 'approved')->count();
-        $pendingCount    = Quotation::where('status', 'pending')->count();
-        $rejectedCount   = Quotation::where('status', 'rejected')->count();
-
-        $approvalRate = $totalQuotations > 0
-            ? round(($approvedCount / $totalQuotations) * 100, 1)
-            : 0;
-
-        $stats = [
-            'reports' => [
-                'quotation_sales_month' => $approvedThisMonth,
-                'average_quotation'     => $averageQuotation,
-                'diagnostic_fees'       => $diagnosticFees,
-                'grand_total_sum'       => $grandTotalSum,
-                'approval_rate'         => $approvalRate,
-            ],
-            'counts' => [
-                'total'    => $totalQuotations,
-                'approved' => $approvedCount,
-                'pending'  => $pendingCount,
-                'rejected' => $rejectedCount,
-            ],
-        ];
-
-              $grandTotal = Quotation::sum('grand_total');;
-
- $grandTotal = Quotation::selectRaw('SUM(grand_total + COALESCE(diagnostic_fee, 0)) as aggregate')
-            ->value('aggregate');
-
-             $reportRows = Quotation::with(['customer', 'inquiry'])
-            ->orderByDesc('date_issued')
-            ->paginate(12);
-
-        return view('manager.reports', compact('stats', 'reportRows', 'grandTotal'));    }
-
-    public function sales()
-    {
-        $stats = [
-            'monthly' => [
-                'total_revenue'    => '₱ 0.00',
-                'avg_ticket'       => '₱ 0.00',
-                'conversion_rate'  => '0%',
-            ],
-            'pipeline' => [
-                'open_quotes' => 0,
-                'won_quotes'  => 0,
-            ],
-        ];
-        
-        $recentTransactions = [];
-
-        return view('manager.sales', compact('stats', 'recentTransactions'));
-    }   
+public function sales()
+{
+    $now = Carbon::now();
+    
+    // Monthly revenue from completed jobs
+    $monthlyRevenue = JobOrder::where('status', 'completed')
+        ->whereMonth('completed_at', $now->month)
+        ->whereYear('completed_at', $now->year)
+        ->sum('subtotal');
+    
+    // Average job ticket (from completed jobs)
+    $avgTicket = JobOrder::where('status', 'completed')
+        ->avg('subtotal') ?? 0;
+    
+    // Conversion rate: approved quotations → completed jobs
+    $approvedQuotations = Quotation::where('status', 'approved')->count();
+    $completedJobs = JobOrder::where('status', 'completed')->count();
+    $conversionRate = $approvedQuotations > 0
+        ? round(($completedJobs / $approvedQuotations) * 100, 1)
+        : 0;
+    
+    $stats = [
+        'monthly' => [
+            'total_revenue' => '₱ ' . number_format($monthlyRevenue, 2),
+            'avg_ticket' => '₱ ' . number_format($avgTicket, 2),
+            'conversion_rate' => $conversionRate . '%',
+        ],
+        'pipeline' => [
+            'open_quotes' => Quotation::where('status', 'pending')->count(),
+            'won_quotes' => Quotation::where('status', 'approved')->count(),
+            'active_jobs' => JobOrder::whereIn('status', ['scheduled', 'in_progress'])->count(),
+            'completed_jobs' => $completedJobs,
+        ],
+    ];
+    
+    // Recent transactions (completed job orders)
+    $recentTransactions = JobOrder::where('status', 'completed')
+        ->with(['quotation.customer'])
+        ->orderByDesc('completed_at')
+        ->limit(10)
+        ->get();
+    
+    return view('manager.sales', compact('stats', 'recentTransactions'));
+}
 }

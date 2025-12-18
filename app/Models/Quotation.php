@@ -1,4 +1,7 @@
 <?php
+// ============================================
+// App\Models\Quotation.php
+// ============================================
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -55,9 +58,16 @@ class Quotation extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    // ✅ Changed from hasOne to hasMany
+    public function jobOrders()
+    {
+        return $this->hasMany(JobOrder::class);
+    }
+
+    // ✅ Keep this for backwards compatibility (gets the first/latest job order)
     public function jobOrder()
     {
-        return $this->hasOne(JobOrder::class);
+        return $this->hasOne(JobOrder::class)->latestOfMany();
     }
 
     public function details()
@@ -126,5 +136,85 @@ class Quotation extends Model
         return $this->timeline_min_days
             ? "{$this->timeline_min_days} days"
             : 'Not specified';
+    }
+
+    // ✅ Helper method to check if quotation has been converted to job order
+    public function hasJobOrder()
+    {
+        return $this->jobOrders()->exists();
+    }
+}
+
+// ============================================
+// App\Models\JobOrder.php
+// ============================================
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class JobOrder extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'quotation_id',
+        'technician_id',
+        'start_date',
+        'expected_finish_date',
+        'timeline_min_days',
+        'timeline_max_days',
+        'technician_notes',
+        'status',
+        'completed_at',
+        'subtotal',
+        'downpayment',
+        'total_amount',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'expected_finish_date' => 'date',
+        'completed_at' => 'datetime',
+    ];
+
+    // Relationships
+    public function quotation()
+    {
+        return $this->belongsTo(Quotation::class);
+    }
+
+    public function technician()
+    {
+        return $this->belongsTo(Technician::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(JobOrderItem::class);
+    }
+
+    // Status helpers
+    public function isScheduled(): bool
+    {
+        return $this->status === 'scheduled';
+    }
+
+    public function isInProgress(): bool
+    {
+        return $this->status === 'in_progress';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function markAsCompleted()
+    {
+        $this->update([
+            'status' => 'completed',
+            'completed_at' => now(),
+        ]);
     }
 }

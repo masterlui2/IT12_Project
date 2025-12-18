@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             TechnicianUserSeeder::class,
             ServiceTemplateSeeder::class,
             CustomerSeeder::class,
+            ServiceSeeder::class,
          ]);
         //Technician::factory()->count(2)->create();
 

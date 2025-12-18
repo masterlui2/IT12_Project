@@ -14,10 +14,13 @@ class InquiryController extends Controller
     public function create()
     {
         if(Auth::check()){
+            // Fetch all services from database
+            $services = \App\Models\Service::all();
+            
             return match(Auth::user()->role){
-                'technician'   => view('technician.contents.inquiries.create'),
-                'customer'     => view('customer.inquiries.create'),
-                default        => view('customer.inquiries.create')
+                'technician'   => view('technician.contents.inquiries.create', compact('services')),
+                'customer'     => view('customer.inquiries.create', compact('services')),
+                default        => view('customer.inquiries.create', compact('services'))
             };
         }
     }

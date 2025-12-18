@@ -160,14 +160,13 @@
                                 <select name="category"
                                         required
                                         class="w-full rounded-lg bg-white border border-slate-300 px-4 py-3 text-sm text-slate-900
-                                               focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 transition">
+                                            focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 transition">
                                     <option value="">{{ __('Select an option') }}</option>
-                                    <option value="Computer / Laptop Repair" {{ old('category') == 'Computer / Laptop Repair' ? 'selected' : '' }}>{{ __('Computer / Laptop') }}</option>
-                                    <option value="Networking" {{ old('category') == 'Networking' ? 'selected' : '' }}>{{ __('Networking') }}</option>
-                                    <option value="Printer Repair" {{ old('category') == 'Printer Repair' ? 'selected' : '' }}>{{ __('Printer') }}</option>
-                                    <option value="CCTV Installation / Repair" {{ old('category') == 'CCTV Installation / Repair' ? 'selected' : '' }}>{{ __('CCTV') }}</option>
-                                    <option value="Aircon Cleaning / Repair" {{ old('category') == 'Aircon Cleaning / Repair' ? 'selected' : '' }}>{{ __('Aircon') }}</option>
-                                    <option value="Other" {{ old('category') == 'Other' ? 'selected' : '' }}>{{ __('Other') }}</option>
+                                    @foreach($services as $service)
+                                        <option value="{{ $service->name }}" {{ old('category', $inquiry->category ?? '') == $service->name ? 'selected' : '' }}>
+                                            {{ __($service->name) }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 @error('category')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>

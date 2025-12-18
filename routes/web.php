@@ -58,6 +58,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
         Route::get('/index', [ManagerController::class, 'quotation'])->name('quotation');
         Route::post('/{quotation}/approve', [ManagerController::class,'approve'])->name('manager.quotation.approve');
         Route::post('/{quotation}/reject', [ManagerController::class,'reject'])->name('manager.quotation.reject');
+        Route::get('/{id}', [QuotationController::class, 'show'])->name('manager.quotation.show');
     });
     
 
@@ -72,6 +73,8 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
         Route::get('/index', [JobOrderController::class, 'index'])->name('manager.job.index');
         Route::patch('/markComplete/{id}',[JobOrderController::class, 'markComplete'])->name('manager.job.markComplete');
         Route::get('/show/{id}', [JobOrderController::class, 'show'])->name('manager.job.show');
+        Route::get('/show/{id}', [JobOrderController::class, 'show'])->name('manager.job.show');
+        Route::post('/{id}/assign', [JobOrderController::class, 'assignTechnician'])->name('manager.job.assign');
     });
 
     // ⭐ Added missing components (same style, same method)

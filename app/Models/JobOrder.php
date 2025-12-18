@@ -19,6 +19,9 @@ class JobOrder extends Model
         'technician_notes',
         'status',
         'completed_at',
+        'subtotal',           // ✅ Add this
+        'downpayment',        // ✅ Add this
+        'total_amount',
     ];
 
     protected $casts = [

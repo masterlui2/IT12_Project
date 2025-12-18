@@ -88,13 +88,17 @@
                         </td>
                         <td class="px-4 py-3 text-center">
                             <div class="inline-flex gap-2 justify-center">
-                                <form action="{{ route('technician.job.in_progress', $job->id) }}" method="POST" class="text-green-600 hover:text-green-800" title="Start">
+                                @if ($job->status == 'scheduled')
+                                    <form action="{{ route('technician.job.in_progress', $job->id) }}" method="POST" class="text-green-600 hover:text-green-800" title="Start">
                                     @csrf 
                                     @method('PATCH')
                                     <button type="submit" name="button" action="in_progress"><i class="fas fa-wrench"></i></button>
-                                </form>
+                                    </form>
+                                @endif
                                 <a href="{{ route('technician.job.show', $job->id) }}" class="text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i></a>
-                                <a href="{{ route('technician.job.edit', $job->id) }}" class="text-yellow-600 hover:text-yellow-700" title="Update"><i class="fas fa-pen-to-square"></i></a>
+                                @if ($job->status == 'in_progress')
+                                    <a href="{{ route('technician.job.edit', $job->id) }}" class="text-yellow-600 hover:text-yellow-700" title="Update"><i class="fas fa-pen-to-square"></i></a>
+                                @endif
                             </div>
                         </td>
                     </tr>

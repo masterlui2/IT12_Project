@@ -125,20 +125,10 @@
                                                   method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"
-                                                        class="text-emerald-600 hover:text-emerald-700"
+                                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 rounded-lg text-xs font-medium border border-emerald-200 transition-colors"
                                                         title="Approve">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                            </form>
-
-                                            <form action="{{ route('manager.quotation.reject', $quote->id) }}"
-                                                  method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit"
-                                                        class="text-red-600 hover:text-red-700"
-                                                        title="Reject"
-                                                        onclick="return confirm('Reject this quotation?')">
-                                                    <i class="fas fa-xmark"></i>
+                                                    <i class="fas fa-check mr-2"></i>
+                                                    Downpayment paid
                                                 </button>
                                             </form>
                                         @endif

@@ -67,19 +67,6 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Fixed quotation items -->
-            @if(optional($job->quotation)->details && $job->quotation->details->count())
-                @foreach($job->quotation->details as $detail)
-                    <tr class="bg-gray-50">
-                        <td class="border p-1">{{ $detail->item_name }}</td>
-                        <td class="border p-1">{{ $detail->description }}</td>
-                        <td class="border p-1 text-center">{{ $detail->quantity }}</td>
-                        <td class="border p-1 text-right">₱{{ number_format($detail->unit_price, 2) }}</td>
-                        <td class="border p-1 text-right">₱{{ number_format($detail->total, 2) }}</td>
-                        <td class="border p-1 text-center text-xs text-gray-500 italic">Quotation</td>
-                    </tr>
-                @endforeach
-            @endif
             <!-- Technician added items -->
             @forelse($job->items as $item)
                 <tr class="bg-white">
@@ -98,15 +85,14 @@
 
     <!-- Cost Summary -->
     @php
-        $quotationSubtotal = optional($job->quotation)->details->sum('total') ?? 0;
         $techSubtotal       = $job->items->sum('total') ?? 0;
-        $subtotal           = $quotationSubtotal + $techSubtotal;
-        $diagnostic         = $subtotal * 0.10;
-        $grandTotal         = $subtotal + $diagnostic;
+        $subtotal           = $techSubtotal;
+        $downpayment         = $subtotal * 0.50;
+        $grandTotal         = $subtotal - $downpayment;
     @endphp
     <div class="w-1/2 ml-auto mb-4 text-sm space-y-0.5">
         <div class="flex justify-between"><span>Subtotal:</span><span>₱{{ number_format($subtotal, 2) }}</span></div>
-        <div class="flex justify-between"><span>Diagnostic Fee (10%):</span><span>₱{{ number_format($diagnostic, 2) }}</span></div>
+        <div class="flex justify-between"><span>Downpayment (50%):</span><span>₱{{ number_format($downpayment, 2) }}</span></div>
         <div class="flex justify-between font-semibold"><span>Grand Total:</span><span>₱{{ number_format($grandTotal, 2) }}</span></div>
     </div>
 
