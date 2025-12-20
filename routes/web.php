@@ -38,9 +38,8 @@ Route::middleware(['auth', 'verified', 'role:customer'])
     ->prefix('customer')
     ->group(function () {
         Route::get('/dashboard', fn () => view('customer.welcome'))->name('customer.welcome');
-      Route::get('/inquiry', [InquiryController::class, 'create'])->name('customer.inquiry.form');
+        Route::get('/inquiry', [InquiryController::class, 'create'])->name('customer.inquiry.form');
         Route::post('/inquiry', [InquiryController::class, 'store'])->name('customer.inquiry.store');
-        Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('customer.inquiry.create');
         Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('customer.inquiry.create');
     // 🔹 Customer: Track Repair page
     Route::get('/track-repair', [CustomerController::class, 'track'])->name('customer.track');
@@ -92,15 +91,18 @@ Route::delete('/technicians/{technician}', [ManagerController::class, 'destroyTe
     Route::get('/services', [ManagerController::class, 'services'])->name('services');
     Route::get('/reports',[ManagerController::class, 'reports'])->name('reports');
 });
+
+Route::get('/inquiry/create', [InquiryController::class, 'create'])
+        ->name('inquiry.create');
+
+Route::post('/inquiry', [InquiryController::class, 'store'])
+        ->name('inquiry.store');
+
 Route::middleware(['auth'])->group(function () {
     // Show the inquiry creation form
-    Route::get('/inquiry/create', [InquiryController::class, 'create'])
-        ->name('inquiry.create');
       Route::get('/feedback/create', [FeedbackController::class, 'create'])
         ->name('feedback.create');
     // Handle the inquiry form submission
-    Route::post('/inquiry', [InquiryController::class, 'store'])
-        ->name('inquiry.store');
     Route::post('/feedback/create', [FeedbackController::class, 'store'])
         ->name('feedback.store');
  Route::get('/messages', function () {

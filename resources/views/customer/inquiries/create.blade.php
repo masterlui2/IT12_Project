@@ -56,7 +56,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('customer.inquiry.store') }}" enctype="multipart/form-data" class="space-y-6">
+                <form method="POST" action="{{ route('inquiry.store') }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
 
                     {{-- Section 1 --}}
@@ -176,7 +176,7 @@
                             {{-- Urgency --}}
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">
-                                    {{ __('Urgency') }} <span class="text-red-500">*</span>
+                                    {{ __('How quick would you like the response*') }} <span class="text-red-500">*</span>
                                 </label>
                                 <select name="urgency"
                                         required
