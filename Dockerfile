@@ -35,8 +35,12 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 # Copy Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port
-EXPOSE 80
+# --- NEW: Copy startup script and make it executable ---
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
-# Start services
-CMD service nginx start && php-fpm
+# Expose port (this is mainly for documentation, the Nginx config will bind to the actual port)
+# EXPOSE 80 # You can keep this or remove it, it doesn't strictly affect runtime on Render.
+
+# --- MODIFIED: Use the startup script as the main command ---
+CMD ["/usr/local/bin/start.sh"]
