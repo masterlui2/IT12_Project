@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     curl \
-    nginx
+    nginx \
+    libpq-dev 
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pgsql mbstring zip exif pcntl gd
