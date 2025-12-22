@@ -226,7 +226,7 @@
                             @enderror
                         </div>
                     </div>
-
+    
                     {{-- Section 3 --}}
                     <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
                         <h3 class="text-sm font-semibold text-slate-900 flex items-center gap-2">
