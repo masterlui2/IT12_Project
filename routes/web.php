@@ -90,7 +90,7 @@ Route::delete('/technicians/{technician}', [ManagerController::class, 'destroyTe
     Route::post('/job-orders', [ManagerController::class, 'storeJobOrder'])->name('manager.job-orders.store');
     Route::get('/services', [ManagerController::class, 'services'])->name('services');
     Route::get('/reports',[ManagerController::class, 'reports'])->name('manager.reports.index');
-    Route::post('/reports/export',[ManagerController::class, 'reports'])->name('manager.reports.export');
+    Route::post('/reports/export',[ManagerController::class, 'exportReports'])->name('manager.reports.export');
 });
 
 Route::get('/inquiry/create', [InquiryController::class, 'create'])
