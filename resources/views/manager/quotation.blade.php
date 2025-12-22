@@ -66,90 +66,96 @@
         </div>
 
         {{-- Quotations Table --}}
-        <div class="overflow-hidden rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
-            <div class="overflow-x-auto">
-                <table class="min-w-full border-separate border-spacing-0 text-left text-sm">
-                    <thead>
-                        <tr class="border-b border-neutral-200 bg-neutral-50 text-neutral-700
-                                   dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
-                            <th class="px-6 py-4 font-medium text-left">Quote #</th>
-                            <th class="px-6 py-4 font-medium text-left">Customer &amp; Project</th>
-                            <th class="px-6 py-4 font-medium text-left">Technician</th>
-                            <th class="px-6 py-4 font-medium text-right">Amount</th>
-                            <th class="px-6 py-4 font-medium text-right">Submitted</th>
-                            <th class="px-6 py-4 font-medium text-center">Status</th>
-                        </tr>
-                    </thead>
+<div class="overflow-hidden rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+    <div class="overflow-x-auto">
+        <!-- Added table-fixed here -->
+        <table class="min-w-full border-separate border-spacing-0 text-left text-sm table-fixed">
+            <thead>
+                <tr class="border-b border-neutral-200 bg-neutral-50 text-neutral-700
+                             dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
+                    <!-- Added width classes to TH elements. Adjust percentages as needed! -->
+                    <th class="px-6 py-4 font-medium text-left w-[10%]">Quote #</th>
+                    <th class="px-6 py-4 font-medium text-left w-[25%]">Customer &amp; Project</th>
+                    <th class="px-6 py-4 font-medium text-left w-[15%]">Technician</th>
+                    <th class="px-6 py-4 font-medium text-right w-[15%]">Amount</th>
+                    <th class="px-6 py-4 font-medium text-right w-[12%]">Submitted</th>
+                    <th class="px-6 py-4 font-medium text-center w-[10%]">Status</th>
+                    <!-- New Actions column header -->
+                    <th class="px-6 py-4 font-medium text-center w-[13%]">Actions</th>
+                </tr>
+            </thead>
 
-                    <tbody class="text-neutral-700 dark:text-neutral-300">
-                        @forelse ($quotations as $quote)
-                            <tr class="border-b border-neutral-100 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
-                                <td class="px-6 py-4 font-medium">
-                                    Q-{{ str_pad($quote->id, 5, '0', STR_PAD_LEFT) }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="font-medium">{{ $quote->client_name }}</div>
-                                    <div class="text-xs text-neutral-500">{{ $quote->project_title }}</div>
-                                </td>
-                                <td class="px-6 py-4 text-neutral-600 dark:text-neutral-400">
-                                    {{ $quote->technician->name ?? '—' }}
-                                </td>
-                                <td class="px-6 py-4 font-medium text-right whitespace-nowrap">
-                                    ₱{{ number_format($quote->grand_total, 2) }}
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    {{ optional($quote->date_issued)->diffForHumans() }}
-                                </td>
+            <tbody class="text-neutral-700 dark:text-neutral-300">
+                @forelse ($quotations as $quote)
+                    <tr class="border-b border-neutral-100 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
+                        <!-- Added truncate/whitespace-normal classes to TD elements for consistent behavior -->
+                        <td class="px-6 py-4 font-medium truncate">
+                            Q-{{ str_pad($quote->id, 5, '0', STR_PAD_LEFT) }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="font-medium whitespace-normal break-words">{{ $quote->client_name }}</div>
+                            <div class="text-xs text-neutral-500 whitespace-normal break-words">{{ $quote->project_title }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-neutral-600 dark:text-neutral-400 whitespace-normal break-words">
+                            {{ $quote->technician->name ?? '—' }}
+                        </td>
+                        <td class="px-6 py-4 font-medium text-right whitespace-nowrap truncate">
+                            ₱{{ number_format($quote->grand_total, 2) }}
+                        </td>
+                        <td class="px-6 py-4 text-right truncate">
+                            {{ optional($quote->date_issued)->diffForHumans() }}
+                        </td>
 
-                                {{-- Status Badge --}}
-                                <td class="px-6 py-4 text-center">
-                                    @php
-                                        $color = match($quote->status) {
-                                            'pending' => 'bg-blue-100 text-blue-700',
-                                            'approved' => 'bg-green-100 text-green-700',
-                                            'rejected' => 'bg-red-100 text-red-700',
-                                            default => 'bg-gray-100 text-gray-700'
-                                        };
-                                    @endphp
-                                    <span class="inline-flex rounded-full {{ $color }} px-3 py-1 text-xs font-semibold capitalize">
-                                        {{ $quote->status }}
-                                    </span>
-                                </td>
+                        {{-- Status Badge --}}
+                        <td class="px-6 py-4 text-center">
+                            @php
+                                $color = match($quote->status) {
+                                    'pending' => 'bg-blue-100 text-blue-700',
+                                    'approved' => 'bg-green-100 text-green-700',
+                                    'rejected' => 'bg-red-100 text-red-700',
+                                    default => 'bg-gray-100 text-gray-700'
+                                };
+                            @endphp
+                            <span class="inline-flex rounded-full {{ $color }} px-3 py-1 text-xs font-semibold capitalize truncate">
+                                {{ $quote->status }}
+                            </span>
+                        </td>
 
-                                {{-- Actions --}}
-                                <td class="px-6 py-5 text-center align-middle">
-                                    <div class="inline-flex items-center justify-center gap-4">
-                                        
-                                        @if ($quote->status === 'pending')
-                                            <form action="{{ route('manager.quotation.approve', $quote->id) }}"
-                                                  method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit"
-                                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 rounded-lg text-xs font-medium border border-emerald-200 transition-colors"
-                                                        title="Approve">
-                                                    <i class="fas fa-check mr-2"></i>
-                                                    Downpayment paid
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="px-6 py-12 text-center text-neutral-500">
-                                    No quotations to review
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="border-t bg-white px-6 py-3 text-sm text-neutral-500 dark:bg-neutral-900 dark:border-neutral-700">
-                {{ $quotations->links() }}
-            </div>
-        </div>
+                        {{-- Actions Column --}}
+                        <td class="px-6 py-5 text-center align-middle">
+                            <div class="inline-flex items-center justify-center gap-4">
+                                @if ($quote->status === 'pending')
+                                    <form action="{{ route('manager.quotation.approve', $quote->id) }}"
+                                            method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 rounded-lg text-xs font-medium border border-emerald-200 transition-colors"
+                                                title="Approve">
+                                            <i class="fas fa-check mr-2"></i>
+                                            Downpayment paid
+                                        </button>
+                                    </form>
+                                @endif
+                                <!-- Add other actions here if needed for approved, rejected, etc. -->
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <!-- Updated colspan to 7 -->
+                        <td colspan="7" class="px-6 py-12 text-center text-neutral-500">
+                            No quotations to review
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
+
+    <div class="border-t bg-white px-6 py-3 text-sm text-neutral-500 dark:bg-neutral-900 dark:border-neutral-700">
+        {{ $quotations->links() }}
+    </div>
+</div>
+
 
 </x-layouts.app>

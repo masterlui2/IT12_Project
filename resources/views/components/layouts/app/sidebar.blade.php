@@ -74,7 +74,7 @@
              {{ Route::is('manager.job.*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'hover:bg-gray-50 text-gray-700' }}">
              <div class="relative">
                <div class="w-8 h-8 flex items-center justify-center rounded-lg
-                 {{ Route::is('manager*') ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }}">
+                 {{ Route::is('manager.job*') ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }}">
                  <i class="fas fa-question-circle text-sm"></i>
                </div>
              </div>
@@ -100,11 +100,11 @@
      
         <!-- Reports -->
         <li>
-          <a href="{{ route('reports') }}"
+          <a href="{{ route('manager.reports.index') }}"
              class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-             {{ Route::is('reports*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'hover:bg-gray-50 text-gray-700' }}">
+             {{ Route::is('manager.reports*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'hover:bg-gray-50 text-gray-700' }}">
              <div class="w-8 h-8 flex items-center justify-center rounded-lg
-               {{ Route::is('reports*') ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }}">
+               {{ Route::is('manager.reports*') ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }}">
                <i class="fas fa-chart-line text-sm"></i>
              </div>
              <span class="text-sm font-medium">Reports</span>
@@ -115,7 +115,7 @@
 
     <!-- User Info -->
     <div class="border-t border-gray-100 px-5 py-4">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 px-4">
         <div class="w-10 h-10 flex items-center justify-center rounded-full text-blue-700 font-semibold text-sm bg-blue-50 border border-blue-100">
           {{ strtoupper(substr(auth()->user()->name ?? 'M', 0, 1)) }}
         </div>
