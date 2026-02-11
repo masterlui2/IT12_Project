@@ -10,6 +10,12 @@
     <input type="hidden" name="quotation_id" value="{{ $quotation->id }}">
   @endif
 
+  {{-- Hidden fields for calculated totals --}}
+    <input type="hidden" name="subtotal" id="hiddenSubtotal" value="0">
+    <input type="hidden" name="downpayment" id="hiddenDownpayment" value="0">
+    <input type="hidden" name="total_amount" id="hiddenTotalAmount" value="0">
+
+
   <div class="bg-white rounded-xl shadow-sm border p-8 space-y-8">
 
     {{-- HEADER --}}
@@ -17,10 +23,38 @@
       <div>
         <h1 class="text-xl font-bold text-gray-800">Techne Fixer Computer and Laptop Repair Services</h1>
         <p class="text-sm text-gray-500">007 Manga Street Crossing Bayabas, Davao City</p>
-        <p class="text-sm text-gray-500">Contact No: 09662406825  TIN 618‑863‑736‑000000</p>
+        <p class="text-sm text-gray-500">Contact No: 09662406825  TIN 618‑863‑736‑000000</p>
       </div>
       <img src="{{ asset('images/logo.png') }}" class="w-20 h-20 object-contain" alt="Company Logo">
     </div>
+
+
+    {{-- Display Validation Errors --}}
+    @if ($errors->any())
+      <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+        <strong>Please fix the following errors:</strong>
+        <ul class="mt-2 list-disc list-inside">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
+    {{-- Display Session Error --}}
+    @if(session('error'))
+      <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+        {{ session('error') }}
+      </div>
+    @endif
+
+    {{-- Display Success Message --}}
+    @if(session('success'))
+      <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+        {{ session('success') }}
+      </div>
+    @endif
+
 
     @if(isset($quotation))
       <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
@@ -78,108 +112,61 @@
     </div>
 
     {{-- ITEMS (Same as Quotation) --}}
-    <div>
-      <h3 class="text-lg font-semibold text-gray-700 mb-3">Items / Services Used *</h3>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm border rounded-lg">
-          <thead class="bg-gray-100 text-gray-700">
-            <tr>
-              <th class="px-4 py-2">Item / Part</th>
-              <th class="px-4 py-2">Description</th>
-              <th class="px-4 py-2">Qty Used</th>
-              <th class="px-4 py-2">Actual Unit Price (₱)</th>
-              <th class="px-4 py-2">Total (₱)</th>
-              <th class="px-4 py-2 text-right">–</th>
-            </tr>
-          </thead>
-          <tbody id="itemRows" class="divide-y">
-            {{-- Quotation items (immutable) --}}
-            @if(isset($job->quotation->details) && count($job->quotation->details))
-                @foreach($job->quotation->details as $i => $detail)
-                    <tr class="bg-gray-50">
-                        <td class="px-4 py-3 font-medium text-gray-700">
-                            <input type="text"
-                                  name="quotation_items[{{ $i }}][name]"
-                                  value="{{ $detail->item_name }}"
-                                  readonly
-                                  class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
-                        </td>
-                        <td class="px-4 py-3">
-                            <textarea rows="2"
-                                      name="quotation_items[{{ $i }}][description]"
-                                      readonly
-                                      class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">{{ $detail->description }}</textarea>
-                        </td>
-                        <td class="px-4 py-3 w-20">
-                            <input type="number"
-                                  name="quotation_items[{{ $i }}][quantity]"
-                                  value="{{ $detail->quantity }}"
-                                  readonly
-                                  class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
-                        </td>
-                        <td class="px-4 py-3 w-24">
-                            <input type="number"
-                                  name="quotation_items[{{ $i }}][unit_price]"
-                                  value="{{ $detail->unit_price }}"
-                                  readonly
-                                  class="item-price border rounded-md px-2 py-1 w-full text-center text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
-                        </td>
-                        <td class="px-4 py-3 text-gray-700 item-total">
-                            ₱{{ number_format($detail->total, 2) }}
-                        </td>
-                        <td class="px-4 py-3 text-right">
-                            <span class="text-gray-400 text-xs italic">Fixed from quotation</span>
-                        </td>
-                    </tr>
-                @endforeach
-            @endif
-
-            {{-- Technician‑added / editable items --}}
-            @foreach($job->items as $index => $item)
-                <tr class="bg-white editable-row">
+<div>
+  <h3 class="text-lg font-semibold text-gray-700 mb-3">Items / Services Used *</h3>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm border rounded-lg">
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="px-4 py-2">Item / Part</th>
+          <th class="px-4 py-2">Description</th>
+          <th class="px-4 py-2">Qty Used</th>
+          <th class="px-4 py-2">Actual Unit Price (₱)</th>
+          <th class="px-4 py-2">Total (₱)</th>
+        </tr>
+      </thead>
+      <tbody id="itemRows" class="divide-y">
+        {{-- Quotation items (name & description readonly, qty & price editable) --}}
+        @if(isset($job->quotation->details) && count($job->quotation->details))
+            @foreach($job->quotation->details as $i => $detail)
+                <tr class="bg-gray-50 quotation-row">
                     <td class="px-4 py-3 font-medium text-gray-700">
                         <input type="text"
-                              name="items[{{ $index }}][name]"
-                              value="{{ $item->name }}"
-                              class="w-full border rounded-md px-2 py-1 text-sm">
+                              name="items[{{ $i }}][name]"
+                              value="{{ $detail->item_name }}"
+                              readonly
+                              class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">
                     </td>
                     <td class="px-4 py-3">
                         <textarea rows="2"
-                                  name="items[{{ $index }}][description]"
-                                  class="w-full border rounded-md px-2 py-1 text-sm">{{ $item->description }}</textarea>
+                                  name="items[{{ $i }}][description]"
+                                  readonly
+                                  class="w-full border rounded-md px-2 py-1 text-sm bg-gray-100 text-gray-700 cursor-not-allowed">{{ $detail->description }}</textarea>
                     </td>
                     <td class="px-4 py-3 w-20">
                         <input type="number"
-                              name="items[{{ $index }}][quantity]"
-                              value="{{ $item->quantity }}"
+                              name="items[{{ $i }}][quantity]"
+                              value="{{ $detail->quantity }}"
                               min="1" step="1"
-                              class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm">
+                              class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm focus:ring-blue-500 focus:border-blue-500">
                     </td>
                     <td class="px-4 py-3 w-24">
                         <input type="number"
-                              name="items[{{ $index }}][unit_price]"
-                              value="{{ $item->unit_price }}"
+                              name="items[{{ $i }}][unit_price]"
+                              value="{{ $detail->unit_price }}"
                               min="0" step="0.01"
-                              class="item-price border rounded-md px-2 py-1 w-full text-center text-sm">
+                              class="item-price border rounded-md px-2 py-1 w-full text-center text-sm focus:ring-blue-500 focus:border-blue-500">
                     </td>
                     <td class="px-4 py-3 text-gray-700 item-total">
-                        ₱{{ number_format($item->total, 2) }}
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                        <button type="button" class="remove-row text-red-500 hover:text-red-700 text-sm">
-                            Remove
-                        </button>
+                        ₱{{ number_format($detail->total, 2) }}
                     </td>
                 </tr>
             @endforeach
-        </tbody>
-        </table>
-      </div>
-      <div class="flex justify-end mt-3">
-        <button type="button" id="addItemBtn" class="text-blue-600 hover:underline text-sm">+ Add Item</button>
-      </div>
-    </div>
-
+        @endif
+    </tbody>
+    </table>
+  </div>
+</div>
     {{-- TOTALS --}}
     <div class="flex justify-end mt-4">
       <div class="bg-gray-50 border rounded-lg p-4 w-80">
@@ -188,7 +175,7 @@
           <span id="subtotal">₱0.00</span>
         </div>
         <div class="flex justify-between text-sm py-1">
-          <span>Tax (10%)</span>
+          <span>Downpayment (50%)</span>
           <span id="tax">₱0.00</span>
         </div>
         <div class="flex justify-between text-sm font-semibold border-t mt-2 pt-2">
@@ -201,7 +188,7 @@
     <!-- Scope of Work (Reference Only) -->
     @if(isset($job->quotation->scopes) && $job->quotation->scopes->count())
       <div class="mt-8">
-          <h3 class="text-sm font-semibold text-gray-700 mb-2">Scope of Work (Reference)</h3>
+          <h3 class="text-sm font-semibold text-gray-700 mb-2">Scope of Work (Reference)</h3>
           <div class="overflow-x-auto bg-gray-50 border rounded-md">
               <table class="w-full text-sm text-left border-collapse">
                   <thead class="bg-gray-100 text-gray-700 border-b">
@@ -237,12 +224,10 @@
       </div>
     @endif
 
-
-
     <!-- Scope of Waiver (Reference Only) -->
     @if(isset($job->quotation->waivers) && $job->quotation->waivers->count())
       <div class="mt-8">
-          <h3 class="text-sm font-semibold text-gray-700 mb-2">Scope of Waiver (Reference)</h3>
+          <h3 class="text-sm font-semibold text-gray-700 mb-2">Scope of Waiver (Reference)</h3>
           <div class="overflow-x-auto bg-gray-50 border rounded-md">
               <table class="w-full text-sm text-left border-collapse">
                   <thead class="bg-gray-100 text-gray-700 border-b">
@@ -271,10 +256,7 @@
               </table>
           </div>
       </div>
-      @endif
-
-
-
+    @endif
 
     {{-- TECHNICIAN NOTES --}}
     <div>
@@ -282,20 +264,6 @@
       <textarea rows="4" name="technician_notes"
                 placeholder="Record observations, parts replaced, diagnostics, etc."
                 class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('technician_notes', $job->technician_notes) }}</textarea>
-    </div>
-
-    {{-- TIMELINE --}}
-    <div>
-      <label class="block text-sm text-gray-700 font-semibold mb-2">Actual Timeline / Completion</label>
-      <div class="flex items-center gap-2">
-        <input id="minDays" name="timeline_min_days" type="number" min="1" placeholder="Min" value="{{ old('timeline_min_days',$job->timeline_min_days) }}"
-               class="w-24 border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-        <span class="text-gray-500">to</span>
-        <input id="maxDays" name="timeline_max_days" type="number" min="1" placeholder="Max" value="{{ old('timeline_max_days',$job->timeline_max_days) }}"
-               class="w-24 border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-        <span class="text-gray-700 text-sm">days</span>
-      </div>
-      <p id="timelinePreview" class="text-xs text-gray-500 mt-2 italic"></p>
     </div>
 
     {{-- ACCEPTANCE / COMPLETION --}}
@@ -350,9 +318,9 @@
               class="px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">
         Save Job Order
       </button>
-      <button type="submit" name="action" value="review"
+      <button type="submit" name="action" value="completed"
               class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-        Mark as For Review
+        Mark as Completed
       </button>
     </div>
 
@@ -360,66 +328,60 @@
 </form>
 
 <script>
-// This script section reuses your existing item and total handling logic
-// (no need to modify unless you want different tax or quantity behavior).
-// Everything else remains identical to your quotation script block.
-
+// Utility functions
 function formatCurrency(amount) {
   return '₱' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 
 function calculateTotals() {
   let subtotal = 0;
+  
+  // Calculate subtotal from all rows
   document.querySelectorAll('#itemRows tr').forEach(row => {
-    const qty = parseFloat(row.querySelector('input[name*="[quantity]"]')?.value || 0);
-    const price = parseFloat(row.querySelector('input[name*="[unit_price]"]')?.value || 0);
-    const total = qty * price;
+    const qtyInput = row.querySelector('input[name*="[quantity]"]');
+    const priceInput = row.querySelector('input[name*="[unit_price]"]');
     const totalCell = row.querySelector('.item-total');
-    if (totalCell) totalCell.textContent = formatCurrency(total);
-    subtotal += total;
+    
+    if (qtyInput && priceInput && totalCell) {
+      const qty = parseFloat(qtyInput.value || 0);
+      const price = parseFloat(priceInput.value || 0);
+      const total = qty * price;
+      
+      totalCell.textContent = formatCurrency(total);
+      subtotal += total;
+    }
   });
-  const tax = subtotal * 0.10;
+  
+  // Calculate downpayment (50%) and remaining balance
+  const downpayment = subtotal * 0.50;
+  const totalAmount = subtotal - downpayment; // Remaining balance
+  
+  // Update display
   document.getElementById('subtotal').textContent = formatCurrency(subtotal);
-  document.getElementById('tax').textContent = formatCurrency(tax);
-  document.getElementById('totalAmount').textContent = formatCurrency(subtotal + tax);
+  document.getElementById('tax').textContent = formatCurrency(downpayment);
+  document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+  
+  // Update hidden fields for form submission
+  document.getElementById('hiddenSubtotal').value = subtotal.toFixed(2);
+  document.getElementById('hiddenDownpayment').value = downpayment.toFixed(2);
+  document.getElementById('hiddenTotalAmount').value = totalAmount.toFixed(2);
 }
 
-// initial add row
-document.addEventListener('DOMContentLoaded', () => document.getElementById('addItemBtn').click());
-
-document.getElementById('addItemBtn').addEventListener('click', e => {
-  e.preventDefault();
-  const tbody = document.getElementById('itemRows');
-  const rowCount = tbody.rows.length;
-  const row = document.createElement('tr');
-  row.classList.add('editable-row');
-  row.innerHTML = `
-    <td class="px-4 py-3 font-medium text-gray-700">
-      <input type="text" name="items[${rowCount}][name]" placeholder="Item ${rowCount + 1}" required class="w-full border rounded-md px-2 py-1 text-sm">
-    </td>
-    <td class="px-4 py-3">
-      <textarea rows="2" name="items[${rowCount}][description]" placeholder="Description" class="w-full border rounded-md px-2 py-1 text-sm"></textarea>
-    </td>
-    <td class="px-4 py-3 w-20">
-      <input type="number" name="items[${rowCount}][quantity]" value="1" min="1" step="1" required class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm">
-    </td>
-    <td class="px-4 py-3 w-24">
-      <input type="number" name="items[${rowCount}][unit_price]" value="0" min="0" step="0.01" required class="item-price border rounded-md px-2 py-1 w-full text-center text-sm">
-    </td>
-    <td class="px-4 py-3 text-gray-700 item-total">₱0.00</td>
-    <td class="px-4 py-3 text-right">
-      <button type="button" class="remove-row text-red-500 hover:text-red-700 text-sm">Remove</button>
-    </td>`;
-  tbody.appendChild(row);
-  row.querySelector('.item-qty').addEventListener('input', calculateTotals);
-  row.querySelector('.item-price').addEventListener('input', calculateTotals);
+// Calculate totals on page load
+document.addEventListener('DOMContentLoaded', () => {
   calculateTotals();
+  
+  // Add event listeners to all quantity and price inputs
+  document.querySelectorAll('#itemRows .item-qty, #itemRows .item-price').forEach(input => {
+    input.addEventListener('input', calculateTotals);
+  });
 });
 
+// Handle remove functionality for editable rows only
 document.getElementById('itemRows').addEventListener('click', e => {
   if (e.target.classList.contains('remove-row')) {
     const row = e.target.closest('tr');
-    if (row.classList.contains('editable-row')) {  // allow removal only on added rows
+    if (row.classList.contains('editable-row')) {
       e.preventDefault();
       row.remove();
       calculateTotals();

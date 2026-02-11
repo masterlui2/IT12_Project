@@ -112,41 +112,52 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
         // Validate the request
-        $validated = $request->validate([
-            'inquiry_id' => 'required|exists:inquiries,id',
-            'project_title' => 'required|string|max:255',
-            'client_name' => 'required|string|max:255',
-            'date_issued' => 'required|date',
-            'client_address' => 'nullable|string|max:500',
-            'objective' => 'nullable|string',
-            'client_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            
-            // Items validation
-            'items' => 'required|array|min:1',
-            'items.*.name' => 'required|string|max:255',
-            'items.*.description' => 'nullable|string',
-            'items.*.quantity' => 'required|numeric|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            
-            // Timeline
-            'timeline_min_days' => 'nullable|integer|min:1',
-            'timeline_max_days' => 'nullable|integer|min:1',
-            
-            // Terms
-            'terms_conditions' => 'nullable|string',
-            
-            // Signature fields
-            'customer_name' => 'nullable|string|max:255',
-            'customer_signature' => 'nullable|string|max:255',
-            'customer_date' => 'nullable|date',
-            'provider_name' => 'nullable|string|max:255',
-            'provider_signature' => 'nullable|string|max:255',
-            'provider_date' => 'nullable|date',
-        ]);
+        $rules = [
+        'inquiry_id' => 'required|exists:inquiries,id',
+        'project_title' => 'required|string|max:255',
+        'client_name' => 'required|string|max:255',
+        'date_issued' => 'required|date',
+        'client_address' => 'nullable|string|max:500',
+        'objective' => 'nullable|string',
+        'client_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        
+        // Timeline
+        'timeline_min_days' => 'nullable|integer|min:1',
+        'timeline_max_days' => 'nullable|integer|min:1',
+        
+        // Terms
+        'terms_conditions' => 'nullable|string',
+        
+        // Signature fields
+        'customer_name' => 'nullable|string|max:255',
+        'customer_signature' => 'nullable|string|max:255',
+        'customer_date' => 'nullable|date',
+        'provider_name' => 'nullable|string|max:255',
+        'provider_signature' => 'nullable|string|max:255',
+        'provider_date' => 'nullable|date',
+    ];
+
+    // Only require items when sending to manager
+    if ($request->action === 'submit_manager') {
+        $rules['items'] = 'required|array|min:1';
+        $rules['items.*.name'] = 'required|string|max:255';
+        $rules['items.*.quantity'] = 'required|numeric|min:1';
+        $rules['items.*.unit_price'] = 'required|numeric|min:0';
+    } else {
+        $rules['items'] = 'nullable|array';
+        $rules['items.*.name'] = 'nullable|string|max:255';
+        $rules['items.*.quantity'] = 'nullable|numeric|min:1';
+        $rules['items.*.unit_price'] = 'nullable|numeric|min:0';
+    }
+    
+    $rules['items.*.description'] = 'nullable|string';
+
+    $validated = $request->validate($rules);
 
         try {
             DB::beginTransaction();
 
+            $inquiry = Inquiry::with(['technician', 'service'])->findOrFail($request->inquiry_id);
             // Determine status based on action
             $status = $request->action === 'draft' ? 'draft' : 'pending';
 
@@ -155,10 +166,8 @@ class QuotationController extends Controller
             foreach ($request->items as $item) {
                 $subtotal += $item['quantity'] * $item['unit_price'];
             }
-            $tax = $subtotal * 0.10;
+            $tax = $inquiry->service->diagnostic_fee ?? 0;
             $total = $subtotal + $tax;
-
-            $inquiry = Inquiry::with('technician')->findOrFail($request->inquiry_id);
            
             $customerId = Customer::where('user_id', $inquiry->customer_id ?? $inquiry->user_id)->value('id');
             $technicianId = optional($inquiry->technician)->id
@@ -301,6 +310,16 @@ class QuotationController extends Controller
                     ->with('success', 'Quotation is drafted.');
             }
 
+            if ($request->action === 'diagnostic') {
+                $quotation->update([
+                    'status' => 'diagnostic',
+                    'date_issued' => now(),
+                ]);
+
+                return redirect()->route('technician.quotation')
+                    ->with('success', 'Quotation is drafted.');
+            }
+
         } catch (\Exception $e) {
             DB::rollBack();
             
@@ -384,11 +403,11 @@ class QuotationController extends Controller
             'client_address' => 'nullable|string|max:500',
             'objective' => 'nullable|string',
             'client_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'items' => 'required|array|min:1',
-            'items.*.name' => 'required|string|max:255',
+            'items' => 'array|min:1',
+            'items.*.name' => 'string|max:255',
             'items.*.description' => 'nullable|string',
-            'items.*.quantity' => 'required|numeric|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.quantity' => 'numeric|min:1',
+            'items.*.unit_price' => 'numeric|min:0',
         ]);
 
         try {
@@ -402,7 +421,7 @@ class QuotationController extends Controller
             foreach ($request->items as $item) {
                 $subtotal += $item['quantity'] * $item['unit_price'];
             }
-            $tax = $subtotal * 0.10;
+            $tax = $inquiry->service->diagnostic_fee ?? 0;
             $total = $subtotal + $tax;
 
             $quotation->update([

@@ -18,6 +18,7 @@ return new class extends Migration
 
             // Technician assigned
             $table->foreignId('technician_id')
+                ->nullable()
                 ->constrained()
                 ->onDelete('cascade');
 

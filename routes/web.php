@@ -38,7 +38,7 @@ Route::middleware(['auth', 'verified', 'role:customer'])
     ->prefix('customer')
     ->group(function () {
         Route::get('/dashboard', fn () => view('customer.welcome'))->name('customer.welcome');
-      Route::get('/inquiry', [InquiryController::class, 'create'])->name('customer.inquiry.form');
+        Route::get('/inquiry', [InquiryController::class, 'create'])->name('customer.inquiry.form');
         Route::post('/inquiry', [InquiryController::class, 'store'])->name('customer.inquiry.store');
         Route::get('/inquiry/create', [InquiryController::class, 'create'])->name('customer.inquiry.create');
     // 🔹 Customer: Track Repair page
@@ -59,6 +59,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
         Route::get('/index', [ManagerController::class, 'quotation'])->name('quotation');
         Route::post('/{quotation}/approve', [ManagerController::class,'approve'])->name('manager.quotation.approve');
         Route::post('/{quotation}/reject', [ManagerController::class,'reject'])->name('manager.quotation.reject');
+        Route::get('/{id}', [QuotationController::class, 'show'])->name('manager.quotation.show');
     });
     
 
@@ -73,6 +74,8 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
         Route::get('/index', [JobOrderController::class, 'index'])->name('manager.job.index');
         Route::patch('/markComplete/{id}',[JobOrderController::class, 'markComplete'])->name('manager.job.markComplete');
         Route::get('/show/{id}', [JobOrderController::class, 'show'])->name('manager.job.show');
+        Route::get('/show/{id}', [JobOrderController::class, 'show'])->name('manager.job.show');
+        Route::post('/{id}/assign', [JobOrderController::class, 'assignTechnician'])->name('manager.job.assign');
     });
 
     // ⭐ Added missing components (same style, same method)
@@ -88,17 +91,21 @@ Route::delete('/technicians/{technician}', [ManagerController::class, 'destroyTe
     ->name('manager.technicians.destroy');
     Route::post('/job-orders', [ManagerController::class, 'storeJobOrder'])->name('manager.job-orders.store');
     Route::get('/services', [ManagerController::class, 'services'])->name('services');
-    Route::get('/reports',[ManagerController::class, 'reports'])->name('reports');
+    Route::get('/reports',[ManagerController::class, 'reports'])->name('manager.reports.index');
+    Route::post('/reports/export',[ManagerController::class, 'exportReports'])->name('manager.reports.export');
 });
+
+Route::get('/inquiry/create', [InquiryController::class, 'create'])
+        ->name('inquiry.create');
+
+Route::post('/inquiry', [InquiryController::class, 'store'])
+        ->name('inquiry.store');
+
 Route::middleware(['auth'])->group(function () {
     // Show the inquiry creation form
-    Route::get('/inquiry/create', [InquiryController::class, 'create'])
-        ->name('inquiry.create');
       Route::get('/feedback/create', [FeedbackController::class, 'create'])
         ->name('feedback.create');
     // Handle the inquiry form submission
-    Route::post('/inquiry', [InquiryController::class, 'store'])
-        ->name('inquiry.store');
     Route::post('/feedback/create', [FeedbackController::class, 'store'])
         ->name('feedback.store');
  Route::get('/messages', function () {

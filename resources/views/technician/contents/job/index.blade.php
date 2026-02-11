@@ -80,99 +80,43 @@
 
                 <tbody class="divide-y">
                     @forelse ($jobOrders as $job)
-                        @php
-                            // Relationships (safe)
-                            $quotation = $job->quotation;
-                            $customer  = $quotation?->customer;
-                            $inquiry   = $quotation?->inquiry;
-
-                            // Client name (safe)
-                            $clientName = $customer
-                                ? trim(($customer->firstname ?? '') . ' ' . ($customer->lastname ?? ''))
-                                : null;
-
-                            // Project title / device / issue fallback (safe)
-                            $projectTitle =
-                                $inquiry?->device_type
-                                ?? $inquiry?->issue_description
-                                ?? $quotation?->project_title
-                                ?? 'N/A';
-
-                            // Dates (safe)
-                            $startDate = $job->start_date ?? $job->created_at;
-                            $targetDate = $job->expected_finish_date;
-                        @endphp
-
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="px-4 py-3 font-medium text-neutral-900">
-                                JO-{{ str_pad($job->id, 5, '0', STR_PAD_LEFT) }}
-                            </td>
-
-                            <td class="px-4 py-3">
-                                {{ $clientName ?: '—' }}
-                            </td>
-
-                            <td class="px-4 py-3 text-neutral-800">
-                                {{ $projectTitle }}
-                            </td>
-
-                            <td class="px-4 py-3 text-right text-neutral-700">
-                                {{ optional($startDate)->format('M d, Y') ?? 'N/A' }}
-                            </td>
-
-                            <td class="px-4 py-3 text-right text-neutral-700">
-                                {{ optional($targetDate)->format('M d, Y') ?? 'N/A' }}
-                            </td>
-
-                            <td class="px-4 py-3">
-                                @php
-                                    $statusColors = [
-                                        'scheduled'   => 'bg-blue-100 text-blue-700',
-                                        'in_progress' => 'bg-yellow-100 text-yellow-800',
-                                        'completed'   => 'bg-green-100 text-green-700',
-                                        'cancelled'   => 'bg-red-100 text-red-700',
-                                    ];
-                                    $badge = $statusColors[$job->status] ?? 'bg-gray-100 text-gray-700';
-                                @endphp
-
-                                <span class="{{ $badge }} text-xs px-2 py-1 rounded capitalize">
-                                    {{ str_replace('_', ' ', $job->status ?? '—') }}
-                                </span>
-                            </td>
-
-                            <td class="px-4 py-3 text-center">
-                                <div class="inline-flex gap-2 justify-center">
-                                    <form
-                                        action="{{ route('technician.job.in_progress', $job->id) }}"
-                                        method="POST"
-                                        class="text-green-600 hover:text-green-800"
-                                        title="Start"
-                                    >
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit">
-                                            <i class="fas fa-wrench"></i>
-                                        </button>
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3 font-medium text-neutral-900">JO-{{ str_pad($job->id, 5, '0', STR_PAD_LEFT) }}</td>
+                        <td class="px-4 py-3">{{ $job->quotation->client_name }}</td>
+                        <td class="px-4 py-3 text-neutral-800">{{ optional($job->quotation)->project_title ?? 'N/A' }}</td>
+                        <td class="px-4 py-3 text-right text-neutral-700">{{ $job->created_at->format('M d, Y') }}</td>
+                        <td class="px-4 py-3 text-right text-neutral-700">
+                            {{ optional($job->expected_finish_date)->format('M d, Y') ?? 'N/A' }}
+                        </td>
+                        <td class="px-4 py-3">
+                            @php
+                                $statusColors = [
+                                    'scheduled' => 'bg-blue-100 text-blue-700',
+                                    'in_progress' => 'bg-yellow-100 text-yellow-800',
+                                    'completed' => 'bg-green-100 text-green-700',
+                                    'cancelled' => 'bg-red-100 text-red-700',
+                                ];
+                            @endphp
+                            <span class="{{ $statusColors[$job->status] ?? 'bg-gray-100 text-gray-700' }} text-xs px-2 py-1 rounded capitalize">
+                                {{ $job->status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="inline-flex gap-2 justify-center">
+                                @if ($job->status == 'scheduled')
+                                    <form action="{{ route('technician.job.in_progress', $job->id) }}" method="POST" class="text-green-600 hover:text-green-800" title="Start">
+                                    @csrf 
+                                    @method('PATCH')
+                                    <button type="submit" name="button" action="in_progress"><i class="fas fa-wrench"></i></button>
                                     </form>
-
-                                    <a
-                                        href="{{ route('technician.job.show', $job->id) }}"
-                                        class="text-blue-600 hover:text-blue-800"
-                                        title="View"
-                                    >
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
-                                    <a
-                                        href="{{ route('technician.job.edit', $job->id) }}"
-                                        class="text-yellow-600 hover:text-yellow-700"
-                                        title="Update"
-                                    >
-                                        <i class="fas fa-pen-to-square"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                                @endif
+                                <a href="{{ route('technician.job.show', $job->id) }}" class="text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i></a>
+                                @if ($job->status == 'in_progress')
+                                    <a href="{{ route('technician.job.edit', $job->id) }}" class="text-yellow-600 hover:text-yellow-700" title="Update"><i class="fas fa-pen-to-square"></i></a>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
                     @empty
                         <tr>
                             <td colspan="7" class="text-center py-4 text-gray-500">

@@ -53,26 +53,64 @@
             <table class="w-full text-left text-sm">
                 <thead class="bg-neutral-50 text-neutral-700">
                     <tr class="border-b border-neutral-200">
-                        <th class="px-4 py-3 font-medium">Job #</th>
+                        <th class="px-4 py-3 font-medium text-center">Job #</th>
                         <th class="px-4 py-3 font-medium">Client</th>
-                        <th class="px-4 py-3 font-medium">Project Title</th>
-                        <th class="px-4 py-3 font-medium text-right">Start Date</th>
-                        <th class="px-4 py-3 font-medium text-right">Target Completion</th>
-                        <th class="px-4 py-3 font-medium">Status</th>
-                        <th class="px-4 py-3 font-medium text-center w-40">Actions</th>
+                        <th class="px-4 py-3 font-medium">Project Title</th>
+                        <th class="px-4 py-3 font-medium text-center">Technician</th>
+                        <th class="px-4 py-3 font-medium text-center">Start Date</th>
+                        <th class="px-4 py-3 font-medium text-center">Target Completion</th>
+                        <th class="px-4 py-3 font-medium text-center">Status</th>
+                        <th class="px-4 py-3 font-medium text-center w-56">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
                     @forelse ($jobOrders as $job)
                     <tr class="hover:bg-gray-50 transition">
-                        <td class="px-4 py-3 font-medium text-neutral-900">JO-{{ str_pad($job->id, 5, '0', STR_PAD_LEFT) }}</td>
-                        <td class="px-4 py-3">{{ $job->quotation->client_name }}</td>
-                        <td class="px-4 py-3 text-neutral-800">{{ optional($job->quotation)->project_title ?? 'N/A' }}</td>
-                        <td class="px-4 py-3 text-right text-neutral-700">{{ $job->created_at->format('M d, Y') }}</td>
-                        <td class="px-4 py-3 text-right text-neutral-700">
-                            {{ optional($job->expected_finish_date)->format('M d, Y') ?? 'N/A' }}
+                        <!-- Job Order ID -->
+                        <td class="px-4 py-3 text-center font-semibold text-neutral-900">
+                            JO-{{ str_pad($job->id, 5, '0', STR_PAD_LEFT) }}
                         </td>
+
+                        <!-- Client -->
                         <td class="px-4 py-3">
+                            <div class="font-medium text-neutral-900">{{ $job->quotation->client_name ?? 'N/A' }}</div>
+                        </td>
+
+                        <!-- Project Title -->
+                        <td class="px-4 py-3 text-neutral-800">
+                            {{ optional($job->quotation)->project_title ?? 'N/A' }}
+                        </td>
+
+                        <!-- Assigned Technician -->
+                        <td class="px-4 py-3 text-center">
+                            @if ($job->technician)
+                                <span class="inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-full text-xs font-medium text-blue-700">
+                                    <i class="fas fa-user"></i>
+                                    {{ $job->technician->user?->firstname }} {{ $job->technician->user?->lastname }}
+                                </span>
+                            @else
+                                <span class="text-xs text-neutral-500">Unassigned</span>
+                            @endif
+                        </td>
+
+                        <!-- Start Date -->
+                        <td class="px-4 py-3 text-center text-neutral-700">
+                            <div>{{ $job->created_at->format('M d, Y') }}</div>
+                            <div class="text-xs text-neutral-500">{{ $job->created_at->format('h:i A') }}</div>
+                        </td>
+
+                        <!-- Target Completion -->
+                        <td class="px-4 py-3 text-center text-neutral-700">
+                            @if($job->expected_finish_date)
+                                <div>{{ $job->expected_finish_date->format('M d, Y') }}</div>
+                                <div class="text-xs text-neutral-500">{{ $job->expected_finish_date->format('h:i A') }}</div>
+                            @else
+                                <span class="text-neutral-500">Not set</span>
+                            @endif
+                        </td>
+
+                        <!-- Status -->
+                        <td class="px-4 py-3 text-center">
                             @php
                                 $statusColors = [
                                     'scheduled' => 'bg-blue-100 text-blue-700',
@@ -81,28 +119,53 @@
                                     'cancelled' => 'bg-red-100 text-red-700',
                                 ];
                             @endphp
-                            <span class="{{ $statusColors[$job->status] ?? 'bg-gray-100 text-gray-700' }} text-xs px-2 py-1 rounded capitalize">
-                                {{ $job->status }}
+                            <span class="{{ $statusColors[$job->status] ?? 'bg-gray-100 text-gray-700' }} text-xs px-3 py-1 rounded-full capitalize font-medium">
+                                {{ str_replace('_', ' ', $job->status) }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-center">
-                            <div class="inline-flex gap-2 justify-center">
-                                <form action="{{ route('manager.job.markComplete', $job->id) }}" method="POST" class="text-green-600 hover:text-green-800" title="Start">
-                                    @csrf 
-                                    @method('PATCH')
-                                    <button type="submit" name="button" action="in_progress"><i class="fas fa-check"></i></button>
+
+                        <!-- Actions -->
+                        <td class="px-4 py-3">
+                            <div class="flex items-center justify-center gap-2">
+                                <!-- Assign Technician Form -->
+                                <form action="{{ route('manager.job.assign', $job->id) }}" method="POST" class="flex items-center gap-2">
+                                    @csrf
+                                    <select
+                                        name="technician_id"
+                                        class="w-36 rounded-lg border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-700 focus:border-neutral-300 focus:outline-none focus:ring-1 focus:ring-neutral-300"
+                                    >
+                                        <option value="">Assign…</option>
+                                        @foreach ($technicians as $technician)
+                                            <option value="{{ $technician->id }}" @selected($technician->id == $job->technician_id)>
+                                                {{ $technician->user?->firstname }} {{ $technician->user?->lastname }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    <button
+                                        type="submit"
+                                        class="bg-neutral-900 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-neutral-800"
+                                    >
+                                        Assign
+                                    </button>
                                 </form>
-                                <a href="{{ route('manager.job.show', $job->id) }}" class="text-blue-600 hover:text-blue-800" title="View"><i class="fas fa-eye"></i></a>
+
+                                <!-- View Button -->
+                                <a href="{{ route('manager.job.show', $job->id) }}" class="text-blue-600 hover:text-blue-800 px-2" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-gray-500">No job orders found.</td>
+                        <td colspan="8" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-inbox text-3xl mb-2 text-gray-400"></i>
+                            <div class="font-medium">No job orders found</div>
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
-
             </table>
         </div>
 

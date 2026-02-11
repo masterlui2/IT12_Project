@@ -184,7 +184,7 @@
                                 {{-- Urgency Level --}}
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                                        {{ __('Urgency') }} <span class="text-red-500">*</span>
+                                        {{ __('How quick would you like the response*') }} <span class="text-red-500">*</span>
                                     </label>
                                     <select name="urgency"
                                             class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"

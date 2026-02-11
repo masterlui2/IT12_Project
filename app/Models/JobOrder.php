@@ -9,18 +9,20 @@ class JobOrder extends Model
 {
     use HasFactory;
 
-   protected $fillable = [
-    'user_id',
-    'quotation_id',
-    'technician_id',
-    'start_date',
-    'expected_finish_date',
-    'timeline_min_days',
-    'timeline_max_days',
-    'technician_notes',
-    'status',
-    'completed_at',
-];
+    protected $fillable = [
+        'quotation_id',
+        'technician_id',
+        'start_date',
+        'expected_finish_date',
+        'timeline_min_days',
+        'timeline_max_days',
+        'technician_notes',
+        'status',
+        'completed_at',
+        'subtotal',           // ✅ Add this
+        'downpayment',        // ✅ Add this
+        'total_amount',
+    ];
 
  
     protected $casts = [

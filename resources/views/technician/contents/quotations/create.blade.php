@@ -9,6 +9,12 @@
     <input type="hidden" name="inquiry_id" value="{{ $inquiry->id }}">
   @endif
 
+  @if(isset($inquiry) && $inquiry->category)
+  <input type="hidden" id="diagnosticFeeAmount" value="{{ $inquiry->service->diagnostic_fee }}">
+  @else
+    <input type="hidden" id="diagnosticFeeAmount" value="0">
+  @endif
+
   <div class="bg-white rounded-xl shadow-sm border p-8 space-y-8">
     @if(isset($inquiry) && $inquiry)
       <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
@@ -119,7 +125,7 @@
 
     <!-- Itemization Table -->
     <div>
-      <h3 class="text-lg font-semibold text-gray-700 mb-3">Items and Services *</h3>
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">Items and Services</h3>
 
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm border rounded-lg">
@@ -152,7 +158,7 @@
           <span id="subtotal">₱0.00</span>
         </div>
         <div class="flex justify-between text-sm py-1">
-          <span>Tax (10%)</span>
+          <span>Diagnostic Fee ({{ $inquiry->service->name ?? 'N/A' }})</span>
           <span id="tax">₱0.00</span>
         </div>
         <div class="flex justify-between text-sm font-semibold border-t mt-2 pt-2">
@@ -329,6 +335,9 @@
       <button type="submit" name="action" value="draft" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">
         Save Draft
       </button>
+      <button type="submit" name="action" value="diagnostic" class="px-4 py-2 bg-orange-600 text-white rounded-md text-sm hover:bg-orange-700">
+        Diagnostic Only
+      </button>
       <button type="submit" name="action" value="submit_manager" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
         Send To Manager
       </button>
@@ -432,14 +441,14 @@ function calculateTotals() {
     subtotal += total;
   });
   
-  const tax = subtotal * 0.10;
-  const totalAmount = subtotal + tax;
+  // ✅ Get fixed diagnostic fee from hidden input
+  const diagnosticFee = parseFloat(document.getElementById('diagnosticFeeAmount').value || 0);
+  const totalAmount = subtotal + diagnosticFee;
   
   document.getElementById('subtotal').textContent = formatCurrency(subtotal);
-  document.getElementById('tax').textContent = formatCurrency(tax);
+  document.getElementById('tax').textContent = formatCurrency(diagnosticFee);
   document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
 }
-
 // ============================================
 // ITEMS SECTION
 // ============================================
@@ -452,7 +461,7 @@ document.getElementById('addItemBtn').addEventListener('click', function(e) {
   const newRow = document.createElement('tr');
   newRow.innerHTML = `
     <td class="px-4 py-3 font-medium text-gray-700">
-      <input type="text" name="items[${rowCount}][name]" placeholder="Item ${rowCount + 1}" required
+      <input type="text" name="items[${rowCount}][name]" placeholder="Item ${rowCount + 1}"
              class="w-full border rounded-md px-2 py-1 text-sm">
     </td>
     <td class="px-4 py-3">
@@ -460,11 +469,11 @@ document.getElementById('addItemBtn').addEventListener('click', function(e) {
                 class="w-full border rounded-md px-2 py-1 text-sm"></textarea>
     </td>
     <td class="px-4 py-3 w-20">
-      <input type="number" name="items[${rowCount}][quantity]" value="1" min="1" step="1" required
+      <input type="number" name="items[${rowCount}][quantity]" value="1" min="1" step="1"
              class="item-qty border rounded-md px-2 py-1 w-full text-center text-sm">
     </td>
     <td class="px-4 py-3 w-24">
-      <input type="number" name="items[${rowCount}][unit_price]" value="0" min="0" step="0.01" required
+      <input type="number" name="items[${rowCount}][unit_price]" value="0" min="0" step="0.01"
              class="item-price border rounded-md px-2 py-1 w-full text-center text-sm">
     </td>
     <td class="px-4 py-3 text-gray-700 item-total">₱0.00</td>
@@ -702,12 +711,20 @@ document.getElementById('clientLogoInput').addEventListener('change', function(e
 
 document.getElementById('quotationForm').addEventListener('submit', function(e) {
   const itemRows = document.querySelectorAll('#itemRows tr');
+  const submitter = e.submitter; // Get which button was clicked
+  const action = submitter ? submitter.value : null;
   
-  if (itemRows.length === 0) {
-    e.preventDefault();
-    alert('Please add at least one item to the quotation.');
-    return false;
+  // Only require items when sending to manager
+  if (action === 'submit_manager') {
+    if (itemRows.length === 0) {
+      e.preventDefault();
+      alert('Please add at least one item before sending to manager.');
+      return false;
+    }
   }
+  
+  // Diagnostic and Draft can be submitted without items
+  // No validation needed for these actions
 });
 
 // ============================================
