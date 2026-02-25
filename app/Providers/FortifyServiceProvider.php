@@ -49,8 +49,25 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::verifyEmailView(fn () => view('livewire.auth.verify-email'));
         Fortify::twoFactorChallengeView(fn () => view('livewire.auth.two-factor-challenge'));
         Fortify::confirmPasswordView(fn () => view('livewire.auth.confirm-password'));
-        Fortify::registerView(fn () => view('livewire.auth.register'));
-        Fortify::resetPasswordView(fn () => view('livewire.auth.reset-password'));
+        Fortify::registerView(function () {
+            $recaptchaEnabled = filled(config('services.recaptcha.site_key'))
+                && filled(config('services.recaptcha.secret_key'));
+
+            $humanChallenge = null;
+
+            if (! $recaptchaEnabled) {
+                $left = random_int(2, 9);
+                $right = random_int(1, 9);
+
+                session(['human_challenge_answer' => $left + $right]);
+                $humanChallenge = "{$left} + {$right}";
+            }
+
+            return view('livewire.auth.register', [
+                'recaptchaEnabled' => $recaptchaEnabled,
+                'humanChallenge' => $humanChallenge,
+            ]);
+        });        Fortify::resetPasswordView(fn () => view('livewire.auth.reset-password'));
         Fortify::requestPasswordResetLinkView(fn () => view('livewire.auth.forgot-password'));
     }
 

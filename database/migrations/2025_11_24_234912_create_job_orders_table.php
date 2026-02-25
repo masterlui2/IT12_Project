@@ -12,9 +12,8 @@ return new class extends Migration
             $table->id();
 
             // Link to quotation that generated this job order
-            $table->foreignId('quotation_id')
-                ->constrained()
-                ->onDelete('cascade');
+             $table->unsignedBigInteger('quotation_id')->nullable();
+
 
             // Technician assigned
             $table->foreignId('technician_id')

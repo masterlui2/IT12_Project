@@ -63,6 +63,7 @@
                 />
 
                 <!-- Password -->
+                 <div>
                 <flux:input
                     name="password"
                     :label="__('Password')"
@@ -72,8 +73,15 @@
                     placeholder="Password"
                     viewable
                 />
-
-                <!-- Confirm Password -->
+                  <!-- Password Requirements -->
+                <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                    Password must be at least 
+                    <span class="font-semibold">12 characters</span> 
+                    and include at least 
+                    <span class="font-semibold">one special symbol</span> 
+                    (e.g. ! @ # $ % & *).
+                </p>
+                </div>          <!-- Confirm Password -->
                 <flux:input
                     name="password_confirmation"
                     :label="__('Confirm password')"
@@ -83,6 +91,32 @@
                     placeholder="Confirm password"
                     viewable
                 />
+             <!-- Human verification -->
+                @if ($recaptchaEnabled)
+                    <div class="space-y-2">
+                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                        @error('g-recaptcha-response')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @else
+                    <div class="space-y-2 rounded-lg border border-zinc-300 p-4 dark:border-zinc-700">
+                        <p class="text-sm text-zinc-600 dark:text-zinc-300">
+                            {{ __('Human check: solve this puzzle') }}
+                        </p>
+                        <flux:input
+                            name="human_challenge_answer"
+                            :label="__('What is :challenge?', ['challenge' => $humanChallenge])"
+                            type="text"
+                            required
+                            inputmode="numeric"
+                            placeholder="Enter your answer"
+                        />
+                        @error('human_challenge_answer')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @endif
 
                 <!-- Submit Button -->
                 <flux:button 
@@ -111,4 +145,7 @@
             </div>
         </div>
     </div>
+ @if ($recaptchaEnabled)
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
 </x-layouts.auth>

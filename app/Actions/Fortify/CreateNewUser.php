@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Actions\Fortify;
-
+use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -18,11 +18,11 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        Validator::make($input, [
+        $rules = [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'birthday' => ['required','date'],
-            'email' => [
+            'birthday' => ['required', 'date'],
+               'email' => [
                 'required',
                 'string',
                 'email',
@@ -30,8 +30,41 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
-        ])->validate();
+            ];
 
+        $recaptchaEnabled = filled(config('services.recaptcha.site_key'))
+            && filled(config('services.recaptcha.secret_key'));
+
+        if ($recaptchaEnabled) {
+            $rules['g-recaptcha-response'] = [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                        'secret' => (string) config('services.recaptcha.secret_key'),
+                        'response' => $value,
+                    ]);
+
+                    if (! $response->ok() || ! $response->json('success')) {
+                        $fail('Captcha verification failed. Please try again.');
+                    }
+                },
+            ];
+        } else {
+            $rules['human_challenge_answer'] = [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $expected = (string) session('human_challenge_answer', '');
+
+                    if ($expected === '' || trim((string) $value) !== $expected) {
+                        $fail('Human verification answer is incorrect.');
+                    }
+                },
+            ];
+        }
+
+        Validator::make($input, $rules)->validate();
+
+        session()->forget('human_challenge_answer');
         return User::create([
             'firstname' => $input['first_name'],
             'lastname' => $input['last_name'],

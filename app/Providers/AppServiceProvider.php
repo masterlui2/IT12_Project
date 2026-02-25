@@ -10,7 +10,7 @@ use App\Observers\UserObserver;
 use Illuminate\Support\Facades\View;
 use App\Models\Feedback;
 use App\Observers\QuotationObserver;
-
+use Illuminate\Validation\Rules\Password;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -26,6 +26,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Password::defaults(function () {
+            return Password::min(12)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->uncompromised();
+        });
+
         // Force HTTPS in production or ngrok
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
