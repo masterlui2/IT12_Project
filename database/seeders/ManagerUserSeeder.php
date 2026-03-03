@@ -18,7 +18,7 @@ class ManagerUserSeeder extends Seeder
             [
                 'firstname' => 'Manager',
                 'lastname' => 'User',
-                'password' => Hash::make('manager'),
+                'password' => Hash::make('Manager@2003'),
                 'birthday' => '2005-04-12', 
                 'role' => 'manager', // requires you added this column
             ]

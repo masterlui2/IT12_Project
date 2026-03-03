@@ -8,6 +8,7 @@ use App\Models\Message;
 use App\Models\JobOrder;
 use App\Models\Quotation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 class TechnicianController extends Controller
 {
@@ -22,8 +23,10 @@ class TechnicianController extends Controller
             'completed_jobs' => (clone $jobOrdersQuery)->where('status', 'completed')->count(),
             'open_inquiries' => Inquiry::query()
                 ->where('assigned_technician_id', $technicianId ?? 0)
-                ->where(function ($query) {
-                    $query->whereNull('status')->orWhere('status', '!=', 'closed');
+               ->when(Schema::hasColumn('inquiries', 'status'), function ($query) {
+                    $query->where(function ($statusQuery) {
+                        $statusQuery->whereNull('status')->orWhere('status', '!=', 'closed');
+                    });
                 })
                 ->count(),
             'quotations' => Quotation::query()
@@ -199,8 +202,9 @@ class TechnicianController extends Controller
         }
 
         $inquiry->assigned_technician_id = $technician->id; // ✅ use technician ID
-        $inquiry->status = 'Acknowledged';
-        $inquiry->save();
+if (Schema::hasColumn('inquiries', 'status')) {
+            $inquiry->status = 'Acknowledged';
+        }        $inquiry->save();
 
         return redirect()->route('technician.inquire.index')
             ->with('success', 'Inquiry INQ-' . str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) . ' claimed successfully.');

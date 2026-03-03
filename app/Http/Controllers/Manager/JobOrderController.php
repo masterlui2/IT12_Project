@@ -11,29 +11,43 @@ class JobOrderController extends Controller
     public function index(Request $request)
 {  
     // Optional filters from search & status
-    $query = JobOrder::query();
+    {
+        // Optional filters from search & status
+        $query = JobOrder::query();
+        $filters = $request->only(['search', 'status']);
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('customer_name', 'like', "%{$search}%")
-              ->orWhere('id', 'like', "%{$search}%");
-        });
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('customer_name', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Eager load quotation and technician relationships
+        $jobOrders = $query->with(['quotation', 'technician.user'])->latest()->paginate(10);
+
+        // Get all technicians for the dropdown
+        $technicians = \App\Models\Technician::with('user')->get();
+
+        // Summary counts used by the index view
+        $stats = [
+            'total' => JobOrder::count(),
+            'active' => JobOrder::where('status', 'in_progress')->count(),
+        ];
+
+        return view('manager.job.index', [
+            'jobOrders' => $jobOrders,
+            'technicians' => $technicians,
+            'stats' => $stats,
+            'filters' => $filters,
+        ]);
     }
-
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-
-    // ✅ Eager load quotation and technician relationships
-    $jobOrders = $query->with(['quotation', 'technician.user'])->latest()->paginate(10);
-
-    // ✅ Get all technicians for the dropdown
-    $technicians = \App\Models\Technician::with('user')->get();
-
-    return view('manager.job.index', compact('jobOrders', 'technicians'));
 }
-
     public function markComplete($id)
     {
         $job = JobOrder::findOrFail($id);

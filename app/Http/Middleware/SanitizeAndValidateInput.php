@@ -18,18 +18,14 @@ class SanitizeAndValidateInput
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next): Response
-    {
-        $sanitized = $this->sanitizeValue($request->all());
+   public function handle(Request $request, Closure $next): Response
+{
+    $sanitized = $this->sanitizeValue($request->all());
 
-        if ($this->containsSqlInjectionPattern($sanitized)) {
-            abort(422, 'Input contains unsafe SQL patterns.');
-        }
+    $request->merge($sanitized);
 
-        $request->merge($sanitized);
-
-        return $next($request);
-    }
+    return $next($request);
+}
 
     /**
      * Recursively sanitize user input values.

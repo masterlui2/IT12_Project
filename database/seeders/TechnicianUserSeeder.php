@@ -19,7 +19,7 @@ class TechnicianUserSeeder extends Seeder
             [
                 'firstname' => 'Red Xavier',
                 'lastname' => 'Rodrigo',
-                'password' => Hash::make('12345678'), // change this
+                'password' => Hash::make('Tech@2003'), // change this
                 'birthday' => '2005-04-12', // change this
                 'role' => 'technician', // requires you added this column
             ]
