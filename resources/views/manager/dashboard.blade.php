@@ -222,6 +222,61 @@
                 </div>
             </div>
         </div>
+            
+        {{-- Audit Logs --}}
+        <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+            <div class="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-neutral-700">
+                <div>
+                    <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        {{ __('Audit Logs') }}
+                    </h3>
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Recent system and manager actions') }}</span>
+                </div>
+            </div>
 
+            <div class="p-4">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm">
+                        <thead class="text-xs text-neutral-500 dark:text-neutral-400">
+                            <tr class="border-b border-neutral-200 dark:border-neutral-800">
+                                <th class="py-2 pr-4">{{ __('Time') }}</th>
+                                <th class="py-2 pr-4">{{ __('User') }}</th>
+                                <th class="py-2 pr-4">{{ __('Action') }}</th>
+                                <th class="py-2 pr-0">{{ __('Details') }}</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
+                            @forelse($auditLogs as $log)
+                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40">
+                                    <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100">
+                                        {{ $log->created_at?->format('M d, Y h:i A') }}
+                                    </td>
+                                    <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100">
+                                        {{ trim(($log->user?->firstname ?? '') . ' ' . ($log->user?->lastname ?? '')) ?: ($log->user?->email ?? 'System') }}
+                                    </td>
+                                    <td class="py-3 pr-4 font-medium text-neutral-900 dark:text-neutral-50">
+                                        {{ str_replace('_', ' ', $log->action) }}
+                                    </td>
+                                    <td class="py-3 pr-0 text-xs text-neutral-500 dark:text-neutral-300">
+                                        @if(!empty($log->meta))
+                                            <code>{{ json_encode($log->meta) }}</code>
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                                        {{ __('No audit records yet.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </x-layouts.app>

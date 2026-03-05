@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Manager;
-
+use App\Models\AuditLog;
+use App\Support\AuditLogger;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
@@ -65,6 +66,10 @@ class ManagerController extends Controller
             ->toArray();
 
         $totalQuotations = (clone $quotationsRange)->count();
+         $auditLogs = AuditLog::with('user')
+            ->latest()
+            ->take(12)
+            ->get();
 
         $stats = [
             'inquiries' => [
@@ -94,8 +99,7 @@ class ManagerController extends Controller
             'recent_jobs' => $recentJobs,
         ];
 
-        return view('manager.dashboard', compact('stats', 'range'));
-    }
+        return view('manager.dashboard', compact('stats', 'range', 'auditLogs'));    }
 
     public function quotation(){
         // Base query
@@ -184,12 +188,19 @@ class ManagerController extends Controller
     public function approve(Quotation $quotation)
     {
         $quotation->update(['status' => 'approved', 'approved_by' => Auth::user()->id]);
+        
+        AuditLogger::log('manager.quotation.approved', [
+            'quotation_id' => $quotation->id,
+        ]);
         return back()->with('success','Quotation approved successfully.');
     }
 
     public function reject(Quotation $quotation)
     {
         $quotation->update(['status' => 'rejected', 'approved_by' => Auth::user()->id]);
+        AuditLogger::log('manager.quotation.rejected', [
+            'quotation_id' => $quotation->id,
+        ]);
         return back()->with('success','Quotation rejected.');
     }
 
@@ -203,6 +214,10 @@ class ManagerController extends Controller
         $inquiry->assigned_technician_id = $request->technician_id;
         $inquiry->status = 'Acknowledged';
         $inquiry->save();
+                AuditLogger::log('manager.inquiry.assigned_technician', [
+            'inquiry_id' => $inquiry->id,
+            'technician_user_id' => (int) $request->technician_id,
+        ]);
 
         return redirect()->route('inquiries')
             ->with('status', 'Technician assigned to inquiry INQ-' . str_pad($inquiry->id, 8, '0', STR_PAD_LEFT));
@@ -217,6 +232,10 @@ class ManagerController extends Controller
     public function inquireDestroy(int $id){
         $inq = Inquiry::findOrFail($id);
         $inq->delete();
+          AuditLogger::log('manager.inquiry.deleted', [
+            'inquiry_id' => $id,
+        ]);
+
         return redirect()->route('manager.inquiries')
             ->with('status', 'Inquiry INQ-'.$id.' deleted');
     }
@@ -271,7 +290,10 @@ public function updateTechnician(Request $request, Technician $technician)
         'specialization'  => $validated['specialization'] ?? null,
         'certifications'  => $validated['certifications'] ?? null,
     ]);
-
+  AuditLogger::log('manager.technician.updated', [
+        'technician_id' => $technician->id,
+        'user_id' => $technician->user_id,
+    ]);
     return redirect()->route('technicians')->with('status', 'Technician updated successfully.');
 }
 
@@ -279,8 +301,14 @@ public function destroyTechnician(Technician $technician)
 {
     // delete technician + linked user (optional but usually correct)
     $user = $technician->user;
+    $technicianId = $technician->id;
+    $userId = $user?->id;
     $technician->delete();
     if ($user) $user->delete();
+                AuditLogger::log('manager.technician.deleted', [
+        'technician_id' => $technicianId,
+        'user_id' => $userId,
+    ]);
 
     return redirect()->route('technicians')->with('status', 'Technician deleted successfully.');
 }
@@ -312,6 +340,11 @@ public function destroyTechnician(Technician $technician)
             'specialization' => $validated['specialization'] ?? null,
             'certifications' => $validated['certifications'] ?? null,
         ]);
+                AuditLogger::log('manager.technician.created', [
+            'technician_id' => $user->technician?->id,
+            'user_id' => $user->id,
+            'email' => $user->email,
+        ]);
 
         return redirect()->route('technicians')->with('status', 'Technician added successfully.');
     }
@@ -331,12 +364,16 @@ public function destroyTechnician(Technician $technician)
         'status'                => 'nullable|string|in:scheduled,in_progress,review,completed,cancelled',
     ]);
 
-    JobOrder::create([
-        ...$validated,
+    $jobOrder = JobOrder::create([
+                ...$validated,
         'user_id' => (int) Auth::id(),
         'status'  => $validated['status'] ?? 'scheduled',
     ]);
-
+AuditLogger::log('manager.job_order.created', [
+        'job_order_id' => $jobOrder->id,
+        'technician_id' => $jobOrder->technician_id,
+        'quotation_id' => $jobOrder->quotation_id,
+    ]);
     return redirect()->route('technicians')
         ->with('status', 'Job order assigned to technician successfully.');
 }
