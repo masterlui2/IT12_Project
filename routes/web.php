@@ -19,7 +19,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Manager\JobOrderController;
 use App\Models\JobOrder;
 use App\Http\Controllers\MessageController;
-
+use App\Http\Controllers\Auth\ManualPasswordResetRequestController;
 // Generic landing
 Route::get('/', function () {
     if (Auth::check()) {
@@ -151,13 +151,18 @@ Route::get('/auth/facebook/redirect', [SocialAuthController::class, 'redirectToF
 Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
 
 // Legal pages
+
 Route::get('/terms-of-service', [SocialAuthController::class, 'terms'])->name('terms.service');
 Route::get('/privacy-policy', [SocialAuthController::class, 'privacy'])->name('privacy.policy');
-
+Route::post('/forgot-password/manual-request', [ManualPasswordResetRequestController::class, 'store'])
+    ->middleware('guest')
+    ->name('password.manual-request.store');
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('/admin')->group(function () {
     Route::get('/dashboard',[AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/system-management',[AdminController::class, 'systemManagement'])->name('admin.systemManagement');
     Route::get('/user-access',[AdminController::class, 'userAccess'])->name('admin.userAccess');
+    Route::post('/password-reset-requests/{passwordResetRequest}/reset', [AdminController::class, 'processPasswordResetRequest'])->name('admin.password-reset-requests.reset');
+    Route::post('/password-reset-requests/{passwordResetRequest}/reject', [AdminController::class, 'rejectPasswordResetRequest'])->name('admin.password-reset-requests.reject');
     Route::get('/activity-logs',[AdminController::class, 'activity'])->name('admin.activity');
     Route::get('/analytics',[AdminController::class, 'analytics'])->name('admin.analytics');
     Route::get('/devtools',[AdminController::class, 'developerTools'])->name('admin.developerTools');
