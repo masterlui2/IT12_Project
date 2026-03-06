@@ -248,19 +248,44 @@
 
                         <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
                             @forelse($auditLogs as $log)
-                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40">
-                                    <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100">
+                                @php
+                                    $action = strtolower($log->action ?? '');
+                                    $metaText = strtolower(is_array($log->meta) ? json_encode($log->meta) : (string) $log->meta);
+                                    $isCriticalEvent = str_contains($action, 'failed')
+                                        || str_contains($action, 'denied')
+                                        || str_contains($action, 'locked')
+                                        || str_contains($action, 'error')
+                                        || str_contains($metaText, 'failed')
+                                        || str_contains($metaText, 'error');
+                                    $isWarningEvent = ! $isCriticalEvent && (str_contains($action, 'warn') || str_contains($metaText, 'warn'));
+                                @endphp
+                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40 {{ $isCriticalEvent ? 'bg-red-50/40 dark:bg-red-950/20' : '' }}">
+                                    <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100 whitespace-nowrap">
                                         {{ $log->created_at?->format('M d, Y h:i A') }}
                                     </td>
-                                    <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100">
-                                        {{ trim(($log->user?->firstname ?? '') . ' ' . ($log->user?->lastname ?? '')) ?: ($log->user?->email ?? 'System') }}
+ <td class="py-3 pr-4 text-neutral-700 dark:text-neutral-100 whitespace-nowrap">                                        {{ trim(($log->user?->firstname ?? '') . ' ' . ($log->user?->lastname ?? '')) ?: ($log->user?->email ?? 'System') }}
                                     </td>
                                     <td class="py-3 pr-4 font-medium text-neutral-900 dark:text-neutral-50">
-                                        {{ str_replace('_', ' ', $log->action) }}
+                                       <div class="flex items-center gap-2">
+                                            @if($isCriticalEvent)
+                                                <i class="fas fa-triangle-exclamation text-red-600" title="Critical event"></i>
+                                            @elseif($isWarningEvent)
+                                                <i class="fas fa-circle-exclamation text-amber-500" title="Warning event"></i>
+                                            @else
+                                                <i class="fas fa-circle-info text-blue-500" title="Information event"></i>
+                                            @endif
+                                            <span>{{ ucfirst(str_replace(['.', '_'], ' ', $log->action)) }}</span>
+                                        </div>
                                     </td>
                                     <td class="py-3 pr-0 text-xs text-neutral-500 dark:text-neutral-300">
-                                        @if(!empty($log->meta))
-                                            <code>{{ json_encode($log->meta) }}</code>
+                                        @if(!empty($log->meta) && is_array($log->meta))
+                                            <div class="flex flex-wrap gap-1.5">
+                                                @foreach(collect($log->meta)->take(3) as $metaKey => $metaValue)
+                                                    <span class="rounded-full border border-neutral-200 bg-neutral-100 px-2 py-0.5 dark:border-neutral-700 dark:bg-neutral-800">
+                                                        {{ $metaKey }}: {{ is_scalar($metaValue) ? $metaValue : '...' }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
                                         @else
                                             —
                                         @endif

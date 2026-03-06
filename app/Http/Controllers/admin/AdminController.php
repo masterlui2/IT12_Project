@@ -18,15 +18,25 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-               $this->ensureAdmin();
-    }
+ $this->ensureAdmin();
+
+        return view('admin.contents.dashboard');    }
 
     public function systemManagement(){
-        $this->ensureAdmin();    }
+        $this->ensureAdmin();
 
+        return view('admin.contents.system-management');
+    }
+    
+
+    
     public function userAccess(){
-        $this->ensureAdmin();    }
+           
+        $this->ensureAdmin();
 
+        return view('admin.contents.users-access');
+    }
+    
    public function activity(Request $request){
        $query = AuditLog::with('user')->latest();
 
@@ -78,12 +88,24 @@ class AdminController extends Controller
             'filters' => $filters,
         ]);
    }
-    public function analytics(){
-        $this->ensureAdmin();    }
+      public function analytics(){
+           
+        $this->ensureAdmin();
+
+        return view('admin.contents.analytics');
+    }
 
     public function developerTools(){
-        $this->ensureAdmin();    }
+           
+        $this->ensureAdmin();
+
+        return view('admin.contents.developer-tools');
+    }
 
     public function documentation(){
-        $this->ensureAdmin();    }
+           
+        $this->ensureAdmin();
+
+        return view('admin.contents.documentation');
+    }
 }

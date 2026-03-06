@@ -3,10 +3,11 @@
 @section('content')
 @php
   $levelStyles = [
-      'info' => 'bg-green-100 text-green-700',
-      'warning' => 'bg-yellow-100 text-yellow-800',
-      'error' => 'bg-red-100 text-red-700',
-      'system' => 'bg-blue-100 text-blue-700',
+    'info' => 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+      'warning' => 'bg-amber-100 text-amber-800 border border-amber-200',
+      'error' => 'bg-rose-100 text-rose-800 border border-rose-200',
+      'critical' => 'bg-red-100 text-red-800 border border-red-200',
+      'system' => 'bg-blue-100 text-blue-800 border border-blue-200',
   ];
 @endphp
 
@@ -78,26 +79,47 @@
           @php
             $action = strtolower($log->action ?? '');
             $metaText = strtolower(is_array($log->meta) ? json_encode($log->meta) : (string) $log->meta);
-            $derivedLevel = str_contains($action, 'error') || str_contains($metaText, 'error')
-              ? 'error'
+           $isCriticalEvent = str_contains($action, 'failed')
+              || str_contains($action, 'denied')
+              || str_contains($action, 'locked')
+              || str_contains($action, 'error')
+              || str_contains($metaText, 'failed')
+              || str_contains($metaText, 'error');
+
+            $derivedLevel = $isCriticalEvent
+              ? 'critical'
               : (str_contains($action, 'warn') || str_contains($metaText, 'warn')
                 ? 'warning'
                 : ($log->user_id ? 'info' : 'system'));
 
             $level = strtolower($log->level ?? $derivedLevel);
-            $levelClass = $levelStyles[$level] ?? 'bg-gray-100 text-gray-700';
-          @endphp
-          <tr class="hover:bg-gray-50 transition">
-            <td class="px-6 py-3 text-gray-500">{{ optional($log->created_at)->format('Y-m-d H:i') ?? 'N/A' }}</td>
-            <td class="px-6 py-3 font-semibold text-gray-800">
+ if ($isCriticalEvent && !in_array($level, ['critical', 'error'], true)) {
+              $level = 'critical';
+            }
+
+            $levelClass = $levelStyles[$level] ?? 'bg-gray-100 text-gray-700 border border-gray-200';
+            $displayAction = str_replace(['.', '_'], ' ', $log->action);          @endphp
+          <tr class="hover:bg-gray-50 transition align-top {{ $isCriticalEvent ? 'bg-red-50/30' : '' }}">
+            <td class="px-6 py-3 text-gray-500 whitespace-nowrap">{{ optional($log->created_at)->format('Y-m-d H:i') ?? 'N/A' }}</td>
+            <td class="px-6 py-3 font-semibold text-gray-800 whitespace-nowrap">
               {{ trim(($log->user->firstname ?? '') . ' ' . ($log->user->lastname ?? '')) ?: 'System' }}
             </td>
-            <td class="px-6 py-3 text-gray-600">{{ $log->user->role ?? 'System' }}</td>
-            <td class="px-6 py-3 text-gray-700">{{ $log->action }}</td>
-            <td class="px-6 py-3 text-gray-500">{{ $log->ip_address ?? 'N/A' }}</td>
-            <td class="px-6 py-3">
-              <span class="px-2 py-1 rounded text-xs {{ $levelClass }}">{{ ucfirst($level) }}</span>
+          <td class="px-6 py-3 text-gray-600 capitalize">{{ $log->user->role ?? 'System' }}</td>
+            <td class="px-6 py-3 text-gray-700">
+              <div class="flex items-start gap-2">
+                @if($isCriticalEvent)
+                  <i class="fas fa-triangle-exclamation text-red-600 mt-0.5" title="Critical event"></i>
+                @elseif($level === 'warning')
+                  <i class="fas fa-circle-exclamation text-amber-600 mt-0.5" title="Warning event"></i>
+                @else
+                  <i class="fas fa-circle-info text-blue-500 mt-0.5" title="Information event"></i>
+                @endif
+                <span class="break-words">{{ ucfirst($displayAction) }}</span>
+              </div>
             </td>
+            <td class="px-6 py-3 text-gray-500 whitespace-nowrap">{{ $log->ip_address ?? 'N/A' }}</td>
+            <td class="px-6 py-3">
+<span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $levelClass }}">{{ ucfirst($level) }}</span>            </td>
           </tr>
         @empty
           <tr>

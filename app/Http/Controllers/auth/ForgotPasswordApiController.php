@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Support\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
 
 class ForgotPasswordApiController extends Controller
 {
@@ -16,22 +15,21 @@ class ForgotPasswordApiController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-        $status = Password::sendResetLink([
-            'email' => $validated['email'],
-        ]);
-
+      
         AuditLogger::log(
             action: 'auth.password_reset_link_requested',
             meta: [
                 'email' => $validated['email'],
-                'status' => $status,
+                'status' => 'manual_admin_verification_required',
             ],
             userId: optional($request->user())->id,
         );
 
         return response()->json([
-            'message' => __($status),
-            'sent' => $status === Password::RESET_LINK_SENT,
+            
+            'message' => __('For security, password reset requests are processed manually. Please contact an administrator for identity verification.'),
+            'sent' => false,
+            'requires_admin' => true,
         ]);
     }
 }

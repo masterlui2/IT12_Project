@@ -25,20 +25,14 @@
       <li><a href="{{ route('admin.dashboard') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.dashboard') ? $activeLinkClass : '' }}">
         <i class="fas fa-gauge text-blue-500"></i> <span>Dashboard</span></a></li>
 
-      <li><a href="{{ route('admin.systemManagement') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.systemManagement') ? $activeLinkClass : '' }}">
-        <i class="fas fa-cogs text-blue-500"></i> <span>System&nbsp;Management</span></a></li>
-
       <li><a href="{{ route('admin.userAccess') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.userAccess') ? $activeLinkClass : '' }}">
         <i class="fas fa-users text-blue-500"></i> <span>User&nbsp;&amp;&nbsp;Access</span></a></li>
 
       <li><a href="{{ route('admin.activity') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.activity') ? $activeLinkClass : '' }}">
         <i class="fas fa-clipboard-list text-blue-500"></i> <span>Audit&nbsp;Logs</span></a></li>
 
-      <li><a href="{{ route('admin.analytics') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.analytics') ? $activeLinkClass : '' }}">
-        <i class="fas fa-chart-bar text-blue-500"></i> <span>Analytics</span></a></li>
-
-      <li><a href="{{ route('admin.developerTools') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.developerTools') ? $activeLinkClass : '' }}">
-        <i class="fas fa-terminal text-blue-500"></i> <span>Developer&nbsp;Tools</span></a></li>
+     
+    
 
       <li><a href="{{ route('admin.documentation') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.documentation') ? $activeLinkClass : '' }}">
         <i class="fas fa-book text-blue-500"></i> <span>Documentation</span></a></li>
@@ -57,10 +51,11 @@
   <!-- Sign Out -->
   <div class="px-6 py-2">
     <a href="#">
-      <button class="text-gray-600 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition w-full flex items-center gap-2 text-left">
-        <i class="fas fa-right-from-bracket"></i> Sign out
+ <form method="POST" action="{{ route('logout') }}">
+      @csrf
+      <button type="submit" class="text-gray-600 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition w-full flex items-center gap-2 text-left">        <i class="fas fa-right-from-bracket"></i> Sign out
       </button>
-    </a>
+    </form>
   </div>
 
 </aside>
