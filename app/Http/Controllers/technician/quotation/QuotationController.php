@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Technician\Quotation;
-
+use App\Support\AuditLogger;
 use App\Models\Quotation;
 use App\Models\QuotationDetail;
 use App\Models\QuotationScope;
@@ -348,16 +348,24 @@ class QuotationController extends Controller
     }
 
     public function sendToManager($id,Request $request){
-        $quotation = Quotation::findOrFail($id);
-        if ($request->action === 'submit_manager') {
-                $quotation->update([
-                    'status' => 'pending',
-                    'date_issued' => now(),
-                ]);
+        $quotation = Quotation::with('jobOrder')->findOrFail($id);
+                if ($request->action === 'submit_manager') {
+           $quotation->update([
+                'status' => 'pending',
+                'date_issued' => now(),
+            ]);
 
-                return redirect()->route('technician.quotation')
-                    ->with('success', 'Quotation sent to manager for approval.');
-            }
+            AuditLogger::log('technician.quotation.sent_to_manager', [
+                'manager_user_id' => null,
+                'technician_id' => $quotation->technician_id,
+                'job_order_id' => optional($quotation->jobOrder)->id,
+                'quotation_id' => $quotation->id,
+                'inquiry_id' => $quotation->inquiry_id,
+            ], Auth::id());
+
+            return redirect()->route('technician.quotation')
+                ->with('success', 'Quotation sent to manager for approval.');
+        }
     }
 
     /**

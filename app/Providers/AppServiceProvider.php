@@ -2,15 +2,20 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
-use App\Models\User;
 use App\Models\Quotation;
-use App\Observers\UserObserver;
-use Illuminate\Support\Facades\View;
-use App\Models\Feedback;
+use App\Models\User;
 use App\Observers\QuotationObserver;
+use App\Observers\UserObserver;
+use App\Support\AuditLogger;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Fortify\Fortify;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -46,16 +51,39 @@ class AppServiceProvider extends ServiceProvider
 
         // Register model observers
         User::observe(UserObserver::class);
-         // Share recent feedback with any view that includes the testimonials partial
-        // View::composer('customer.about-feedback', function ($view) {
-        //     $recentFeedback = Feedback::with('user')
-        //         ->orderByDesc('Date_Submitted')
-        //         ->orderByDesc('created_at')
-        //         ->take(3)
-        //         ->get();
+        Quotation::observe(QuotationObserver::class);
 
-        //     $view->with('feedbacks', $recentFeedback);
-        // });
-        Quotation::observe(QuotationObserver::class);   // 👈 add this line
+        Event::listen(Failed::class, function (Failed $event): void {
+            $usernameField = Fortify::username();
+            $identifier = $event->credentials[$usernameField] ?? null;
+
+            AuditLogger::logAuthAttempt('auth.login.failed', $identifier, 'invalid_credentials', null, [
+                'guard' => $event->guard,
+                'method' => 'fortify_password',
+            ]);
+        });
+
+        Event::listen(Lockout::class, function (Lockout $event): void {
+            $usernameField = Fortify::username();
+
+            AuditLogger::logAuthAttempt(
+                'auth.login.failed',
+                $event->request->input($usernameField),
+                'throttled',
+                null,
+                [
+                    'method' => 'fortify_password',
+                    'username_field' => $usernameField,
+                ]
+            );
+        });
+
+        Event::listen(Login::class, function (Login $event): void {
+            $identifier = $event->user?->{Fortify::username()} ?? $event->user?->email;
+
+            AuditLogger::logAuthAttempt('auth.login.succeeded', $identifier, 'authenticated', $event->user?->id, [
+                'guard' => $event->guard,
+            ]);
+        });
     }
 }

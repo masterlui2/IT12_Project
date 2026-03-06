@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         // Call your manager seeder
         $this->call([
             ManagerUserSeeder::class,
+            AdminUserSeeder::class,
             TechnicianUserSeeder::class,
             ServiceTemplateSeeder::class,
             CustomerSeeder::class,

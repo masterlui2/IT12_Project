@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\JobOrder;
+use Illuminate\Support\Facades\Auth;
+use App\Support\AuditLogger;
 
 class JobOrderController extends Controller
 {
@@ -50,8 +52,18 @@ class JobOrderController extends Controller
 }
     public function markComplete($id)
     {
-        $job = JobOrder::findOrFail($id);
+        $job = JobOrder::with('quotation')->findOrFail($id);
         $job->markAsCompleted();
+
+        $quotation = $job->quotation;
+
+        AuditLogger::log('manager.job_order.completed', [
+            'manager_user_id' => Auth::id(),
+            'technician_id' => $job->technician_id,
+            'job_order_id' => $job->id,
+            'quotation_id' => $job->quotation_id,
+            'inquiry_id' => $quotation?->inquiry_id,
+        ], Auth::id());
 
         return redirect()->route('manager.job.index')
             ->with('success', 'Job marked as completed!');
@@ -69,11 +81,21 @@ class JobOrderController extends Controller
             'technician_id' => 'required|exists:technicians,id',
         ]);
 
-        $jobOrder = JobOrder::findOrFail($id);
-        
+        $jobOrder = JobOrder::with('quotation')->findOrFail($id);
+
         $jobOrder->update([
             'technician_id' => $request->technician_id,
         ]);
+
+        $quotation = $jobOrder->quotation;
+
+        AuditLogger::log('manager.job_order.technician_assigned', [
+            'manager_user_id' => Auth::id(),
+            'technician_id' => (int) $request->technician_id,
+            'job_order_id' => $jobOrder->id,
+            'quotation_id' => $jobOrder->quotation_id,
+            'inquiry_id' => $quotation?->inquiry_id,
+        ], Auth::id());
 
         return redirect()->back()->with('success', 'Technician assigned successfully.');
     }

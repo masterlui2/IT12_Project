@@ -104,7 +104,7 @@
   <div class="bg-white border rounded-lg shadow-sm">
     <div class="p-4 border-b flex justify-between items-center">
       <h3 class="font-semibold text-gray-700">Recent System Activity</h3>
-      <button class="text-blue-600 hover:underline text-sm">View Logs</button>
+<a href="{{ route('admin.activity') }}" class="text-blue-600 hover:underline text-sm">View Audit Logs</a>
     </div>
 
     <div class="overflow-x-auto">

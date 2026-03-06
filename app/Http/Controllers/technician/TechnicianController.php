@@ -10,6 +10,7 @@ use App\Models\Quotation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use App\Support\AuditLogger;
 class TechnicianController extends Controller
 {
     public function dashboard(){
@@ -205,6 +206,13 @@ class TechnicianController extends Controller
 if (Schema::hasColumn('inquiries', 'status')) {
             $inquiry->status = 'Acknowledged';
         }        $inquiry->save();
+        AuditLogger::log('technician.inquiry.claimed', [
+            'manager_user_id' => null,
+            'technician_id' => $technician->id,
+            'job_order_id' => null,
+            'quotation_id' => null,
+            'inquiry_id' => $inquiry->id,
+        ], Auth::id());
 
         return redirect()->route('technician.inquire.index')
             ->with('success', 'Inquiry INQ-' . str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) . ' claimed successfully.');

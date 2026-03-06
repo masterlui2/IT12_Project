@@ -154,7 +154,7 @@ Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFaceb
 Route::get('/terms-of-service', [SocialAuthController::class, 'terms'])->name('terms.service');
 Route::get('/privacy-policy', [SocialAuthController::class, 'privacy'])->name('privacy.policy');
 
-Route::prefix('/admin')->group(function (){
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('/admin')->group(function () {
     Route::get('/dashboard',[AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/system-management',[AdminController::class, 'systemManagement'])->name('admin.systemManagement');
     Route::get('/user-access',[AdminController::class, 'userAccess'])->name('admin.userAccess');

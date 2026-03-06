@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\JobOrder;
 use Carbon\Carbon;
+use App\Support\AuditLogger;
 
 class JobOrderTechnicianController extends Controller
 {
@@ -30,53 +31,9 @@ class JobOrderTechnicianController extends Controller
         // Search: JO id or customer name (via quotation/customer), or inquiry issue/device
         if ($request->filled('search')) {
             $search = trim($request->input('search'));
-
-            // If user types "JO-00001" or "00001"
-            $numericId = (int) preg_replace('/\D+/', '', $search);
-
-            $query->where(function ($q) use ($search, $numericId) {
-                if ($numericId > 0) {
-                    $q->orWhere('id', $numericId);
-                }
-
-                // If you still have a job_orders.customer_name column, this will work too:
-                $q->orWhere('customer_name', 'like', "%{$search}%");
-
-                // Search from quotation
-                $q->orWhereHas('quotation', function ($qq) use ($search) {
-                    $qq->where('client_name', 'like', "%{$search}%")
-                       ->orWhere('project_title', 'like', "%{$search}%");
-                });
-
-                // Search from customer relation (if exists)
-                $q->orWhereHas('quotation.customer', function ($qc) use ($search) {
-                    $qc->where('firstname', 'like', "%{$search}%")
-                       ->orWhere('lastname', 'like', "%{$search}%")
-                       ->orWhereRaw("CONCAT(firstname,' ',lastname) LIKE ?", ["%{$search}%"]);
-                });
-
-                // Search from inquiry relation (if exists)
-                $q->orWhereHas('quotation.inquiry', function ($qi) use ($search) {
-                    $qi->where('device_type', 'like', "%{$search}%")
-                       ->orWhere('issue_description', 'like', "%{$search}%");
-                });
-            });
         }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $jobOrders = (clone $query)->latest()->paginate(10);
-
-        $stats = [
-            'total'  => (clone $query)->count(),
-            'active' => (clone $query)->whereIn('status', ['scheduled', 'in_progress'])->count(),
-        ];
-
-        return view('technician.contents.job.index', compact('jobOrders', 'stats'));
     }
-
+            // If user types "JO-00001" or "00001"
     public function show($id)
     {
         $technician = Auth::user()->technician;
@@ -101,7 +58,12 @@ class JobOrderTechnicianController extends Controller
 
     public function update(Request $request, $id)
 {
-    $job = JobOrder::findOrFail($id);
+    $technician = Auth::user()->technician;
+
+    $job = JobOrder::with('quotation')
+        ->where('technician_id', $technician?->id)
+        ->findOrFail($id);
+
     $request->validate([
         'start_date' => 'required|date',
         'expected_finish_date' => 'nullable|date',
@@ -125,15 +87,15 @@ class JobOrderTechnicianController extends Controller
     // Calculate totals from items
     $subtotal = 0;
     $itemsData = [];
-    
+
     foreach ($request->items as $itemData) {
         if (!empty($itemData['name'])) {
             $quantity = (float) ($itemData['quantity'] ?? 0);
             $unitPrice = (float) ($itemData['unit_price'] ?? 0);
             $total = $quantity * $unitPrice;
-            
+
             $subtotal += $total;
-            
+
             $itemsData[] = [
                 'name' => $itemData['name'],
                 'description' => $itemData['description'] ?? '',
@@ -143,7 +105,7 @@ class JobOrderTechnicianController extends Controller
             ];
         }
     }
-    
+
     // Calculate downpayment (50%) and total amount (remaining balance)
     $downpayment = $subtotal * 0.50;
     $totalAmount = $subtotal - $downpayment; // Remaining balance after downpayment
@@ -162,17 +124,31 @@ class JobOrderTechnicianController extends Controller
 
     // Handle items: Delete all and recreate
     $job->items()->delete();
-    
+
     foreach ($itemsData as $item) {
         $job->items()->create($item);
     }
 
+    $quotation = $job->quotation;
+    $meta = [
+        'manager_user_id' => $quotation?->approved_by,
+        'technician_id' => $job->technician_id,
+        'job_order_id' => $job->id,
+        'quotation_id' => $job->quotation_id,
+        'inquiry_id' => $quotation?->inquiry_id,
+    ];
+
     // Handle action buttons
     if ($request->action === 'completed') {
         $job->markAsCompleted();
+
+        AuditLogger::log('technician.job_order.completed', $meta, Auth::id());
+
         return redirect()->route('technician.job.index')
             ->with('success', 'Job order marked as completed!');
     }
+
+    AuditLogger::log('technician.job_order.updated', $meta, Auth::id());
 
     // Default save action
     return redirect()->route('technician.job.index')
@@ -180,11 +156,27 @@ class JobOrderTechnicianController extends Controller
 }
 
     public function in_progress($id){
-       $job = JobOrder::findOrFail($id);
+       $technician = Auth::user()->technician;
+
+       $job = JobOrder::with('quotation')
+           ->where('technician_id', $technician?->id)
+           ->findOrFail($id);
+
        $job->update([
         'status' => 'in_progress',
-        'start_date' => now()->format('Y-m-d')  // or now()->toDateString()
+        'start_date' => now()->format('Y-m-d')
         ]);
+
+        $quotation = $job->quotation;
+
+        AuditLogger::log('technician.job_order.in_progress', [
+            'manager_user_id' => $quotation?->approved_by,
+            'technician_id' => $job->technician_id,
+            'job_order_id' => $job->id,
+            'quotation_id' => $job->quotation_id,
+            'inquiry_id' => $quotation?->inquiry_id,
+        ], Auth::id());
+
        return redirect()->route('technician.job.index');
     }
 }
