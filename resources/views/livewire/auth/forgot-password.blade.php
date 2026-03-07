@@ -29,7 +29,24 @@
                         </div>
                     </div>
                 @endif
-
+                     <!-- Request Status Timeline -->
+                <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                    <div class="flex gap-2">
+                        <div class="flex-shrink-0">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-medium text-blue-800 text-xs">{{ __('What happens after you submit this request?') }}</p>
+                            <ul class="mt-1 space-y-1 text-xs text-blue-700 list-disc pl-4">
+                                <li>{{ __('You will receive an email update regarding the status of your password reset request.') }}</li>
+                                <li>{{ __('An admin will manually review your request and decide whether to approve or reject it.') }}</li>
+                                <li>{{ __('Once acknowledged by the admin, notification may take at least a few days depending on verification volume.') }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>div>
                 <!-- Verification Notice -->
                 <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
                     <div class="flex gap-2">

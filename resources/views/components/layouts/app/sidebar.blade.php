@@ -19,11 +19,11 @@
       <ul class="space-y-1">
         <!-- Dashboard -->
         <li>
-          <a href="{{ route('dashboard') }}"
+        <a href="{{ route('manager.dashboard') }}"
              class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-             {{ Route::is('dashboard') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'hover:bg-gray-50 text-gray-700' }}">
+             {{ Route::is('manager.dashboard') || Route::is('dashboard') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'hover:bg-gray-50 text-gray-700' }}">
              <div class="w-8 h-8 flex items-center justify-center rounded-lg
-               {{ Route::is('dashboard') ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }}">
+               {{ Route::is('manager.dashboard') || Route::is('dashboard') ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }}">
                <i class="fas fa-gauge text-sm"></i>
              </div>
              <span class="text-sm font-medium">Dashboard</span>

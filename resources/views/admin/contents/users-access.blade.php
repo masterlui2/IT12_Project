@@ -117,18 +117,20 @@
     </div>
 
 
-    <div class="bg-white rounded-xl shadow-sm border">
+       <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
         <div class="px-6 py-4 border-b">
             <h3 class="font-semibold text-gray-700">Password Reset Requests</h3>
             <p class="text-sm text-gray-500 mt-1">
                 Review user identity details carefully before processing account recovery.
             </p>
         </div>
-
+         <div class="px-6 py-3 bg-slate-50/70 border-b text-xs text-slate-600">
+            Pending requests require review before a reset email update is sent to the requester.
+        </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 text-gray-600">
+               <thead class="bg-gray-50 text-gray-600 uppercase tracking-wide text-xs">
                     <tr>
                         <th class="px-6 py-3 text-left">Submitted</th>
                         <th class="px-6 py-3 text-left">User Details</th>
@@ -140,9 +142,10 @@
 
                 <tbody class="divide-y">
                     @forelse($passwordResetRequests as $requestItem)
-                        <tr class="hover:bg-gray-50">
+                                                <tr class="hover:bg-slate-50/70 align-top">
                             <td class="px-6 py-4 align-top text-gray-600">
-                                {{ $requestItem->created_at?->format('Y-m-d H:i') }}
+                                  <p class="font-medium text-gray-700">{{ $requestItem->created_at?->format('M d, Y') }}</p>
+                                <p class="text-xs text-gray-500">{{ $requestItem->created_at?->format('h:i A') }}</p>
                             </td>
 
                             <td class="px-6 py-4 align-top">
@@ -157,12 +160,19 @@
                                 </div>
                             </td>
 
-                            <td class="px-6 py-4 text-gray-700 align-top">
-                                {{ $requestItem->proof_details ?: '—' }}
+                         <td class="px-6 py-4 text-gray-700 align-top max-w-xs">
+                                @if($requestItem->proof_details)
+                                    <p class="text-sm leading-relaxed text-gray-700">{{ $requestItem->proof_details }}</p>
+                                @else
+                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">No additional proof submitted</span>
+                                @endif
                             </td>
 
                             <td class="px-6 py-4 align-top">
-                                <span class="px-3 py-1 text-xs rounded-full bg-blue-50 text-blue-700">
+                                <span class="px-3 py-1 text-xs rounded-full font-medium
+                                    {{ $requestItem->status === 'pending' ? 'bg-amber-50 text-amber-700' : '' }}
+                                    {{ $requestItem->status === 'approved' ? 'bg-green-50 text-green-700' : '' }}
+                                    {{ $requestItem->status === 'rejected' ? 'bg-rose-50 text-rose-700' : '' }}">
                                     {{ ucfirst(str_replace('_',' ',$requestItem->status)) }}
                                 </span>
                             </td>
@@ -225,29 +235,46 @@
 
 
 <div id="password-request-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
-  <div class="bg-white w-full max-w-md rounded-xl shadow-xl">
+ <div class="bg-white w-full max-w-lg rounded-xl shadow-xl overflow-hidden">
         <div class="px-5 py-4 border-b flex items-center justify-between">
             <h4 id="modal-title" class="font-semibold text-gray-800">Process Request</h4>
             <button type="button" class="text-gray-400 hover:text-gray-600" data-modal-close="password-request-modal">✕</button>
         </div>
 
 
-        <form id="password-request-form" method="POST" class="p-5 space-y-3">
+                <form id="password-request-form" method="POST" class="p-5 space-y-4">
             @csrf
             <p id="modal-description" class="text-sm text-gray-600"></p>
-
-
-            <div id="password-fields" class="space-y-3 hidden">
-                <input type="password" name="password" id="modal-password" placeholder="New password" class="w-full border-gray-300 rounded text-sm" minlength="8">
-                <input type="password" name="password_confirmation" id="modal-password-confirmation" placeholder="Confirm password" class="w-full border-gray-300 rounded text-sm" minlength="8">
+            <div class="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                Make sure notes clearly explain the verification decision for audit and user support follow-up.
             </div>
 
 
-            <textarea name="admin_notes" id="modal-notes" rows="3" placeholder="Admin notes" class="w-full border-gray-300 rounded text-sm"></textarea>
+            <div id="password-fields" class="space-y-3 hidden">
+                  <div>
+                    <label for="modal-password" class="mb-1 block text-xs font-medium text-gray-700">New Password</label>
+                    <input type="password" name="password" id="modal-password" placeholder="Minimum 8 characters" class="w-full rounded-lg border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500" minlength="8">
+                </div>
+                <div>
+                    <label for="modal-password-confirmation" class="mb-1 block text-xs font-medium text-gray-700">Confirm Password</label>
+                    <input type="password" name="password_confirmation" id="modal-password-confirmation" placeholder="Re-enter the password" class="w-full rounded-lg border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500" minlength="8">
+                </div>
+            </div>
 
-            <button id="modal-submit" type="submit" class="w-full text-white text-sm py-2 rounded bg-blue-600 hover:bg-blue-700">
-                Submit
-            </button>
+
+          <div>
+                <label for="modal-notes" class="mb-1 block text-xs font-medium text-gray-700">Admin Notes</label>
+                <textarea name="admin_notes" id="modal-notes" rows="3" placeholder="Admin notes" class="w-full rounded-lg border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-1">
+                <button type="button" class="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50" data-modal-close="password-request-modal">
+                    Cancel
+                </button>
+                <button id="modal-submit" type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700">
+                    Submit
+                </button>
+            </div>
         </form>
     </div>
 </div>
@@ -274,7 +301,7 @@
                     title.textContent = 'Reset Password';
                     description.textContent = `Set a new password for ${user} and include verification notes.`;
                     submitButton.textContent = 'Verify & Reset';
-                    submitButton.className = 'w-full text-white text-sm py-2 rounded bg-green-600 hover:bg-green-700';
+                     submitButton.className = 'w-full text-white text-sm py-2 rounded bg-green-600 hover:bg-green-700';
                     passwordFields.classList.remove('hidden');
                     password.required = true;
                     passwordConfirmation.required = true;
@@ -284,7 +311,7 @@
                     title.textContent = 'Reject Request';
                     description.textContent = `Provide a reason for rejecting ${user}'s request.`;
                     submitButton.textContent = 'Reject Request';
-                    submitButton.className = 'w-full text-white text-sm py-2 rounded bg-red-600 hover:bg-red-700';
+                 submitButton.className = 'rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700';
                     passwordFields.classList.add('hidden');
                     password.required = false;
                     passwordConfirmation.required = false;
@@ -306,6 +333,13 @@
 
         modal.addEventListener('click', (event) => {
             if (event.target === modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                form.reset();
+            }
+        });
+document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
                 form.reset();
