@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Customer;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class CustomerSeeder extends Seeder
 {
@@ -15,14 +14,15 @@ class CustomerSeeder extends Seeder
      */
     public function run(): void
     {
+        $password = (string) env('SEED_CUSTOMER_PASSWORD') ?: Str::random(40);
         User::updateOrCreate(
-            ['email' => 'imbaxgx1fromyt@gmail.com'],  // lookup
+            ['email' => 'imbaxgx1fromyt@gmail.com'],
             [
                 'firstname' => 'Tom German',
                 'lastname' => 'Arizobal',
-                'password' => Hash::make('12345678'), // change this
-                'birthday' => '2005-04-12', // change this
-                'role' => 'customer', // requires you added this column
+                'password' => Hash::make($password),
+                'birthday' => '2005-04-12',
+                'role' => 'customer',
             ]
         );
     }
