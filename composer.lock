@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "89dff8dbe1dc1c3a624824b24d611df5",
+    "content-hash": "ba4d6ed1105fe7990bc50daa8b4d229a",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -997,6 +997,68 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "filastudio/laravel-vigil",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/filastudio/laravel-vigil.git",
+                "reference": "5e9b410d14f81d7462f250fa46f019ed256ff61e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/filastudio/laravel-vigil/zipball/5e9b410d14f81d7462f250fa46f019ed256ff61e",
+                "reference": "5e9b410d14f81d7462f250fa46f019ed256ff61e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^11.0|^12.0",
+                "illuminate/database": "^11.0|^12.0",
+                "illuminate/http": "^11.0|^12.0",
+                "illuminate/support": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.0|^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0",
+                "phpstan/phpstan": "^1.0|^2.0"
+            },
+            "suggest": {
+                "filament/filament": "Required for the Filament v5 dashboard integration (^5.0)"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "FilaStudio\\Vigil\\VigilServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "FilaStudio\\Vigil\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "FilaStudio",
+                    "email": "filastudio09@gmail.com"
+                }
+            ],
+            "description": "A security audit package for Laravel applications with Filament v5 integration.",
+            "support": {
+                "issues": "https://github.com/filastudio/laravel-vigil/issues",
+                "source": "https://github.com/filastudio/laravel-vigil/tree/v1.0.0"
+            },
+            "time": "2026-02-22T16:57:00+00:00"
         },
         {
             "name": "firebase/php-jwt",
