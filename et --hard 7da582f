@@ -1,0 +1,102 @@
+[33m7da582f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Security
+[33m10b3c5b[m Fixing the UI (admin)
+[33m5dd25a9[m Audit working
+[33mbd4265b[m Audit logs
+[33mff3107a[m Bugs audit log
+[33m4d7c084[m Final fixed bugs
+[33m1cead58[m security
+[33m50ea4aa[m Reg security
+[33md96317e[m Wow
+[33mafc3f8a[m fixing csv bug
+[33mc62b7eb[m update on manager UI reports
+[33m658bdec[m adding libpq-dev
+[33m73db062[m update on database
+[33m9a50a80[m added start.sh and fixing some issues idk if it works
+[33m07e11c8[m adding docker and nginx
+[33m9799eea[m few updates
+[33me387222[m revision
+[33m1bfb116[m Added service table
+[33mbf4877e[m Fixed the UI on the inquiry and the grand total on the reports
+[33m58d8765[m Fixed
+[33mc0522e7[m to fix
+[33m5111bec[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33md20bd02[m Manager and technician stats and chart is now dynamic
+[33m4dff618[m Review and Complete finsihed technician and manager connection
+[33m0624ee9[m cleaning the show on job order
+[33m7914410[m fixed a minor bug
+[33mbc7f35c[m Job Order finished and working
+[33m13efb28[m wtf why are we losing some files
+[33m91b5a46[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m391cf14[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m5f02cbf[m Added attachment files/images on messages and working on manager job order
+[33m0afbbb6[m[33m ([m[1;31morigin/Ken[m[33m)[m fixing db
+[33m7c2a49d[m fixed the index on quotation technician
+[33m1e5bbbe[m fixed the technician controller that affected inquiry
+[33meaa57d1[m fixed the customer inquiry
+[33mf45ee93[m fixing the web.php
+[33m093ed74[m fixing the header on Ken
+[33md06699b[m resolve conflicts
+[33m39ecae0[m resolve
+[33me64a7d4[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m13a440d[m unfinished updates job order
+[33md34262c[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m89ebbef[m Enhanced UI and added floating customer support
+[33meb3a77c[m added scope and waiver turned immutable on the job order
+[33mba55687[m Added a send to manager on the show quotation if the item was drafted
+[33m5ec4a81[m fixing the db cause idk what tf just happened
+[33m18ce7bf[m added the template
+[33mf14c09b[m immutable job order
+[33mac57ba3[m updated the UI on the inquiry to match the HCI
+[33mce9e923[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project into Ken
+[33m446b253[m improving the homepage/and the actions of inquiry in tech side
+[33m7eed264[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m4adae77[m Messages function(technician)
+[33m1ea50f0[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m8475b63[m finishing the job order but i got to pull
+[33md086f2c[m Merge remote-tracking branch 'origin/main' into Ken
+[33ma434bf2[m Added return button on inquiry form  and sales component(Manager)
+[33mbce44fc[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m5343a8c[m Feedbacks
+[33me79854a[m Merge remote-tracking branch 'origin/main' into Ken
+[33m8656027[m bug fixing and made job order
+[33m532e65b[m Merge remote-tracking branch 'origin/main' into Ken
+[33mbc62a79[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33mec923f5[m fixing back the customer header
+[33m555c3a0[m Feedbacks Function
+[33ma166402[m Feedbacks Function
+[33m5beda8b[m merging with latest
+[33mad93ca5[m unfinished job order
+[33mcdd11e2[m pushing fully functioning Quotation and Inquiry
+[33mdb573f9[m Resolve merge conflicts after pulling main
+[33mb2c02a8[m Feedbacks
+[33mea47472[m forgot to save
+[33m8c16234[m added the assign function, walk-in function, and even show the inquiry detail
+[33med8ede5[m made a lot of functionality on the inquiry-quotation side might create views especially for the manager side
+[33m8a11699[m unfinished inquiry
+[33m96b1dd7[m Customer feedbacks
+[33mb790796[m Working on feedbacks
+[33m5087942[m merging to luigi also deleted the customer.welcome cause its useless since we are using the layouts.welcome
+[33md057899[m added functionality and updated a lot in the inquiry of customer also cleaned some folder
+[33m8aea4d0[m Homepage feedbacks and about us section
+[33m7efecf5[m Merge remote-tracking branch 'origin/main' into Ken
+[33m60800e8[m merging main
+[33mfa1ed84[m change what customer say to feedback on public/folder
+[33m15728ee[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33ma3111c4[m New header arrangement
+[33m2eb0707[m erge remote-tracking branch 'origin/main' into Ken
+[33m3314979[m Merge branch 'red-xavier' of https://github.com/masterlui2/IT12_Project
+[33m3df0dd1[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m6b7d74c[m Merge branch 'Ken' of https://github.com/masterlui2/IT12_Project
+[33me9c4e46[m idk changes
+[33m130ca46[m[33m ([m[1;31morigin/red-xavier[m[33m)[m i merge the updated in main to my code
+[33m3179700[m updated
+[33m5613268[m[33m ([m[1;31morigin/Diputado[m[33m)[m eerge branch 'main' of https://github.com/masterlui2/IT12_Project into Diputado
+[33me6898f3[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project
+[33m7cdbb86[m Added track repair and messages to the header for logged in customers
+[33m264a9f2[m alert dot in inquiries sidebar both technician and manager module
+[33m1adb142[m adding alert icon in manager side inquiry table
+[33m5949bfa[m[33m ([m[1;31morigin/Genshirog[m[33m)[m Merge branch 'Ken' of https://github.com/masterlui2/IT12_Project into Genshirog
+[33mf737005[m working on manager UI
+[33m2a4c0ab[m inhancing the design of technician table's and functionality of buttons
+[33md31d0b7[m Merge branch 'main' of https://github.com/masterlui2/IT12_Project into Genshirog
+[33m6389b5d[m Changes
