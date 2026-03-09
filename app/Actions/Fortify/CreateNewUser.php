@@ -3,7 +3,6 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -30,32 +29,13 @@ class CreateNewUser implements CreatesNewUsers
                 'max:255',
                 Rule::unique(User::class),
             ],
-            'password' => $this->passwordRules(),
-            'g-recaptcha-response' => [
-                function (string $attribute, mixed $value, \Closure $fail): void {
-                    $siteKey   = (string) config('services.recaptcha.site_key');
-                    $secretKey = (string) config('services.recaptcha.secret_key');
-
-                    if ($siteKey === '' || $secretKey === '') {
-                        $fail('Captcha is not configured. Please contact support.');
-                        return;
-                    }
-
-                    $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-                        'secret'   => $secretKey,
-                        'response' => $value,
-                    ]);
-
-                    if (! $response->ok() || ! $response->json('success')) {
-                        $fail('Captcha verification failed. Please try again.');
-                    }
-                },
-            ],
+            'password'    => $this->passwordRules(),
+            'human_check' => ['accepted'], // must be checked (value: "1", "true", "on", "yes")
         ];
 
-        Validator::make($input, $rules)->validate();
-
-        session()->forget('human_challenge_answer');
+        Validator::make($input, $rules, [
+            'human_check.accepted' => 'Please confirm you are human before registering.',
+        ])->validate();
 
         return User::create([
             'firstname' => $input['first_name'],

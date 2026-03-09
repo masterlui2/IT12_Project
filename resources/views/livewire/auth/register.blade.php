@@ -59,9 +59,11 @@
                     :placeholder="__('Password')"
                     viewable
                 />
-               <p class="-mt-4 text-xs text-zinc-600 dark:text-zinc-400">
+
+                <p class="-mt-4 text-xs text-zinc-600 dark:text-zinc-400">
                     {{ __('Password must be at least 12 characters and include uppercase, lowercase, number, and special character.') }}
                 </p>
+
                 <flux:input
                     name="password_confirmation"
                     :label="__('Confirm password')"
@@ -72,20 +74,19 @@
                     viewable
                 />
 
-                  <div>
-                    @if ($recaptchaEnabled)
-                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-                   @else
-                        <p class="text-sm text-red-600">
-                            {{ __('Captcha is unavailable right now. Please contact support.') }}
-                        </p>
-               @endif
+              {{-- Real Google reCAPTCHA --}}
+<div>
+    <div class="g-recaptcha" data-sitekey="{{ $siteKey }}"></div>
 
-                    @error('g-recaptcha-response')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+    @error('g-recaptcha-response')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+</div>
 
+{{-- reCAPTCHA script before closing tag --}}
+@push('scripts')
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+@endpush
                 <flux:button variant="primary" type="submit" class="w-full py-3 text-base font-semibold">
                     {{ __('Create account') }}
                 </flux:button>
@@ -99,8 +100,4 @@
             </div>
         </div>
     </div>
-
-    @if ($recaptchaEnabled)
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    @endif
 </x-layouts.auth>
