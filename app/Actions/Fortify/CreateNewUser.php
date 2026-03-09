@@ -21,9 +21,9 @@ class CreateNewUser implements CreatesNewUsers
     {
         $rules = [
             'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'birthday' => ['required', 'date'],
-            'email' => [
+            'last_name'  => ['required', 'string', 'max:255'],
+            'birthday'   => ['required', 'date'],
+            'email'      => [
                 'required',
                 'string',
                 'email',
@@ -31,17 +31,18 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
-        ];
-
-        $recaptchaEnabled = filled(config('services.recaptcha.site_key'))
-            && filled(config('services.recaptcha.secret_key'));
-
-        if ($recaptchaEnabled) {
-            $rules['g-recaptcha-response'] = [
-                'required',
+            'g-recaptcha-response' => [
                 function (string $attribute, mixed $value, \Closure $fail): void {
+                    $siteKey   = (string) config('services.recaptcha.site_key');
+                    $secretKey = (string) config('services.recaptcha.secret_key');
+
+                    if ($siteKey === '' || $secretKey === '') {
+                        $fail('Captcha is not configured. Please contact support.');
+                        return;
+                    }
+
                     $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-                        'secret' => (string) config('services.recaptcha.secret_key'),
+                        'secret'   => $secretKey,
                         'response' => $value,
                     ]);
 
@@ -49,19 +50,8 @@ class CreateNewUser implements CreatesNewUsers
                         $fail('Captcha verification failed. Please try again.');
                     }
                 },
-            ];
-        } else {
-            $rules['human_challenge_answer'] = [
-                'required',
-                function (string $attribute, mixed $value, \Closure $fail): void {
-                    $expected = (string) session('human_challenge_answer', '');
-
-                    if ($expected === '' || trim((string) $value) !== $expected) {
-                        $fail('Human verification answer is incorrect.');
-                    }
-                },
-            ];
-        }
+            ],
+        ];
 
         Validator::make($input, $rules)->validate();
 
@@ -69,11 +59,11 @@ class CreateNewUser implements CreatesNewUsers
 
         return User::create([
             'firstname' => $input['first_name'],
-            'lastname' => $input['last_name'],
-            'birthday' => $input['birthday'],
-            'email' => $input['email'],
-            'password' => $input['password'],
-            'role' => 'customer',
+            'lastname'  => $input['last_name'],
+            'birthday'  => $input['birthday'],
+            'email'     => $input['email'],
+            'password'  => $input['password'],
+            'role'      => 'customer',
         ]);
     }
 }

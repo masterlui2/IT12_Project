@@ -54,19 +54,10 @@ class FortifyServiceProvider extends ServiceProvider
             $recaptchaEnabled = filled(config('services.recaptcha.site_key'))
                 && filled(config('services.recaptcha.secret_key'));
 
-            $humanChallenge = null;
-
-            if (! $recaptchaEnabled) {
-                $left = random_int(2, 9);
-                $right = random_int(1, 9);
-
-                session(['human_challenge_answer' => $left + $right]);
-                $humanChallenge = "{$left} + {$right}";
-            }
+        
 
             return view('livewire.auth.register', [
                 'recaptchaEnabled' => $recaptchaEnabled,
-                'humanChallenge' => $humanChallenge,
             ]);
         });
         Fortify::resetPasswordView(fn () => view('livewire.auth.reset-password'));
