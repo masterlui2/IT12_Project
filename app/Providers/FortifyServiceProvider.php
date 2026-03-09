@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use Illuminate\Http\RedirectResponse;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -84,7 +85,16 @@ class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
-            return Limit::perMinutes(15, 5)->by($throttleKey);
+          return Limit::perMinutes(15, 5)
+                ->by($throttleKey)
+                ->response(function (Request $request, array $headers): RedirectResponse {
+                    $retryAfterSeconds = (int) ($headers['Retry-After'] ?? 60);
+                    $retryAfterMinutes = max(1, (int) ceil($retryAfterSeconds / 60));
+
+                    return back()
+                        ->withInput($request->only(Fortify::username(), 'remember'))
+                        ->with('lockout_message', "You have exceeded the login limit. try again after {$retryAfterMinutes} min");
+                });
         });
     }
 }

@@ -13,8 +13,11 @@
                 />
             </div>
 
-            <!-- Session status -->
-            <x-auth-session-status class="text-center" :status="session('status')" />
+           @if (session('lockout_message'))
+                <div class="mx-auto w-full max-w-lg border-l-4 border-red-500 bg-gray-100 px-5 py-4 text-sm text-gray-700 shadow-sm">
+                    {{ session('lockout_message') }}
+                </div>
+            @endif
 
             <!-- Login form -->
             <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6 text-left mx-auto w-full max-w-lg">

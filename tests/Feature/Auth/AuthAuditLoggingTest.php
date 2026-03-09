@@ -53,7 +53,25 @@ class AuthAuditLoggingTest extends TestCase
                 ->contains(fn (AuditLog $log) => ($log->meta['reason'] ?? null) === 'throttled')
         );
     }
+     public function test_throttled_login_shows_clean_lockout_message_instead_of_error_page(): void
+    {
+        $user = User::factory()->create();
 
+        foreach (range(1, 6) as $attempt) {
+            $response = $this->from(route('login'))->post(route('login.store'), [
+                'email' => $user->email,
+                'password' => 'wrong-password',
+            ]);
+        }
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('lockout_message');
+
+        $this->assertStringContainsString(
+            'You have exceeded the login limit. try again after',
+            session('lockout_message')
+        );
+    }
     public function test_successful_fortify_login_is_audited(): void
     {
         $user = User::factory()->withoutTwoFactor()->create();
