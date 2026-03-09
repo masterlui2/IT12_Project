@@ -2,13 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\ServiceTemplate;
-use App\Models\ServiceTemplateScope;
-use App\Models\ServiceTemplateScopeCase;
-use App\Models\ServiceTemplateWaiver;
-use App\Models\ServiceTemplateWaiverCase;
-use App\Models\ServiceTemplateDeliverable;
+use Illuminate\Database\Seeder;
 
 class ServiceTemplateSeeder extends Seeder
 {

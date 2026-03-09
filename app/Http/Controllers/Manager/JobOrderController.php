@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\JobOrder;
-use Illuminate\Support\Facades\Auth;
 use App\Support\AuditLogger;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobOrderController extends Controller
 {
     public function index(Request $request)
-{  
-    // Optional filters from search & status
     {
+        // Optional filters from search & status
+
         // Optional filters from search & status
         $query = JobOrder::query();
         $filters = $request->only(['search', 'status']);
@@ -48,8 +48,9 @@ class JobOrderController extends Controller
             'stats' => $stats,
             'filters' => $filters,
         ]);
+
     }
-}
+
     public function markComplete($id)
     {
         $job = JobOrder::with('quotation')->findOrFail($id);
@@ -72,6 +73,7 @@ class JobOrderController extends Controller
     public function show($id)
     {
         $job = JobOrder::with('quotation')->findOrFail($id);
+
         return view('manager.job.show', compact('job'));
     }
 

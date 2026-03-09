@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Models\Quotation;
 use App\Models\JobOrder;
+use App\Models\Quotation;
 
 class QuotationObserver
 {

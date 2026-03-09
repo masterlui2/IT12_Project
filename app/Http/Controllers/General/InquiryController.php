@@ -2,46 +2,45 @@
 
 namespace App\Http\Controllers\General;
 
-use Illuminate\Http\Request;
-use App\Models\Inquiry; // create this model if it doesn't exist
 use App\Http\Controllers\Controller;
+use App\Models\Inquiry; // create this model if it doesn't exist
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class InquiryController extends Controller
-
 {
     // Show the inquiry form
     public function create()
     {
         $services = \App\Models\Service::all();
-        if(Auth::check()){
+        if (Auth::check()) {
             // Fetch all services from database
-            
-            
-            return match(Auth::user()->role){
-                'technician'   => view('technician.contents.inquiries.create', compact('services')),
-                'customer'     => view('customer.inquiries.create', compact('services')),
-                default        => view('customer.inquiries.create', compact('services'))
+
+            return match (Auth::user()->role) {
+                'technician' => view('technician.contents.inquiries.create', compact('services')),
+                'customer' => view('customer.inquiries.create', compact('services')),
+                default => view('customer.inquiries.create', compact('services'))
             };
         }
-        return view('customer.inquiries.create',compact('services'));
+
+        return view('customer.inquiries.create', compact('services'));
     }
 
     // Save the inquiry
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'               => 'required|string|max:255',
-            'email'              => 'required|email',
-            'contact_number'     => 'required|string|max:20',
-            'service_location'   => 'required|string',
-            'category'           => 'required|string',
-            'device_details'     => 'nullable|string|max:255',
-            'issue_description'  => 'required|string|max:2000',
-            'urgency'            => 'required|in:Normal,Urgent,Flexible',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'contact_number' => 'required|string|max:20',
+            'service_location' => 'required|string',
+            'category' => 'required|string',
+            'device_details' => 'nullable|string|max:255',
+            'issue_description' => 'required|string|max:2000',
+            'urgency' => 'required|in:Normal,Urgent,Flexible',
             'preferred_schedule' => 'nullable|date',
-            'photo'              => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-            'referral_source'    => 'nullable|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'referral_source' => 'nullable|string',
         ]);
 
         // Handle photo upload
@@ -71,18 +70,19 @@ class InquiryController extends Controller
                     $validated['status'] = 'Acknowledged';  // starts directly as acknowledged/claimed
                 }
             }
-            } else {
+        } else {
             $validated['user_id'] = null;
         }
 
         Inquiry::create($validated);
-                    
+
         return redirect()->back()->with('success', 'Inquiry submitted successfully!');
     }
 
     public function index()
     {
         $inquiries = Inquiry::orderBy('created_at', 'desc')->get();
+
         return view('manager.inquiries', compact('inquiries'));
     }
 
@@ -91,6 +91,4 @@ class InquiryController extends Controller
         // create this view: resources/views/manager/inquiry-show.blade.php (or whatever name you prefer)
         return view('manager.inquiries', compact('inquiry'));
     }
-    
-
 }

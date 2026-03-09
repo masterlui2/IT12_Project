@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,6 +30,7 @@ class Technician extends Model
         if ($this->user) {
             return trim("{$this->user->firstname} {$this->user->lastname}");
         }
+
         return null;
     }
 

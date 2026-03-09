@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+    public function up(): void
     {
         Schema::table('feedback', function (Blueprint $table) {
             $table->string('category')->nullable()->after('rating');

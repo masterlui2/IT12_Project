@@ -37,7 +37,7 @@ class Service extends Model
     ];
 
     // If you don't want timestamps, you can set this to false:
-    // public $timestamps = false; 
+    // public $timestamps = false;
     // However, your schema includes created_at and updated_at, so it's usually true by default.
 
     public function inquiries()
@@ -46,4 +46,3 @@ class Service extends Model
         return $this->hasMany(Inquiry::class, 'category', 'name');
     }
 }
-

@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('job_parts', function (Blueprint $table) {
+        Schema::create('blocked_ips', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('Job_ID');
-            $table->unsignedBigInteger('Part_ID');
-            $table->integer('Quantity_Used');
-            $table->decimal('Subtotal', 2, 0);
+            $table->string('ip_address', 45)->unique();
+            $table->string('reason', 255)->nullable();
+            $table->foreignId('blocked_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('blocked_at');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('job_parts');
+        Schema::dropIfExists('blocked_ips');
     }
 };

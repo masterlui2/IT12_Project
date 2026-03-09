@@ -20,11 +20,12 @@ class AdminAccessTest extends TestCase
         $this->assertSame('admin/analytics', Route::getRoutes()->getByName('admin.analytics')?->uri());
         $this->assertSame('admin/devtools', Route::getRoutes()->getByName('admin.developerTools')?->uri());
         $this->assertSame('admin/documentation', Route::getRoutes()->getByName('admin.documentation')?->uri());
+        $this->assertSame('admin/ip-blocking', Route::getRoutes()->getByName('admin.ipBlocking')?->uri());
     }
 
     public function test_guests_are_redirected_to_login_for_admin_routes(): void
     {
-        $response = $this->get(route('admin.activity'));
+               $response = $this->get(route('admin.ipBlocking'));
 
         $response->assertRedirect(route('login'));
     }
@@ -34,7 +35,7 @@ class AdminAccessTest extends TestCase
         $customer = User::factory()->create(['role' => 'customer']);
         $this->actingAs($customer);
 
-        $response = $this->get(route('admin.activity'));
+        $response = $this->get(route('admin.ipBlocking'));
 
         $response->assertForbidden();
     }
@@ -44,7 +45,7 @@ class AdminAccessTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
         $this->actingAs($admin);
 
-        $response = $this->get(route('admin.activity'));
+                $response = $this->get(route('admin.ipBlocking'));
 
         $response->assertOk();
     }

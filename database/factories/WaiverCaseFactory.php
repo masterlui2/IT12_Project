@@ -12,8 +12,8 @@ class WaiverCaseFactory extends Factory
     public function definition()
     {
         return [
-            'case_title'   => $this->faker->sentence(3),
-            'description'  => $this->faker->sentence(8),
+            'case_title' => $this->faker->sentence(3),
+            'description' => $this->faker->sentence(8),
         ];
     }
 }

@@ -32,7 +32,8 @@
         <i class="fas fa-clipboard-list text-blue-500"></i> <span>Audit&nbsp;Logs</span></a></li>
 
      
-    
+    <li><a href="{{ route('admin.ipBlocking') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.ipBlocking*') ? $activeLinkClass : '' }}">
+        <i class="fas fa-shield-halved text-blue-500"></i> <span>IP&nbsp;Blocking</span></a></li>
 
       <li><a href="{{ route('admin.documentation') }}" class="{{ $linkClass }} {{ request()->routeIs('admin.documentation') ? $activeLinkClass : '' }}">
         <i class="fas fa-book text-blue-500"></i> <span>Documentation</span></a></li>

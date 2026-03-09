@@ -1,10 +1,11 @@
 <?php
 
 namespace Database\Factories;
-use App\Models\Quotation;
+
 use App\Models\Customer;
-use App\Models\Technician;
+use App\Models\Quotation;
 use App\Models\QuotationDetail;
+use App\Models\Technician;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class QuotationFactory extends Factory
@@ -36,7 +37,7 @@ class QuotationFactory extends Factory
     {
         return $this->afterCreating(function (Quotation $quotation) {
             QuotationDetail::factory()->count(3)->create([
-                'quotation_id' => $quotation->id
+                'quotation_id' => $quotation->id,
             ]);
         });
     }

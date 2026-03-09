@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('quotation_details', function (Blueprint $table) {
-        $table->id();
-        $table->unsignedBigInteger('quotation_id');
-        $table->string('item_name')->nullable();
-        $table->text('description')->nullable();
-        $table->integer('quantity')->default(1);
-        $table->decimal('unit_price', 10, 2)->default(0);
-        $table->decimal('total', 12, 2)->default(0);
-        $table->timestamps();
+            $table->id();
+            $table->unsignedBigInteger('quotation_id');
+            $table->string('item_name')->nullable();
+            $table->text('description')->nullable();
+            $table->integer('quantity')->default(1);
+            $table->decimal('unit_price', 10, 2)->default(0);
+            $table->decimal('total', 12, 2)->default(0);
+            $table->timestamps();
 
-        $table->foreign('quotation_id')->references('id')->on('quotations')->onDelete('cascade');
-    });
+            $table->foreign('quotation_id')->references('id')->on('quotations')->onDelete('cascade');
+        });
     }
 
     /**

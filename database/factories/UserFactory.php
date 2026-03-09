@@ -24,13 +24,13 @@ class UserFactory extends Factory
     {
         return [
             'firstname' => $this->faker->firstName(),
-            'lastname'  => $this->faker->lastName(),
-            'email'     => $this->faker->unique()->safeEmail(),
+            'lastname' => $this->faker->lastName(),
+            'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password'  => bcrypt('password'), // or 'password' => 'password' (Laravel hashes automatically)
+            'password' => bcrypt('password'), // or 'password' => 'password' (Laravel hashes automatically)
             'remember_token' => Str::random(10),
-            'role'      => $this->faker->randomElement(['customer', 'technician', 'manager']),
-            'birthday'  => $this->faker->date(),
+            'role' => $this->faker->randomElement(['customer', 'technician', 'manager']),
+            'birthday' => $this->faker->date(),
         ];
     }
 

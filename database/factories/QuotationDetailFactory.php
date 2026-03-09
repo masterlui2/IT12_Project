@@ -12,11 +12,11 @@ class QuotationDetailFactory extends Factory
     public function definition()
     {
         return [
-            'item_name'   => $this->faker->word(),
+            'item_name' => $this->faker->word(),
             'description' => $this->faker->sentence(8),
-            'quantity'    => $this->faker->numberBetween(1, 3),
-            'unit_price'  => $this->faker->randomFloat(2, 250, 1500),
-            'total'       => $this->faker->randomFloat(2, 250, 4500),
+            'quantity' => $this->faker->numberBetween(1, 3),
+            'unit_price' => $this->faker->randomFloat(2, 250, 1500),
+            'total' => $this->faker->randomFloat(2, 250, 4500),
         ];
     }
 }

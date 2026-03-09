@@ -15,7 +15,6 @@ class ForgotPasswordApiController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-      
         AuditLogger::log(
             action: 'auth.password_reset_link_requested',
             meta: [
@@ -26,7 +25,7 @@ class ForgotPasswordApiController extends Controller
         );
 
         return response()->json([
-            
+
             'message' => __('For security, password reset requests are processed manually. Please contact an administrator for identity verification.'),
             'sent' => false,
             'requires_admin' => true,

@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-
 
 class Feedback extends Model
 {
@@ -25,8 +23,8 @@ class Feedback extends Model
 
     protected $casts = [
         'Date_Submitted' => 'datetime',
-        'created_at'     => 'datetime',
-        'updated_at'     => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function user()
@@ -37,13 +35,13 @@ class Feedback extends Model
     // Display name accessor
     public function getCustomerNameAttribute(): string
     {
-        if (!$this->user) {
+        if (! $this->user) {
             return 'Anonymous user';
         }
 
         $first = $this->user->firstname ?? '';
-        $last  = $this->user->lastname ?? '';
-        $full  = trim($first . ' ' . $last);
+        $last = $this->user->lastname ?? '';
+        $full = trim($first.' '.$last);
 
         if ($full !== '') {
             return $full;

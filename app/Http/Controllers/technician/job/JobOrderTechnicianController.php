@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Technician\Job;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\JobOrder;
-use Carbon\Carbon;
 use App\Support\AuditLogger;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobOrderTechnicianController extends Controller
 {
@@ -15,7 +15,7 @@ class JobOrderTechnicianController extends Controller
     {
         $technician = Auth::user()->technician;
 
-        if (!$technician) {
+        if (! $technician) {
             return redirect()->route('technician.dashboard')
                 ->with('error', 'No technician profile found for this account.');
         }
@@ -117,7 +117,7 @@ class JobOrderTechnicianController extends Controller
         $itemsData = [];
 
         foreach ($request->items as $itemData) {
-            if (!empty($itemData['name'])) {
+            if (! empty($itemData['name'])) {
                 $quantity = (float) ($itemData['quantity'] ?? 0);
                 $unitPrice = (float) ($itemData['unit_price'] ?? 0);
                 $total = $quantity * $unitPrice;

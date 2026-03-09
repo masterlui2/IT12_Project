@@ -49,7 +49,7 @@ Route::middleware(['auth', 'verified', 'role:customer'])
 
     });
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
-
+//Manager routes
 Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
     Route::get('/dashboard', [ManagerController::class, 'dashboard'])->name('dashboard');
     Route::patch('/job/update/{id}', [JobOrderController::class, 'update'])
@@ -167,8 +167,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('/admin')->group(f
     Route::get('/analytics',[AdminController::class, 'analytics'])->name('admin.analytics');
     Route::get('/devtools',[AdminController::class, 'developerTools'])->name('admin.developerTools');
     Route::get('/documentation',[AdminController::class, 'documentation'])->name('admin.documentation');
+    Route::get('/ip-blocking',[AdminController::class, 'ipBlocking'])->name('admin.ipBlocking');
+    Route::post('/ip-blocking',[AdminController::class, 'storeBlockedIp'])->name('admin.ipBlocking.store');
+    Route::delete('/ip-blocking/{blockedIp}',[AdminController::class, 'destroyBlockedIp'])->name('admin.ipBlocking.destroy');
 });
-
+//Technician routes
 Route::middleware(['auth','verified','role:technician'])->prefix('/technician')->group(function () {
     Route::get('/dashboard', [TechnicianController::class, 'dashboard'])->name('technician.dashboard');
     Route::get('/messages', [TechnicianController::class, 'messages'])->name('technician.messages');

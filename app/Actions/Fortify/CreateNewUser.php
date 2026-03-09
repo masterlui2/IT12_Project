@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Actions\Fortify;
-use Illuminate\Support\Facades\Http;
+
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -22,7 +23,7 @@ class CreateNewUser implements CreatesNewUsers
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'birthday' => ['required', 'date'],
-               'email' => [
+            'email' => [
                 'required',
                 'string',
                 'email',
@@ -30,7 +31,7 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
-            ];
+        ];
 
         $recaptchaEnabled = filled(config('services.recaptcha.site_key'))
             && filled(config('services.recaptcha.secret_key'));
@@ -65,13 +66,14 @@ class CreateNewUser implements CreatesNewUsers
         Validator::make($input, $rules)->validate();
 
         session()->forget('human_challenge_answer');
+
         return User::create([
             'firstname' => $input['first_name'],
             'lastname' => $input['last_name'],
             'birthday' => $input['birthday'],
             'email' => $input['email'],
             'password' => $input['password'],
-            'role'=> 'customer',
+            'role' => 'customer',
         ]);
     }
 }

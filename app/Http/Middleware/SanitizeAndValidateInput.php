@@ -18,21 +18,17 @@ class SanitizeAndValidateInput
     /**
      * Handle an incoming request.
      */
-   public function handle(Request $request, Closure $next): Response
-{
-    $sanitized = $this->sanitizeValue($request->all());
+    public function handle(Request $request, Closure $next): Response
+    {
+        $sanitized = $this->sanitizeValue($request->all());
 
-    $request->merge($sanitized);
+        $request->merge($sanitized);
 
-    return $next($request);
-}
+        return $next($request);
+    }
 
     /**
      * Recursively sanitize user input values.
-     *
-     * @param  mixed  $value
-     * @param  string|null  $key
-     * @return mixed
      */
     protected function sanitizeValue(mixed $value, ?string $key = null): mixed
     {
@@ -65,8 +61,6 @@ class SanitizeAndValidateInput
 
     /**
      * Detect common SQL injection signatures recursively.
-     *
-     * @param  mixed  $value
      */
     protected function containsSqlInjectionPattern(mixed $value): bool
     {

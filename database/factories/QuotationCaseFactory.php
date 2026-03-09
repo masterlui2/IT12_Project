@@ -12,7 +12,7 @@ class QuotationCaseFactory extends Factory
     public function definition()
     {
         return [
-            'case_title'       => $this->faker->sentence(3),
+            'case_title' => $this->faker->sentence(3),
             'case_description' => $this->faker->sentence(8),
         ];
     }

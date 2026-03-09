@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quotation;
-use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class PdfController extends Controller
 {
@@ -24,7 +22,7 @@ class PdfController extends Controller
                 'scopes.cases',
                 'waivers.cases',
                 'deliverables',
-                'signature'
+                'signature',
             ])->findOrFail($id);
 
             // Prepare data from the quotation
@@ -40,9 +38,9 @@ class PdfController extends Controller
         // Generate PDF
         $pdf = Pdf::loadView('technician.contents.quotations.pdf.pdf', $data);
         $pdf->setPaper('A4', 'portrait');
-        
+
         // Stream or download
-        return $pdf->stream('quotation_' . ($id ?? 'preview') . '.pdf');
+        return $pdf->stream('quotation_'.($id ?? 'preview').'.pdf');
     }
 
     /**
@@ -57,7 +55,7 @@ class PdfController extends Controller
             'scopes.cases',
             'waivers.cases',
             'deliverables',
-            'signature'
+            'signature',
         ])->findOrFail($id);
 
         $data = $this->prepareQuotationData($quotation);
@@ -65,8 +63,8 @@ class PdfController extends Controller
 
         $pdf = Pdf::loadView('technician.contents.quotations.pdf.pdf', $data);
         $pdf->setPaper('A4', 'portrait');
-        
-        return $pdf->download('quotation_' . $quotation->id . '.pdf');
+
+        return $pdf->download('quotation_'.$quotation->id.'.pdf');
     }
 
     /**
@@ -127,9 +125,9 @@ class PdfController extends Controller
         // Calculate timeline
         $timeline = '';
         if ($quotation->timeline_min_days && $quotation->timeline_max_days) {
-            $timeline = $quotation->timeline_min_days . '-' . $quotation->timeline_max_days . ' days';
+            $timeline = $quotation->timeline_min_days.'-'.$quotation->timeline_max_days.' days';
         } elseif ($quotation->timeline_min_days) {
-            $timeline = $quotation->timeline_min_days . ' days';
+            $timeline = $quotation->timeline_min_days.' days';
         } else {
             $timeline = 'To be determined';
         }
@@ -163,7 +161,7 @@ class PdfController extends Controller
         $logoBase64 = '';
         if (file_exists($logoPath)) {
             $imageData = base64_encode(file_get_contents($logoPath));
-            $logoBase64 = 'data:image/png;base64,' . $imageData;
+            $logoBase64 = 'data:image/png;base64,'.$imageData;
         } else {
             Log::warning("Logo not found at: {$logoPath}");
         }
@@ -176,7 +174,7 @@ class PdfController extends Controller
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mimeType = finfo_file($finfo, $repairServicePath);
             finfo_close($finfo);
-            $repairServiceBase64 = 'data:' . $mimeType . ';base64,' . $imageData;
+            $repairServiceBase64 = 'data:'.$mimeType.';base64,'.$imageData;
         } else {
             Log::warning("Repair service image not found at: {$repairServicePath}");
         }
@@ -184,13 +182,13 @@ class PdfController extends Controller
         // Client logo (if uploaded)
         $clientLogoBase64 = '';
         if (isset($data['client_logo_path']) && $data['client_logo_path']) {
-            $clientLogoPath = storage_path('app/public/' . $data['client_logo_path']);
+            $clientLogoPath = storage_path('app/public/'.$data['client_logo_path']);
             if (file_exists($clientLogoPath)) {
                 $imageData = base64_encode(file_get_contents($clientLogoPath));
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mimeType = finfo_file($finfo, $clientLogoPath);
                 finfo_close($finfo);
-                $clientLogoBase64 = 'data:' . $mimeType . ';base64,' . $imageData;
+                $clientLogoBase64 = 'data:'.$mimeType.';base64,'.$imageData;
             }
         }
 
@@ -214,18 +212,18 @@ class PdfController extends Controller
             'date_issued' => \Carbon\Carbon::now()->format('F d, Y'),
             'items' => [
                 [
-                    'name' => 'Laptop Replacement', 
-                    'desc' => 'New motherboard installed', 
-                    'qty' => 1, 
-                    'price' => 12500, 
-                    'total' => 12500
+                    'name' => 'Laptop Replacement',
+                    'desc' => 'New motherboard installed',
+                    'qty' => 1,
+                    'price' => 12500,
+                    'total' => 12500,
                 ],
                 [
-                    'name' => 'Diagnostic Fee', 
-                    'desc' => 'Initial system testing', 
-                    'qty' => 1, 
-                    'price' => 500, 
-                    'total' => 500
+                    'name' => 'Diagnostic Fee',
+                    'desc' => 'Initial system testing',
+                    'qty' => 1,
+                    'price' => 500,
+                    'total' => 500,
                 ],
             ],
             'subtotal' => 13000,
@@ -233,20 +231,20 @@ class PdfController extends Controller
             'total' => 14300,
             'scope' => [
                 [
-                    'scenario' => 'Hardware check', 
+                    'scenario' => 'Hardware check',
                     'cases' => [
                         [
-                            'case' => 'Motherboard check', 
-                            'desc' => 'Visual and multimeter testing'
-                        ]
-                    ]
-                ]
+                            'case' => 'Motherboard check',
+                            'desc' => 'Visual and multimeter testing',
+                        ],
+                    ],
+                ],
             ],
             'waivers' => [],
             'deliverables' => [
-                'Repaired motherboard', 
-                'Cleaned system', 
-                'Diagnostic report'
+                'Repaired motherboard',
+                'Cleaned system',
+                'Diagnostic report',
             ],
             'timeline' => '5-7 days',
             'terms_conditions' => 'Standard terms and conditions apply.',

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->decimal('diagnostic_fee',10,2)->default(0);
+            $table->decimal('diagnostic_fee', 10, 2)->default(0);
             $table->timestamps();
         });
     }

@@ -9,14 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
- public function up(): void
+    public function up(): void
     {
         Schema::create('quotation_waivers', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('quotation_id')
-                  ->constrained('quotations')
-                  ->onDelete('cascade');
+                ->constrained('quotations')
+                ->onDelete('cascade');
 
             // 👇 match the seeder fields
             $table->string('waiver_title')->nullable();

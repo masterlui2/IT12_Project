@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -58,7 +59,8 @@ class Inquiry extends Model
         return $query->where('status', $status);
     }
 
-    public function service(){
-        return $this->belongsTo(Service::class,'category','name');
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'category', 'name');
     }
 }

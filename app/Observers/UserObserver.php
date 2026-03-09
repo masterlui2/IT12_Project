@@ -2,9 +2,9 @@
 
 namespace App\Observers;
 
-use App\Models\User;
 use App\Models\Customer;
 use App\Models\Technician;
+use App\Models\User;
 
 class UserObserver
 {

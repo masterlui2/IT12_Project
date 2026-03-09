@@ -13,8 +13,8 @@ return new class extends Migration
 
             // Link to quotations table
             $table->foreignId('quotation_id')
-                  ->constrained('quotations')
-                  ->onDelete('cascade');
+                ->constrained('quotations')
+                ->onDelete('cascade');
 
             // 👇 This is what your model and controller use
             $table->string('deliverable_detail');

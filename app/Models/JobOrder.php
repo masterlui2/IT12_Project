@@ -24,7 +24,6 @@ class JobOrder extends Model
         'total_amount',
     ];
 
- 
     protected $casts = [
         'start_date' => 'date',
         'expected_finish_date' => 'date',

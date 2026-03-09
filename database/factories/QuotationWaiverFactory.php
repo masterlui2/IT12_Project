@@ -12,7 +12,7 @@ class QuotationWaiverFactory extends Factory
     public function definition()
     {
         return [
-            'waiver_title'       => $this->faker->sentence(3),
+            'waiver_title' => $this->faker->sentence(3),
             'waiver_description' => $this->faker->sentence(10),
         ];
     }

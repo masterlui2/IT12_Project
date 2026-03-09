@@ -1,20 +1,22 @@
 <?php
 
 namespace App\Http\Controllers\Technician;
+
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Inquiry;
-use App\Models\Message;
 use App\Models\JobOrder;
+use App\Models\Message;
 use App\Models\Quotation;
+use App\Support\AuditLogger;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
-use App\Support\AuditLogger;
+
 class TechnicianController extends Controller
 {
-    public function dashboard(){
- $technicianId = optional(Auth::user()->technician)->id;
+    public function dashboard()
+    {
+        $technicianId = optional(Auth::user()->technician)->id;
 
         $jobOrdersQuery = JobOrder::query()
             ->where('technician_id', $technicianId ?? 0);
@@ -24,7 +26,7 @@ class TechnicianController extends Controller
             'completed_jobs' => (clone $jobOrdersQuery)->where('status', 'completed')->count(),
             'open_inquiries' => Inquiry::query()
                 ->where('assigned_technician_id', $technicianId ?? 0)
-               ->when(Schema::hasColumn('inquiries', 'status'), function ($query) {
+                ->when(Schema::hasColumn('inquiries', 'status'), function ($query) {
                     $query->where(function ($statusQuery) {
                         $statusQuery->whereNull('status')->orWhere('status', '!=', 'closed');
                     });
@@ -36,11 +38,10 @@ class TechnicianController extends Controller
         ];
 
         $recentJobOrders = $jobOrdersQuery
-    ->with(['quotation.customer', 'quotation.inquiry'])
-    ->latest()
-    ->take(5)
-    ->get();
-
+            ->with(['quotation.customer', 'quotation.inquiry'])
+            ->latest()
+            ->take(5)
+            ->get();
 
         $recentInquiries = Inquiry::query()
             ->where('assigned_technician_id', $technicianId ?? 0)
@@ -60,9 +61,9 @@ class TechnicianController extends Controller
             'recentInquiries' => $recentInquiries,
             'recentQuotations' => $recentQuotations,
         ]);
-        }
+    }
 
-   public function messages(Request $request)
+    public function messages(Request $request)
     {
         $customerThreads = Message::with('user')
             ->whereHas('user', fn ($query) => $query->where('role', 'customer'))
@@ -104,7 +105,7 @@ class TechnicianController extends Controller
             'activeCustomerId' => $activeCustomerId,
             'activeInquiry' => $activeInquiry,
         ]);
-        }
+    }
 
     public function reporting()
     {
@@ -112,7 +113,7 @@ class TechnicianController extends Controller
 
         // Get job orders for this technician
         $jobOrders = JobOrder::where('technician_id', $technicianId)->get();
-        
+
         // Get recent job orders (latest 10)
         $recentJobs = JobOrder::where('technician_id', $technicianId)
             ->with(['quotation'])
@@ -146,20 +147,20 @@ class TechnicianController extends Controller
                 'completed_subtotal' => $jobOrders
                     ->where('status', 'completed')
                     ->sum('subtotal'),
-                
+
                 'downpayments' => $jobOrders
                     ->where('status', 'completed')
                     ->sum('downpayment'),
-                
+
                 'remaining_balance' => $jobOrders
                     ->where('status', 'completed')
                     ->sum('total_amount'),
-                
+
                 // Total revenue = completed job subtotals
                 'total' => $jobOrders
                     ->where('status', 'completed')
                     ->sum('subtotal'),
-            ]
+            ],
         ];
 
         return view('technician.contents.reporting', compact(
@@ -169,7 +170,6 @@ class TechnicianController extends Controller
         ));
     }
 
-
     public function inquire()
     {
         // Get the current technician record linked to the user
@@ -177,9 +177,9 @@ class TechnicianController extends Controller
 
         // Build query: show unclaimed or assigned to this technician only
         $inquiries = Inquiry::where(function ($q) use ($technician) {
-                $q->whereNull('assigned_technician_id')
+            $q->whereNull('assigned_technician_id')
                 ->orWhere('assigned_technician_id', $technician->id);
-            })
+        })
             ->orderByDesc('created_at')
             ->paginate(10);
 
@@ -203,7 +203,7 @@ class TechnicianController extends Controller
         }
 
         $inquiry->assigned_technician_id = $technician->id; // ✅ use technician ID
-if (Schema::hasColumn('inquiries', 'status')) {
+        if (Schema::hasColumn('inquiries', 'status')) {
             $inquiry->status = 'Acknowledged';
         }        $inquiry->save();
         AuditLogger::log('technician.inquiry.claimed', [
@@ -215,7 +215,7 @@ if (Schema::hasColumn('inquiries', 'status')) {
         ], Auth::id());
 
         return redirect()->route('technician.inquire.index')
-            ->with('success', 'Inquiry INQ-' . str_pad($inquiry->id, 5, '0', STR_PAD_LEFT) . ' claimed successfully.');
+            ->with('success', 'Inquiry INQ-'.str_pad($inquiry->id, 5, '0', STR_PAD_LEFT).' claimed successfully.');
     }
 
     public function inquireShow(int $id)
@@ -227,14 +227,17 @@ if (Schema::hasColumn('inquiries', 'status')) {
         return view('technician.contents.inquiries.show', compact('inquiry'));
     }
 
-    public function inquireDestroy(int $id){
+    public function inquireDestroy(int $id)
+    {
         $inq = Inquiry::findOrFail($id);
         $inq->delete();
+
         return redirect()->route('technician.inquire.index')
             ->with('status', 'Inquiry INQ-'.$id.' deleted');
     }
 
-    public function history(){
+    public function history()
+    {
         return view('technician.contents.history');
     }
 }

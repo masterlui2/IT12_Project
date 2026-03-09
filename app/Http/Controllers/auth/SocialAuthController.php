@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Support\AuditLogger;
 use Exception;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+
 class SocialAuthController extends Controller
 {
     // GOOGLE
@@ -34,9 +35,9 @@ class SocialAuthController extends Controller
             Auth::login($user);
 
             return redirect()->route('dashboard');
-            
+
         } catch (Exception $e) {
-              AuditLogger::logAuthAttempt('auth.login.failed', request()->input('email'), 'social_provider_error', null, [
+            AuditLogger::logAuthAttempt('auth.login.failed', request()->input('email'), 'social_provider_error', null, [
                 'provider' => 'google',
             ]);
 
@@ -52,7 +53,7 @@ class SocialAuthController extends Controller
     }
 
     public function handleFacebookCallback()
-{
+    {
         try {
             $fbUser = Socialite::driver('facebook')->user();
 
@@ -78,17 +79,17 @@ class SocialAuthController extends Controller
 
             return redirect()->route('login')
                 ->with('error', 'Failed to authenticate with Facebook. Please try again.');
-        
+
+        }
     }
-}
 
     public function terms()
     {
-        //return view('legal.terms');
+        // return view('legal.terms');
     }
 
     public function privacy()
     {
-        //return view('legal.privacy');
+        // return view('legal.privacy');
     }
 }

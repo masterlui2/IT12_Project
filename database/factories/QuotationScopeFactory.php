@@ -13,7 +13,7 @@ class QuotationScopeFactory extends Factory
     {
         return [
             'scenario_name' => $this->faker->sentence(3),
-            'description'   => $this->faker->paragraph(1),
+            'description' => $this->faker->paragraph(1),
         ];
     }
 }

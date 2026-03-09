@@ -13,7 +13,7 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 2)->default(0)->after('technician_notes');
             $table->decimal('downpayment', 10, 2)->default(0)->after('subtotal');
             $table->decimal('total_amount', 10, 2)->default(0)->after('downpayment');
-            
+
             // Optional: Add discount fields if needed
             // $table->decimal('discount_amount', 10, 2)->default(0)->after('subtotal');
             // $table->string('discount_type')->nullable()->after('discount_amount'); // 'percentage' or 'fixed'

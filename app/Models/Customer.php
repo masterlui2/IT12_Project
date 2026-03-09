@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Quotation;
+
 class Customer extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'user_id',
         'company_name',
@@ -15,7 +16,7 @@ class Customer extends Model
         'contact_number',
         'tin_number',
     ];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -25,8 +26,8 @@ class Customer extends Model
     {
         return $this->hasMany(Quotation::class);
     }
- 
-       public function feedback()
+
+    public function feedback()
     {
         return $this->hasMany(Feedback::class, 'Customer_ID');
     }

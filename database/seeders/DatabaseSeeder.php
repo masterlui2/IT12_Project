@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Quotation;
+use App\Models\Technician;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use App\Models\Customer;
-use App\Models\Technician;
-use App\Models\Quotation;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,7 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Example test user
-      
+
         // Call your manager seeder
         $this->call([
             ManagerUserSeeder::class,
@@ -25,12 +24,12 @@ class DatabaseSeeder extends Seeder
             ServiceTemplateSeeder::class,
             CustomerSeeder::class,
             ServiceSeeder::class,
-         ]);
-        //Technician::factory()->count(2)->create();
+        ]);
+        // Technician::factory()->count(2)->create();
 
         // // 5 customers
 
         // // 20 quotations (customers may repeat, technicians randomly assigned)
-        //Quotation::factory()->count(20)->create();
+        // Quotation::factory()->count(20)->create();
     }
 }

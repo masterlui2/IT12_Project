@@ -1,26 +1,28 @@
 <?php
 
 namespace App\Http\Controllers\Manager;
-use App\Models\AuditLog;
-use App\Support\AuditLogger;
-use Illuminate\Http\Request;
+
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Inquiry;
-use App\Models\User;
+use App\Models\JobOrder;
 use App\Models\Quotation;
 use App\Models\Technician;
-use App\Models\JobOrder;
+use App\Models\User;
+use App\Support\AuditLogger;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+
 class ManagerController extends Controller
 {
     public function dashboard(Request $request)
     {
         $range = $request->input('range', 'today');
-        $now   = Carbon::now();
+        $now = Carbon::now();
 
         switch ($range) {
             case 'week':
@@ -55,40 +57,40 @@ class ManagerController extends Controller
                 $inquiry = $job->quotation?->inquiry;
 
                 return [
-                    'id'         => $job->id,
-                    'customer'   => trim($customer?->firstname . ' ' . $customer?->lastname) ?: 'Customer',
-                    'device'     => $inquiry?->device_type ?? $inquiry?->issue_description ?? '—',
-                    'technician' => trim($technicianUser?->firstname . ' ' . $technicianUser?->lastname) ?: 'Unassigned',
-                    'status'     => $job->status ?? 'pending',
-                    'quoted'     => $job->quotation?->grand_total ?? 0,
+                    'id' => $job->id,
+                    'customer' => trim($customer?->firstname.' '.$customer?->lastname) ?: 'Customer',
+                    'device' => $inquiry?->device_type ?? $inquiry?->issue_description ?? '—',
+                    'technician' => trim($technicianUser?->firstname.' '.$technicianUser?->lastname) ?: 'Unassigned',
+                    'status' => $job->status ?? 'pending',
+                    'quoted' => $job->quotation?->grand_total ?? 0,
                 ];
             })
             ->toArray();
 
         $totalQuotations = (clone $quotationsRange)->count();
-         $auditLogs = AuditLog::with('user')
+        $auditLogs = AuditLog::with('user')
             ->latest()
             ->take(12)
             ->get();
 
         $stats = [
             'inquiries' => [
-                'total'     => (clone $inquiriesRange)->count(),
+                'total' => (clone $inquiriesRange)->count(),
                 'converted' => (clone $inquiriesRange)->where('status', 'Converted')->count(),
             ],
             'quotations' => [
-                'sent'           => $totalQuotations,
-                'approved'       => (clone $quotationsRange)->where('status', 'approved')->count(),
-                'rejected'       => (clone $quotationsRange)->where('status', 'rejected')->count(),
-                'approval_rate'  => $totalQuotations > 0
+                'sent' => $totalQuotations,
+                'approved' => (clone $quotationsRange)->where('status', 'approved')->count(),
+                'rejected' => (clone $quotationsRange)->where('status', 'rejected')->count(),
+                'approval_rate' => $totalQuotations > 0
                     ? round(((clone $quotationsRange)->where('status', 'approved')->count() / $totalQuotations) * 100, 1)
                     : null,
             ],
             'jobs' => [
-                'total'     => (clone $jobsRange)->count(),
-                'active'    => (clone $jobsRange)->whereIn('status', ['scheduled', 'in_progress'])->count(),
-                'ongoing'   => (clone $jobsRange)->where('status', 'in_progress')->count(),
-                'pending'   => (clone $jobsRange)->where('status', 'pending')->count(),
+                'total' => (clone $jobsRange)->count(),
+                'active' => (clone $jobsRange)->whereIn('status', ['scheduled', 'in_progress'])->count(),
+                'ongoing' => (clone $jobsRange)->where('status', 'in_progress')->count(),
+                'pending' => (clone $jobsRange)->where('status', 'pending')->count(),
                 'completed' => (clone $jobsRange)->where('status', 'completed')->count(),
             ],
             'revenue' => [
@@ -99,12 +101,14 @@ class ManagerController extends Controller
             'recent_jobs' => $recentJobs,
         ];
 
-        return view('manager.dashboard', compact('stats', 'range', 'auditLogs'));    }
+        return view('manager.dashboard', compact('stats', 'range', 'auditLogs'));
+    }
 
-    public function quotation(){
+    public function quotation()
+    {
         // Base query
-        $quotations = Quotation::with(['technician.user','inquiry'])
-            ->whereIn('status',['pending','approved','rejected'])
+        $quotations = Quotation::with(['technician.user', 'inquiry'])
+            ->whereIn('status', ['pending', 'approved', 'rejected'])
             ->orderByDesc('date_issued')
             ->paginate(10);
 
@@ -113,7 +117,7 @@ class ManagerController extends Controller
 
         $approvedThisWeek = Quotation::where('status', 'approved')
             ->whereBetween('date_issued', [
-                Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()
+                Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek(),
             ])->count();
 
         $pendingValue = Quotation::where('status', 'pending')->sum('grand_total');
@@ -123,11 +127,12 @@ class ManagerController extends Controller
         ));
     }
 
-    public function inquiries(Request $request)    {
-         $filters = [
-            'search'      => $request->input('search'),
-            'status'      => $request->input('status'),
-            'technician'  => $request->input('technician'),
+    public function inquiries(Request $request)
+    {
+        $filters = [
+            'search' => $request->input('search'),
+            'status' => $request->input('status'),
+            'technician' => $request->input('technician'),
         ];
 
         $inquiriesQuery = Inquiry::with(['technician.user', 'customer'])
@@ -153,7 +158,7 @@ class ManagerController extends Controller
         if ($filters['technician']) {
             $inquiriesQuery->where('assigned_technician_id', $filters['technician']);
         }
-       $inquiries = $inquiriesQuery
+        $inquiries = $inquiriesQuery
             ->paginate(10)
             ->appends($filters);
 
@@ -166,13 +171,13 @@ class ManagerController extends Controller
         $stats = [
             'inquiries' => [
                 'unassigned' => Inquiry::whereNull('assigned_technician_id')->count(),
-                'pending'    => $statusCounts['Pending'] ?? 0,
-                'assigned'   => $statusCounts['Acknowledged'] ?? 0,
-                'ongoing'    => $statusCounts['In Progress'] ?? 0,
-                'completed'  => $statusCounts['Completed'] ?? 0,
-                'cancelled'  => $statusCounts['Cancelled'] ?? 0,
-                'scheduled'  => $statusCounts['Scheduled'] ?? 0,
-                'converted'  => $statusCounts['Converted'] ?? 0,
+                'pending' => $statusCounts['Pending'] ?? 0,
+                'assigned' => $statusCounts['Acknowledged'] ?? 0,
+                'ongoing' => $statusCounts['In Progress'] ?? 0,
+                'completed' => $statusCounts['Completed'] ?? 0,
+                'cancelled' => $statusCounts['Cancelled'] ?? 0,
+                'scheduled' => $statusCounts['Scheduled'] ?? 0,
+                'converted' => $statusCounts['Converted'] ?? 0,
             ],
         ];
 
@@ -183,16 +188,18 @@ class ManagerController extends Controller
             ->where('created_at', '<', Carbon::now()->subHours(48))
             ->count();
 
-        return view('manager.inquiries', compact('inquiries', 'stats', 'technicians', 'unanswered', 'filters'));    }
+        return view('manager.inquiries', compact('inquiries', 'stats', 'technicians', 'unanswered', 'filters'));
+    }
 
     public function approve(Quotation $quotation)
     {
         $quotation->update(['status' => 'approved', 'approved_by' => Auth::user()->id]);
-        
+
         AuditLogger::log('manager.quotation.approved', [
             'quotation_id' => $quotation->id,
         ]);
-        return back()->with('success','Quotation approved successfully.');
+
+        return back()->with('success', 'Quotation approved successfully.');
     }
 
     public function reject(Quotation $quotation)
@@ -201,7 +208,8 @@ class ManagerController extends Controller
         AuditLogger::log('manager.quotation.rejected', [
             'quotation_id' => $quotation->id,
         ]);
-        return back()->with('success','Quotation rejected.');
+
+        return back()->with('success', 'Quotation rejected.');
     }
 
     public function assignTechnician(Request $request, $inquiryId)
@@ -214,25 +222,28 @@ class ManagerController extends Controller
         $inquiry->assigned_technician_id = $request->technician_id;
         $inquiry->status = 'Acknowledged';
         $inquiry->save();
-                AuditLogger::log('manager.inquiry.assigned_technician', [
+        AuditLogger::log('manager.inquiry.assigned_technician', [
             'inquiry_id' => $inquiry->id,
             'technician_user_id' => (int) $request->technician_id,
         ]);
 
         return redirect()->route('inquiries')
-            ->with('status', 'Technician assigned to inquiry INQ-' . str_pad($inquiry->id, 8, '0', STR_PAD_LEFT));
+            ->with('status', 'Technician assigned to inquiry INQ-'.str_pad($inquiry->id, 8, '0', STR_PAD_LEFT));
     }
-    
-    public function inquireShow(int $id){
+
+    public function inquireShow(int $id)
+    {
         $inq = Inquiry::findOrFail($id);
+
         return redirect()->route('manager.inquiries')
             ->with('status', 'Viewing inquiry INQ-'.$inq->id);
     }
 
-    public function inquireDestroy(int $id){
+    public function inquireDestroy(int $id)
+    {
         $inq = Inquiry::findOrFail($id);
         $inq->delete();
-          AuditLogger::log('manager.inquiry.deleted', [
+        AuditLogger::log('manager.inquiry.deleted', [
             'inquiry_id' => $id,
         ]);
 
@@ -240,83 +251,90 @@ class ManagerController extends Controller
             ->with('status', 'Inquiry INQ-'.$id.' deleted');
     }
 
-    public function services(){
+    public function services()
+    {
         return view('manager.services');
     }
-    public function technicians(){
-$technicians = Technician::with(['user', 'jobOrders' => function ($query) {
-                                   $query->latest()->take(1); // ✅ only latest job per technician
 
-                }, 'jobOrders.quotation'])
-                ->withCount('jobOrders')
-                ->get();
+    public function technicians()
+    {
+        $technicians = Technician::with(['user', 'jobOrders' => function ($query) {
+            $query->latest()->take(1); // ✅ only latest job per technician
+
+        }, 'jobOrders.quotation'])
+            ->withCount('jobOrders')
+            ->get();
 
         $approvedQuotations = Quotation::where('status', 'approved')
             ->orderByDesc('date_issued')
             ->get();
 
-         $jobOrderHistory = JobOrder::with(['technician.user', 'quotation.customer'])
+        $jobOrderHistory = JobOrder::with(['technician.user', 'quotation.customer'])
             ->latest()
             ->take(10)
             ->get();
 
         return view('manager.technicians', compact('technicians', 'approvedQuotations', 'jobOrderHistory'));
     }
+
     public function editTechnician(Technician $technician)
-{
-    $technician->load('user');
-    return view('manager.technicians-edit', compact('technician'));
-}
+    {
+        $technician->load('user');
 
-public function updateTechnician(Request $request, Technician $technician)
-{
-    $validated = $request->validate([
-        'firstname'        => 'required|string|max:255',
-        'lastname'         => 'required|string|max:255',
-        'email'            => 'required|email|unique:users,email,' . $technician->user_id,
-        'specialization'   => 'nullable|string|max:255',
-        'certifications'   => 'nullable|string|max:255',
-    ]);
+        return view('manager.technicians-edit', compact('technician'));
+    }
 
-    // update user
-    $technician->user->update([
-        'firstname' => $validated['firstname'],
-        'lastname'  => $validated['lastname'],
-        'email'     => $validated['email'],
-    ]);
+    public function updateTechnician(Request $request, Technician $technician)
+    {
+        $validated = $request->validate([
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$technician->user_id,
+            'specialization' => 'nullable|string|max:255',
+            'certifications' => 'nullable|string|max:255',
+        ]);
 
-    // update technician
-    $technician->update([
-        'specialization'  => $validated['specialization'] ?? null,
-        'certifications'  => $validated['certifications'] ?? null,
-    ]);
-  AuditLogger::log('manager.technician.updated', [
-        'technician_id' => $technician->id,
-        'user_id' => $technician->user_id,
-    ]);
-    return redirect()->route('technicians')->with('status', 'Technician updated successfully.');
-}
+        // update user
+        $technician->user->update([
+            'firstname' => $validated['firstname'],
+            'lastname' => $validated['lastname'],
+            'email' => $validated['email'],
+        ]);
 
-public function destroyTechnician(Technician $technician)
-{
-    // delete technician + linked user (optional but usually correct)
-    $user = $technician->user;
-    $technicianId = $technician->id;
-    $userId = $user?->id;
-    $technician->delete();
-    if ($user) $user->delete();
-                AuditLogger::log('manager.technician.deleted', [
-        'technician_id' => $technicianId,
-        'user_id' => $userId,
-    ]);
+        // update technician
+        $technician->update([
+            'specialization' => $validated['specialization'] ?? null,
+            'certifications' => $validated['certifications'] ?? null,
+        ]);
+        AuditLogger::log('manager.technician.updated', [
+            'technician_id' => $technician->id,
+            'user_id' => $technician->user_id,
+        ]);
 
-    return redirect()->route('technicians')->with('status', 'Technician deleted successfully.');
-}
+        return redirect()->route('technicians')->with('status', 'Technician updated successfully.');
+    }
+
+    public function destroyTechnician(Technician $technician)
+    {
+        // delete technician + linked user (optional but usually correct)
+        $user = $technician->user;
+        $technicianId = $technician->id;
+        $userId = $user?->id;
+        $technician->delete();
+        if ($user) {
+            $user->delete();
+        }
+        AuditLogger::log('manager.technician.deleted', [
+            'technician_id' => $technicianId,
+            'user_id' => $userId,
+        ]);
+
+        return redirect()->route('technicians')->with('status', 'Technician deleted successfully.');
+    }
 
     public function storeTechnician(Request $request)
-    
     {
-        
+
         $validated = $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
@@ -340,7 +358,7 @@ public function destroyTechnician(Technician $technician)
             'specialization' => $validated['specialization'] ?? null,
             'certifications' => $validated['certifications'] ?? null,
         ]);
-                AuditLogger::log('manager.technician.created', [
+        AuditLogger::log('manager.technician.created', [
             'technician_id' => $user->technician?->id,
             'user_id' => $user->id,
             'email' => $user->email,
@@ -349,372 +367,374 @@ public function destroyTechnician(Technician $technician)
         return redirect()->route('technicians')->with('status', 'Technician added successfully.');
     }
 
-   public function storeJobOrder(Request $request)
-{
-    abort_unless(Auth::check(), 403, 'Not authenticated.');
+    public function storeJobOrder(Request $request)
+    {
+        abort_unless(Auth::check(), 403, 'Not authenticated.');
 
-    $validated = $request->validate([
-        'technician_id'         => 'required|exists:technicians,id',
-        'quotation_id'          => 'required|exists:quotations,id',
-        'start_date'            => 'nullable|date',
-        'expected_finish_date'  => 'nullable|date|after_or_equal:start_date',
-        'timeline_min_days'     => 'nullable|integer|min:1',
-        'timeline_max_days'     => 'nullable|integer|min:1',
-        'technician_notes'      => 'nullable|string',
-        'status'                => 'nullable|string|in:scheduled,in_progress,review,completed,cancelled',
-    ]);
+        $validated = $request->validate([
+            'technician_id' => 'required|exists:technicians,id',
+            'quotation_id' => 'required|exists:quotations,id',
+            'start_date' => 'nullable|date',
+            'expected_finish_date' => 'nullable|date|after_or_equal:start_date',
+            'timeline_min_days' => 'nullable|integer|min:1',
+            'timeline_max_days' => 'nullable|integer|min:1',
+            'technician_notes' => 'nullable|string',
+            'status' => 'nullable|string|in:scheduled,in_progress,review,completed,cancelled',
+        ]);
 
-    $jobOrder = JobOrder::create([
-                ...$validated,
-        'user_id' => (int) Auth::id(),
-        'status'  => $validated['status'] ?? 'scheduled',
-    ]);
-AuditLogger::log('manager.job_order.created', [
-        'job_order_id' => $jobOrder->id,
-        'technician_id' => $jobOrder->technician_id,
-        'quotation_id' => $jobOrder->quotation_id,
-    ]);
-    return redirect()->route('technicians')
-        ->with('status', 'Job order assigned to technician successfully.');
-}
+        $jobOrder = JobOrder::create([
+            ...$validated,
+            'user_id' => (int) Auth::id(),
+            'status' => $validated['status'] ?? 'scheduled',
+        ]);
+        AuditLogger::log('manager.job_order.created', [
+            'job_order_id' => $jobOrder->id,
+            'technician_id' => $jobOrder->technician_id,
+            'quotation_id' => $jobOrder->quotation_id,
+        ]);
 
-    
+        return redirect()->route('technicians')
+            ->with('status', 'Job order assigned to technician successfully.');
+    }
 
     public function customers()
     {
         return view('manager.customers');
     }
+
     public function reports(Request $request)
-{
-    $now = Carbon::now();
-    
-    // ===== DATE FILTERING =====
-    $period = $request->get('period', 'all_time');
-    $dateFrom = $request->get('date_from');
-    $dateTo = $request->get('date_to');
-    
-    // Calculate date range based on period
-    switch ($period) {
-        case 'this_week':
-            $startDate = $now->copy()->startOfWeek();
-            $endDate = $now->copy()->endOfWeek();
-            break;
-        case 'this_month':
-            $startDate = $now->copy()->startOfMonth();
-            $endDate = $now->copy()->endOfMonth();
-            break;
-        case 'last_month':
-            $startDate = $now->copy()->subMonth()->startOfMonth();
-            $endDate = $now->copy()->subMonth()->endOfMonth();
-            break;
-        case 'this_year':
-            $startDate = $now->copy()->startOfYear();
-            $endDate = $now->copy()->endOfYear();
-            break;
-        case 'custom':
-            $startDate = $dateFrom ? Carbon::parse($dateFrom)->startOfDay() : null;
-            $endDate = $dateTo ? Carbon::parse($dateTo)->endOfDay() : null;
-            break;
-        case 'all_time':
-        default:
-            $startDate = null;
-            $endDate = null;
-    }
-    
-    // ===== JOB ORDER REVENUE (With Date Filter) =====
-    $completedJobsQuery = JobOrder::with('quotation.details')
-        ->where('status', 'completed');
-    
-    // Apply date filter only if date range is set
-    if ($startDate && $endDate) {
-        $completedJobsQuery->whereBetween('completed_at', [$startDate, $endDate]);
-    }
-    
-    $completedJobs = $completedJobsQuery->get();
-    
-    // Calculate revenue from quotation details
-    $completedJobsRevenue = $completedJobs->sum(function($job) {
-        return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
-    });
-    
-    // Downpayment is 50% of subtotal
-    $downpaymentsReceived = $completedJobsRevenue * 0.50;
-    
-    // Remaining balance is the other 50%
-    $remainingBalance = $completedJobsRevenue * 0.50;
-    
-    // ===== DIAGNOSTIC FEES (With Date Filter) =====
-    $diagnosticFeesQuery = Quotation::query();
-    
-    if ($startDate && $endDate) {
-        $diagnosticFeesQuery->whereBetween('date_issued', [$startDate, $endDate]);
-    }
-    
-    $totalDiagnosticFees = $diagnosticFeesQuery->sum('diagnostic_fee');
-    
-    // ===== TOTAL REVENUE CALCULATION =====
-    $totalRevenue = $completedJobsRevenue + $totalDiagnosticFees;
-    
-    // ===== JOB COUNTS (With Date Filter) =====
-    $totalJobsQuery = JobOrder::query();
-    $activeJobsQuery = JobOrder::whereIn('status', ['scheduled', 'in_progress']);
-    
-    if ($startDate && $endDate) {
-        $totalJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
-        $activeJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
-    }
-    
-    $totalJobs = $totalJobsQuery->count();
-    $completedJobsCount = $completedJobs->count();
-    $activeJobs = $activeJobsQuery->count();
-    
-    // ===== APPROVAL METRICS (With Date Filter) =====
-    $quotationsQuery = Quotation::query();
-    $approvedQuery = Quotation::where('status', 'approved');
-    
-    if ($startDate && $endDate) {
-        $quotationsQuery->whereBetween('date_issued', [$startDate, $endDate]);
-        $approvedQuery->whereBetween('date_issued', [$startDate, $endDate]);
-    }
-    
-    $totalQuotations = $quotationsQuery->count();
-    $approvedCount = $approvedQuery->count();
-    
-    $approvalRate = $totalQuotations > 0
-        ? round(($approvedCount / $totalQuotations) * 100, 1)
-        : 0;
-    
-    // ===== AVERAGE JOB VALUE =====
-    $avgJobValue = $completedJobsCount > 0 ? ($completedJobsRevenue / $completedJobsCount) : 0;
-    
-    // ===== CHART DATA =====
-    $chartData = $this->generateChartData($startDate, $endDate);
-    
-    $stats = [
-        'reports' => [
-            'completed_jobs_revenue' => $completedJobsRevenue,
-            'downpayments_received' => $downpaymentsReceived,
-            'remaining_balance' => $remainingBalance,
-            'diagnostic_fees' => $totalDiagnosticFees,
-            'total_revenue' => $totalRevenue,
-            'approval_rate' => $approvalRate,
-            'avg_job_value' => $avgJobValue,
-        ],
-        'counts' => [
-            'total_jobs' => $totalJobs,
-            'completed_jobs' => $completedJobsCount,
-            'active_jobs' => $activeJobs,
-        ],
-    ];
-    
-    // ===== RECENT JOB ORDERS (With Date Filter) =====
-    $recentJobsQuery = JobOrder::with(['quotation.customer', 'technician.user']);
-    
-    if ($startDate && $endDate) {
-        $recentJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
-    }
-    
-    $recentJobs = $recentJobsQuery
-        ->orderByDesc('created_at')
-        ->limit(10)
-        ->get()
-        ->map(function($job) {
-            // Add computed subtotal if not in database
-            if (!$job->subtotal && $job->quotation) {
-                $job->subtotal = $job->quotation->subtotal;
-            }
-            return $job;
+    {
+        $now = Carbon::now();
+
+        // ===== DATE FILTERING =====
+        $period = $request->get('period', 'all_time');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+
+        // Calculate date range based on period
+        switch ($period) {
+            case 'this_week':
+                $startDate = $now->copy()->startOfWeek();
+                $endDate = $now->copy()->endOfWeek();
+                break;
+            case 'this_month':
+                $startDate = $now->copy()->startOfMonth();
+                $endDate = $now->copy()->endOfMonth();
+                break;
+            case 'last_month':
+                $startDate = $now->copy()->subMonth()->startOfMonth();
+                $endDate = $now->copy()->subMonth()->endOfMonth();
+                break;
+            case 'this_year':
+                $startDate = $now->copy()->startOfYear();
+                $endDate = $now->copy()->endOfYear();
+                break;
+            case 'custom':
+                $startDate = $dateFrom ? Carbon::parse($dateFrom)->startOfDay() : null;
+                $endDate = $dateTo ? Carbon::parse($dateTo)->endOfDay() : null;
+                break;
+            case 'all_time':
+            default:
+                $startDate = null;
+                $endDate = null;
+        }
+
+        // ===== JOB ORDER REVENUE (With Date Filter) =====
+        $completedJobsQuery = JobOrder::with('quotation.details')
+            ->where('status', 'completed');
+
+        // Apply date filter only if date range is set
+        if ($startDate && $endDate) {
+            $completedJobsQuery->whereBetween('completed_at', [$startDate, $endDate]);
+        }
+
+        $completedJobs = $completedJobsQuery->get();
+
+        // Calculate revenue from quotation details
+        $completedJobsRevenue = $completedJobs->sum(function ($job) {
+            return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
         });
-    
-    // ===== TOP REVENUE JOBS (With Date Filter) =====
-    $topRevenueQuery = JobOrder::with(['quotation.customer', 'quotation.details'])
-        ->where('status', 'completed');
-    
-    if ($startDate && $endDate) {
-        $topRevenueQuery->whereBetween('completed_at', [$startDate, $endDate]);
-    }
-    
-    $topRevenueJobs = $topRevenueQuery
-        ->get()
-        ->map(function($job) {
-            // Calculate subtotal from quotation if not in job order
-            $job->calculated_subtotal = $job->subtotal ?? $job->quotation?->subtotal ?? 0;
-            return $job;
-        })
-        ->sortByDesc('calculated_subtotal')
-        ->take(5);
-    
-    // ===== TECHNICIAN PERFORMANCE (With Date Filter) =====
-    $technicianPerformance = Technician::with('user')
-        ->get()
-        ->map(function ($technician) use ($startDate, $endDate) {
-            $totalJobsQuery = JobOrder::where('technician_id', $technician->id);
-            $completedJobsQuery = JobOrder::with('quotation.details')
-                ->where('technician_id', $technician->id)
-                ->where('status', 'completed');
-            $activeJobsQuery = JobOrder::where('technician_id', $technician->id)
-                ->whereIn('status', ['scheduled', 'in_progress']);
-            
-            if ($startDate && $endDate) {
-                $totalJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
-                $completedJobsQuery->whereBetween('completed_at', [$startDate, $endDate]);
-                $activeJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
-            }
-            
-            $totalJobs = $totalJobsQuery->count();
-            $completedJobsList = $completedJobsQuery->get();
-            $completedJobs = $completedJobsList->count();
-            $activeJobs = $activeJobsQuery->count();
-            
-            // Calculate revenue from quotation subtotals
-            $totalRevenue = $completedJobsList->sum(function($job) {
-                return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
-            });
-            
-            $avgJobValue = $completedJobs > 0 ? ($totalRevenue / $completedJobs) : 0;
-            
-            return (object) [
-                'id' => $technician->id,
-                'name' => $technician->name,
-                'total_jobs' => $totalJobs,
-                'completed_jobs' => $completedJobs,
-                'active_jobs' => $activeJobs,
+
+        // Downpayment is 50% of subtotal
+        $downpaymentsReceived = $completedJobsRevenue * 0.50;
+
+        // Remaining balance is the other 50%
+        $remainingBalance = $completedJobsRevenue * 0.50;
+
+        // ===== DIAGNOSTIC FEES (With Date Filter) =====
+        $diagnosticFeesQuery = Quotation::query();
+
+        if ($startDate && $endDate) {
+            $diagnosticFeesQuery->whereBetween('date_issued', [$startDate, $endDate]);
+        }
+
+        $totalDiagnosticFees = $diagnosticFeesQuery->sum('diagnostic_fee');
+
+        // ===== TOTAL REVENUE CALCULATION =====
+        $totalRevenue = $completedJobsRevenue + $totalDiagnosticFees;
+
+        // ===== JOB COUNTS (With Date Filter) =====
+        $totalJobsQuery = JobOrder::query();
+        $activeJobsQuery = JobOrder::whereIn('status', ['scheduled', 'in_progress']);
+
+        if ($startDate && $endDate) {
+            $totalJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
+            $activeJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        $totalJobs = $totalJobsQuery->count();
+        $completedJobsCount = $completedJobs->count();
+        $activeJobs = $activeJobsQuery->count();
+
+        // ===== APPROVAL METRICS (With Date Filter) =====
+        $quotationsQuery = Quotation::query();
+        $approvedQuery = Quotation::where('status', 'approved');
+
+        if ($startDate && $endDate) {
+            $quotationsQuery->whereBetween('date_issued', [$startDate, $endDate]);
+            $approvedQuery->whereBetween('date_issued', [$startDate, $endDate]);
+        }
+
+        $totalQuotations = $quotationsQuery->count();
+        $approvedCount = $approvedQuery->count();
+
+        $approvalRate = $totalQuotations > 0
+            ? round(($approvedCount / $totalQuotations) * 100, 1)
+            : 0;
+
+        // ===== AVERAGE JOB VALUE =====
+        $avgJobValue = $completedJobsCount > 0 ? ($completedJobsRevenue / $completedJobsCount) : 0;
+
+        // ===== CHART DATA =====
+        $chartData = $this->generateChartData($startDate, $endDate);
+
+        $stats = [
+            'reports' => [
+                'completed_jobs_revenue' => $completedJobsRevenue,
+                'downpayments_received' => $downpaymentsReceived,
+                'remaining_balance' => $remainingBalance,
+                'diagnostic_fees' => $totalDiagnosticFees,
                 'total_revenue' => $totalRevenue,
+                'approval_rate' => $approvalRate,
                 'avg_job_value' => $avgJobValue,
-            ];
-        })
-        ->filter(function($tech) {
-            // Only show technicians with at least one job in the period
-            return $tech->total_jobs > 0;
-        })
-        ->sortByDesc('total_revenue');
-    
-    return view('manager.reports', compact(
-        'stats', 
-        'recentJobs', 
-        'topRevenueJobs', 
-        'technicianPerformance',
-        'chartData'
-    ));
-}
+            ],
+            'counts' => [
+                'total_jobs' => $totalJobs,
+                'completed_jobs' => $completedJobsCount,
+                'active_jobs' => $activeJobs,
+            ],
+        ];
 
-/**
- * Generate chart data for revenue visualization
- */
-private function generateChartData($startDate, $endDate)
-{
-    // If no date range, use last 30 days
-    if (!$startDate || !$endDate) {
-        $endDate = Carbon::now();
-        $startDate = Carbon::now()->subDays(30);
+        // ===== RECENT JOB ORDERS (With Date Filter) =====
+        $recentJobsQuery = JobOrder::with(['quotation.customer', 'technician.user']);
+
+        if ($startDate && $endDate) {
+            $recentJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        $recentJobs = $recentJobsQuery
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get()
+            ->map(function ($job) {
+                // Add computed subtotal if not in database
+                if (! $job->subtotal && $job->quotation) {
+                    $job->subtotal = $job->quotation->subtotal;
+                }
+
+                return $job;
+            });
+
+        // ===== TOP REVENUE JOBS (With Date Filter) =====
+        $topRevenueQuery = JobOrder::with(['quotation.customer', 'quotation.details'])
+            ->where('status', 'completed');
+
+        if ($startDate && $endDate) {
+            $topRevenueQuery->whereBetween('completed_at', [$startDate, $endDate]);
+        }
+
+        $topRevenueJobs = $topRevenueQuery
+            ->get()
+            ->map(function ($job) {
+                // Calculate subtotal from quotation if not in job order
+                $job->calculated_subtotal = $job->subtotal ?? $job->quotation?->subtotal ?? 0;
+
+                return $job;
+            })
+            ->sortByDesc('calculated_subtotal')
+            ->take(5);
+
+        // ===== TECHNICIAN PERFORMANCE (With Date Filter) =====
+        $technicianPerformance = Technician::with('user')
+            ->get()
+            ->map(function ($technician) use ($startDate, $endDate) {
+                $totalJobsQuery = JobOrder::where('technician_id', $technician->id);
+                $completedJobsQuery = JobOrder::with('quotation.details')
+                    ->where('technician_id', $technician->id)
+                    ->where('status', 'completed');
+                $activeJobsQuery = JobOrder::where('technician_id', $technician->id)
+                    ->whereIn('status', ['scheduled', 'in_progress']);
+
+                if ($startDate && $endDate) {
+                    $totalJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
+                    $completedJobsQuery->whereBetween('completed_at', [$startDate, $endDate]);
+                    $activeJobsQuery->whereBetween('created_at', [$startDate, $endDate]);
+                }
+
+                $totalJobs = $totalJobsQuery->count();
+                $completedJobsList = $completedJobsQuery->get();
+                $completedJobs = $completedJobsList->count();
+                $activeJobs = $activeJobsQuery->count();
+
+                // Calculate revenue from quotation subtotals
+                $totalRevenue = $completedJobsList->sum(function ($job) {
+                    return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
+                });
+
+                $avgJobValue = $completedJobs > 0 ? ($totalRevenue / $completedJobs) : 0;
+
+                return (object) [
+                    'id' => $technician->id,
+                    'name' => $technician->name,
+                    'total_jobs' => $totalJobs,
+                    'completed_jobs' => $completedJobs,
+                    'active_jobs' => $activeJobs,
+                    'total_revenue' => $totalRevenue,
+                    'avg_job_value' => $avgJobValue,
+                ];
+            })
+            ->filter(function ($tech) {
+                // Only show technicians with at least one job in the period
+                return $tech->total_jobs > 0;
+            })
+            ->sortByDesc('total_revenue');
+
+        return view('manager.reports', compact(
+            'stats',
+            'recentJobs',
+            'topRevenueJobs',
+            'technicianPerformance',
+            'chartData'
+        ));
     }
-    
-    $labels = [];
-    $revenueData = [];
-    $completedRevenueData = [];
-    $diagnosticFeesData = [];
-    
-    // Determine interval based on date range
-    $daysDiff = $startDate->diffInDays($endDate);
-    
-    if ($daysDiff <= 7) {
-        // Daily breakdown for week or less
-        $current = $startDate->copy();
-        while ($current <= $endDate) {
-            $labels[] = $current->format('D');
-            
-            $dayStart = $current->copy()->startOfDay();
-            $dayEnd = $current->copy()->endOfDay();
-            
-            $completedRevenue = JobOrder::with('quotation.details')
-                ->where('status', 'completed')
-                ->whereBetween('completed_at', [$dayStart, $dayEnd])
-                ->get()
-                ->sum(function($job) {
-                    return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
-                });
-            
-            $diagnosticFees = Quotation::whereBetween('date_issued', [$dayStart, $dayEnd])
-                ->sum('diagnostic_fee');
-            
-            $completedRevenueData[] = $completedRevenue;
-            $diagnosticFeesData[] = $diagnosticFees;
-            $revenueData[] = $completedRevenue + $diagnosticFees;
-            
-            $current->addDay();
+
+    /**
+     * Generate chart data for revenue visualization
+     */
+    private function generateChartData($startDate, $endDate)
+    {
+        // If no date range, use last 30 days
+        if (! $startDate || ! $endDate) {
+            $endDate = Carbon::now();
+            $startDate = Carbon::now()->subDays(30);
         }
-    } elseif ($daysDiff <= 31) {
-        // Daily breakdown for month
-        $current = $startDate->copy();
-        while ($current <= $endDate) {
-            $labels[] = $current->format('M j');
-            
-            $dayStart = $current->copy()->startOfDay();
-            $dayEnd = $current->copy()->endOfDay();
-            
-            $completedRevenue = JobOrder::with('quotation.details')
-                ->where('status', 'completed')
-                ->whereBetween('completed_at', [$dayStart, $dayEnd])
-                ->get()
-                ->sum(function($job) {
-                    return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
-                });
-            
-            $diagnosticFees = Quotation::whereBetween('date_issued', [$dayStart, $dayEnd])
-                ->sum('diagnostic_fee');
-            
-            $completedRevenueData[] = $completedRevenue;
-            $diagnosticFeesData[] = $diagnosticFees;
-            $revenueData[] = $completedRevenue + $diagnosticFees;
-            
-            $current->addDay();
-        }
-    } else {
-        // Weekly breakdown for longer periods
-        $current = $startDate->copy()->startOfWeek();
-        $end = $endDate->copy()->endOfWeek();
-        
-        while ($current <= $end) {
-            $weekStart = $current->copy();
-            $weekEnd = $current->copy()->endOfWeek();
-            
-            if ($weekEnd > $endDate) {
-                $weekEnd = $endDate->copy();
+
+        $labels = [];
+        $revenueData = [];
+        $completedRevenueData = [];
+        $diagnosticFeesData = [];
+
+        // Determine interval based on date range
+        $daysDiff = $startDate->diffInDays($endDate);
+
+        if ($daysDiff <= 7) {
+            // Daily breakdown for week or less
+            $current = $startDate->copy();
+            while ($current <= $endDate) {
+                $labels[] = $current->format('D');
+
+                $dayStart = $current->copy()->startOfDay();
+                $dayEnd = $current->copy()->endOfDay();
+
+                $completedRevenue = JobOrder::with('quotation.details')
+                    ->where('status', 'completed')
+                    ->whereBetween('completed_at', [$dayStart, $dayEnd])
+                    ->get()
+                    ->sum(function ($job) {
+                        return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
+                    });
+
+                $diagnosticFees = Quotation::whereBetween('date_issued', [$dayStart, $dayEnd])
+                    ->sum('diagnostic_fee');
+
+                $completedRevenueData[] = $completedRevenue;
+                $diagnosticFeesData[] = $diagnosticFees;
+                $revenueData[] = $completedRevenue + $diagnosticFees;
+
+                $current->addDay();
             }
-            
-            $labels[] = $weekStart->format('M j');
-            
-            $completedRevenue = JobOrder::with('quotation.details')
-                ->where('status', 'completed')
-                ->whereBetween('completed_at', [$weekStart, $weekEnd])
-                ->get()
-                ->sum(function($job) {
-                    return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
-                });
-            
-            $diagnosticFees = Quotation::whereBetween('date_issued', [$weekStart, $weekEnd])
-                ->sum('diagnostic_fee');
-            
-            $completedRevenueData[] = $completedRevenue;
-            $diagnosticFeesData[] = $diagnosticFees;
-            $revenueData[] = $completedRevenue + $diagnosticFees;
-            
-            $current->addWeek();
-        }
-    }
-    
-    return [
-        'labels' => $labels,
-        'revenue' => $revenueData,
-        'completed_revenue' => $completedRevenueData,
-        'diagnostic_fees' => $diagnosticFeesData,
-    ];
-}
+        } elseif ($daysDiff <= 31) {
+            // Daily breakdown for month
+            $current = $startDate->copy();
+            while ($current <= $endDate) {
+                $labels[] = $current->format('M j');
 
-/**
- * Export reports to CSV
- */
-public function exportReports(Request $request)
+                $dayStart = $current->copy()->startOfDay();
+                $dayEnd = $current->copy()->endOfDay();
+
+                $completedRevenue = JobOrder::with('quotation.details')
+                    ->where('status', 'completed')
+                    ->whereBetween('completed_at', [$dayStart, $dayEnd])
+                    ->get()
+                    ->sum(function ($job) {
+                        return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
+                    });
+
+                $diagnosticFees = Quotation::whereBetween('date_issued', [$dayStart, $dayEnd])
+                    ->sum('diagnostic_fee');
+
+                $completedRevenueData[] = $completedRevenue;
+                $diagnosticFeesData[] = $diagnosticFees;
+                $revenueData[] = $completedRevenue + $diagnosticFees;
+
+                $current->addDay();
+            }
+        } else {
+            // Weekly breakdown for longer periods
+            $current = $startDate->copy()->startOfWeek();
+            $end = $endDate->copy()->endOfWeek();
+
+            while ($current <= $end) {
+                $weekStart = $current->copy();
+                $weekEnd = $current->copy()->endOfWeek();
+
+                if ($weekEnd > $endDate) {
+                    $weekEnd = $endDate->copy();
+                }
+
+                $labels[] = $weekStart->format('M j');
+
+                $completedRevenue = JobOrder::with('quotation.details')
+                    ->where('status', 'completed')
+                    ->whereBetween('completed_at', [$weekStart, $weekEnd])
+                    ->get()
+                    ->sum(function ($job) {
+                        return $job->subtotal ?? $job->quotation?->subtotal ?? 0;
+                    });
+
+                $diagnosticFees = Quotation::whereBetween('date_issued', [$weekStart, $weekEnd])
+                    ->sum('diagnostic_fee');
+
+                $completedRevenueData[] = $completedRevenue;
+                $diagnosticFeesData[] = $diagnosticFees;
+                $revenueData[] = $completedRevenue + $diagnosticFees;
+
+                $current->addWeek();
+            }
+        }
+
+        return [
+            'labels' => $labels,
+            'revenue' => $revenueData,
+            'completed_revenue' => $completedRevenueData,
+            'diagnostic_fees' => $diagnosticFeesData,
+        ];
+    }
+
+    /**
+     * Export reports to CSV
+     */
+    public function exportReports(Request $request)
     {
         // Fix 1: Default to 'all_time' for consistency with reports() method
         $period = $request->get('period', 'all_time');
@@ -763,18 +783,18 @@ public function exportReports(Request $request)
         $jobs = $jobsQuery->orderByDesc('created_at')->get();
 
         // Generate CSV
-        $filename = 'reports_' .
-                    ($startDate ? $startDate->format('Y-m-d') : 'all_time_from') .
-                    '_to_' .
-                    ($endDate ? $endDate->format('Y-m-d') : 'all_time_to') .
+        $filename = 'reports_'.
+                    ($startDate ? $startDate->format('Y-m-d') : 'all_time_from').
+                    '_to_'.
+                    ($endDate ? $endDate->format('Y-m-d') : 'all_time_to').
                     '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($jobs) {
+        $callback = function () use ($jobs) {
             $file = fopen('php://output', 'w');
 
             // CSV Headers
@@ -789,13 +809,13 @@ public function exportReports(Request $request)
                 'Subtotal',
                 'Downpayment',
                 'Total Amount',
-                'Diagnostic Fee'
+                'Diagnostic Fee',
             ]);
 
             // CSV Rows
             foreach ($jobs as $job) {
                 fputcsv($file, [
-                    'JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT),
+                    'JOB-'.str_pad($job->id, 4, '0', STR_PAD_LEFT),
                     $job->quotation?->client_name ?? $job->customer_name ?? '—',
                     $job->quotation?->project_title ?? '—',
                     $job->technician?->name ?? '—',

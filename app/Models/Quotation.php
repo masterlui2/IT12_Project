@@ -1,7 +1,9 @@
 <?php
+
 // ============================================
 // App\Models\Quotation.php
 // ============================================
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -99,7 +101,7 @@ class Quotation extends Model
 
     public function getSubtotalAttribute()
     {
-        return $this->details->sum(fn($detail) => $detail->quantity * $detail->unit_price);
+        return $this->details->sum(fn ($detail) => $detail->quantity * $detail->unit_price);
     }
 
     public function getTaxAttribute()
@@ -114,17 +116,17 @@ class Quotation extends Model
 
     public function getFormattedSubtotalAttribute()
     {
-        return '₱' . number_format($this->subtotal, 2);
+        return '₱'.number_format($this->subtotal, 2);
     }
 
     public function getFormattedTaxAttribute()
     {
-        return '₱' . number_format($this->tax, 2);
+        return '₱'.number_format($this->tax, 2);
     }
 
     public function getFormattedTotalAttribute()
     {
-        return '₱' . number_format($this->total_amount, 2);
+        return '₱'.number_format($this->total_amount, 2);
     }
 
     public function getTimelineTextAttribute()
@@ -148,6 +150,7 @@ class Quotation extends Model
 // ============================================
 // App\Models\JobOrder.php
 // ============================================
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

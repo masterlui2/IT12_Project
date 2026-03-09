@@ -32,7 +32,6 @@ class QuotationDetail extends Model
 
     public function getFormattedTotalAttribute()
     {
-        return '₱' . number_format($this->total ?? $this->computed_total, 2);
+        return '₱'.number_format($this->total ?? $this->computed_total, 2);
     }
 }
-    

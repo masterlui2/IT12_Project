@@ -1,33 +1,31 @@
 <?php
 
 namespace App\Http\Controllers\Technician\Quotation;
-use App\Support\AuditLogger;
-use App\Models\Quotation;
-use App\Models\QuotationDetail;
-use App\Models\QuotationScope;
-use App\Models\QuotationCase;
-use App\Models\QuotationWaiver;
-use App\Models\WaiverCase;
-use App\Models\QuotationDeliverable;
-use App\Models\User;
-use App\Models\QuotationSignature;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
-use App\Models\Technician;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Inquiry;
+use App\Models\Quotation;
+use App\Models\QuotationCase;
+use App\Models\QuotationDeliverable;
+use App\Models\QuotationDetail;
+use App\Models\QuotationScope;
+use App\Models\QuotationSignature;
+use App\Models\QuotationWaiver;
 use App\Models\ServiceTemplate;
+use App\Models\Technician;
+use App\Models\WaiverCase;
+use App\Support\AuditLogger;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class QuotationController extends Controller
 {
     /**
      * Display a listing of quotations
      */
-
-
     public function index(Request $request)
     {
         // Get the authenticated technician record
@@ -40,10 +38,10 @@ class QuotationController extends Controller
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('client_name', 'like', "%{$search}%")
-                ->orWhere('project_title', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%");
+                    ->orWhere('project_title', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
             });
         }
 
@@ -73,7 +71,6 @@ class QuotationController extends Controller
         return view('technician.contents.quotations.index', compact('quotations'));
     }
 
-
     /**
      * Show the form for creating a new quotation
      */
@@ -85,7 +82,7 @@ class QuotationController extends Controller
         if ($inquiryId) {
             $inquiry = Inquiry::with(['customer'])->find($inquiryId);
 
-            if (!$inquiry) {
+            if (! $inquiry) {
                 return redirect()
                     ->route('technician.inquire.index')
                     ->with('error', 'Inquiry not found.');
@@ -105,7 +102,6 @@ class QuotationController extends Controller
         return ServiceTemplate::with(['scopes.cases', 'waivers.cases', 'deliverables'])->findOrFail($id);
     }
 
-
     /**
      * Store a newly created quotation
      */
@@ -113,46 +109,46 @@ class QuotationController extends Controller
     {
         // Validate the request
         $rules = [
-        'inquiry_id' => 'required|exists:inquiries,id',
-        'project_title' => 'required|string|max:255',
-        'client_name' => 'required|string|max:255',
-        'date_issued' => 'required|date',
-        'client_address' => 'nullable|string|max:500',
-        'objective' => 'nullable|string',
-        'client_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        
-        // Timeline
-        'timeline_min_days' => 'nullable|integer|min:1',
-        'timeline_max_days' => 'nullable|integer|min:1',
-        
-        // Terms
-        'terms_conditions' => 'nullable|string',
-        
-        // Signature fields
-        'customer_name' => 'nullable|string|max:255',
-        'customer_signature' => 'nullable|string|max:255',
-        'customer_date' => 'nullable|date',
-        'provider_name' => 'nullable|string|max:255',
-        'provider_signature' => 'nullable|string|max:255',
-        'provider_date' => 'nullable|date',
-    ];
+            'inquiry_id' => 'required|exists:inquiries,id',
+            'project_title' => 'required|string|max:255',
+            'client_name' => 'required|string|max:255',
+            'date_issued' => 'required|date',
+            'client_address' => 'nullable|string|max:500',
+            'objective' => 'nullable|string',
+            'client_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
 
-    // Only require items when sending to manager
-    if ($request->action === 'submit_manager') {
-        $rules['items'] = 'required|array|min:1';
-        $rules['items.*.name'] = 'required|string|max:255';
-        $rules['items.*.quantity'] = 'required|numeric|min:1';
-        $rules['items.*.unit_price'] = 'required|numeric|min:0';
-    } else {
-        $rules['items'] = 'nullable|array';
-        $rules['items.*.name'] = 'nullable|string|max:255';
-        $rules['items.*.quantity'] = 'nullable|numeric|min:1';
-        $rules['items.*.unit_price'] = 'nullable|numeric|min:0';
-    }
-    
-    $rules['items.*.description'] = 'nullable|string';
+            // Timeline
+            'timeline_min_days' => 'nullable|integer|min:1',
+            'timeline_max_days' => 'nullable|integer|min:1',
 
-    $validated = $request->validate($rules);
+            // Terms
+            'terms_conditions' => 'nullable|string',
+
+            // Signature fields
+            'customer_name' => 'nullable|string|max:255',
+            'customer_signature' => 'nullable|string|max:255',
+            'customer_date' => 'nullable|date',
+            'provider_name' => 'nullable|string|max:255',
+            'provider_signature' => 'nullable|string|max:255',
+            'provider_date' => 'nullable|date',
+        ];
+
+        // Only require items when sending to manager
+        if ($request->action === 'submit_manager') {
+            $rules['items'] = 'required|array|min:1';
+            $rules['items.*.name'] = 'required|string|max:255';
+            $rules['items.*.quantity'] = 'required|numeric|min:1';
+            $rules['items.*.unit_price'] = 'required|numeric|min:0';
+        } else {
+            $rules['items'] = 'nullable|array';
+            $rules['items.*.name'] = 'nullable|string|max:255';
+            $rules['items.*.quantity'] = 'nullable|numeric|min:1';
+            $rules['items.*.unit_price'] = 'nullable|numeric|min:0';
+        }
+
+        $rules['items.*.description'] = 'nullable|string';
+
+        $validated = $request->validate($rules);
 
         try {
             DB::beginTransaction();
@@ -168,7 +164,7 @@ class QuotationController extends Controller
             }
             $tax = $inquiry->service->diagnostic_fee ?? 0;
             $total = $subtotal + $tax;
-           
+
             $customerId = Customer::where('user_id', $inquiry->customer_id ?? $inquiry->user_id)->value('id');
             $technicianId = optional($inquiry->technician)->id
                 ?? Technician::where('user_id', $inquiry->assigned_technician_id)->value('id')
@@ -201,7 +197,7 @@ class QuotationController extends Controller
             // Create quotation items
             foreach ($request->items as $item) {
                 $itemTotal = $item['quantity'] * $item['unit_price'];
-                
+
                 QuotationDetail::create([
                     'quotation_id' => $quotation->id,
                     'item_name' => $item['name'],
@@ -215,7 +211,7 @@ class QuotationController extends Controller
             // Create scope scenarios and their cases
             if ($request->has('scope')) {
                 foreach ($request->scope as $scopeData) {
-                    if (!empty($scopeData['scenario'])) {
+                    if (! empty($scopeData['scenario'])) {
                         $scope = QuotationScope::create([
                             'quotation_id' => $quotation->id,
                             'scenario_name' => $scopeData['scenario'],
@@ -225,7 +221,7 @@ class QuotationController extends Controller
                         // Create cases for this scenario
                         if (isset($scopeData['cases']) && is_array($scopeData['cases'])) {
                             foreach ($scopeData['cases'] as $caseData) {
-                                if (!empty($caseData['name'])) {
+                                if (! empty($caseData['name'])) {
                                     QuotationCase::create([
                                         'scope_id' => $scope->id,
                                         'case_title' => $caseData['name'],
@@ -241,7 +237,7 @@ class QuotationController extends Controller
             // Create waiver scenarios and their cases
             if ($request->has('waiver')) {
                 foreach ($request->waiver as $waiverData) {
-                    if (!empty($waiverData['scenario'])) {
+                    if (! empty($waiverData['scenario'])) {
                         $waiver = QuotationWaiver::create([
                             'quotation_id' => $quotation->id,
                             'waiver_title' => $waiverData['scenario'],
@@ -251,7 +247,7 @@ class QuotationController extends Controller
                         // Create cases for this waiver
                         if (isset($waiverData['cases']) && is_array($waiverData['cases'])) {
                             foreach ($waiverData['cases'] as $caseData) {
-                                if (!empty($caseData['name'])) {
+                                if (! empty($caseData['name'])) {
                                     WaiverCase::create([
                                         'waiver_id' => $waiver->id,
                                         'case_title' => $caseData['name'],
@@ -267,7 +263,7 @@ class QuotationController extends Controller
             // Create deliverables
             if ($request->has('deliverables')) {
                 foreach ($request->deliverables as $deliverable) {
-                    if (!empty($deliverable['detail'])) {
+                    if (! empty($deliverable['detail'])) {
                         QuotationDeliverable::create([
                             'quotation_id' => $quotation->id,
                             'deliverable_detail' => $deliverable['detail'],
@@ -322,10 +318,10 @@ class QuotationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return back()
                 ->withInput()
-                ->with('error', 'Failed to create quotation: ' . $e->getMessage());
+                ->with('error', 'Failed to create quotation: '.$e->getMessage());
         }
     }
 
@@ -341,16 +337,17 @@ class QuotationController extends Controller
             'scopes.cases',
             'waivers.cases',
             'deliverables',
-            'signature'
+            'signature',
         ])->findOrFail($id);
 
         return view('technician.contents.quotations.show', compact('quotation'));
     }
 
-    public function sendToManager($id,Request $request){
+    public function sendToManager($id, Request $request)
+    {
         $quotation = Quotation::with('jobOrder')->findOrFail($id);
-                if ($request->action === 'submit_manager') {
-           $quotation->update([
+        if ($request->action === 'submit_manager') {
+            $quotation->update([
                 'status' => 'pending',
                 'date_issued' => now(),
             ]);
@@ -378,7 +375,7 @@ class QuotationController extends Controller
             'scopes.cases',
             'waivers.cases',
             'deliverables',
-            'signature'
+            'signature',
         ])->findOrFail($id);
 
         // Only allow editing drafts
@@ -423,7 +420,7 @@ class QuotationController extends Controller
 
             // Update quotation
             $status = $request->action === 'draft' ? 'draft' : 'pending';
-            
+
             // Recalculate totals
             $subtotal = 0;
             foreach ($request->items as $item) {
@@ -479,7 +476,7 @@ class QuotationController extends Controller
             // Recreate scopes
             if ($request->has('scope')) {
                 foreach ($request->scope as $scopeData) {
-                    if (!empty($scopeData['scenario'])) {
+                    if (! empty($scopeData['scenario'])) {
                         $scope = QuotationScope::create([
                             'quotation_id' => $quotation->id,
                             'scenario_name' => $scopeData['scenario'],
@@ -487,7 +484,7 @@ class QuotationController extends Controller
 
                         if (isset($scopeData['cases'])) {
                             foreach ($scopeData['cases'] as $caseData) {
-                                if (!empty($caseData['name'])) {
+                                if (! empty($caseData['name'])) {
                                     QuotationCase::create([
                                         'scope_id' => $scope->id,
                                         'case_title' => $caseData['name'],
@@ -503,7 +500,7 @@ class QuotationController extends Controller
             // Recreate waivers
             if ($request->has('waiver')) {
                 foreach ($request->waiver as $waiverData) {
-                    if (!empty($waiverData['scenario'])) {
+                    if (! empty($waiverData['scenario'])) {
                         $waiver = QuotationWaiver::create([
                             'quotation_id' => $quotation->id,
                             'waiver_title' => $waiverData['scenario'],
@@ -511,7 +508,7 @@ class QuotationController extends Controller
 
                         if (isset($waiverData['cases'])) {
                             foreach ($waiverData['cases'] as $caseData) {
-                                if (!empty($caseData['name'])) {
+                                if (! empty($caseData['name'])) {
                                     WaiverCase::create([
                                         'waiver_id' => $waiver->id,
                                         'case_title' => $caseData['name'],
@@ -527,7 +524,7 @@ class QuotationController extends Controller
             // Recreate deliverables
             if ($request->has('deliverables')) {
                 foreach ($request->deliverables as $deliverable) {
-                    if (!empty($deliverable['detail'])) {
+                    if (! empty($deliverable['detail'])) {
                         QuotationDeliverable::create([
                             'quotation_id' => $quotation->id,
                             'deliverable_detail' => $deliverable['detail'],
@@ -547,7 +544,8 @@ class QuotationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Failed to update: ' . $e->getMessage());
+
+            return back()->withInput()->with('error', 'Failed to update: '.$e->getMessage());
         }
     }
 
@@ -558,19 +556,19 @@ class QuotationController extends Controller
     {
         try {
             $quotation = Quotation::findOrFail($id);
-            
+
             // Delete logo if exists
             if ($quotation->client_logo) {
                 Storage::disk('public')->delete($quotation->client_logo);
             }
-            
+
             $quotation->delete();
 
             return redirect()->route('technician.quotation')
                 ->with('success', 'Quotation deleted successfully!');
-                
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to delete quotation: ' . $e->getMessage());
+            return back()->with('error', 'Failed to delete quotation: '.$e->getMessage());
         }
     }
 
@@ -581,7 +579,7 @@ class QuotationController extends Controller
     {
         $request->validate([
             'logo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'quotation_id' => 'nullable|exists:quotations,id'
+            'quotation_id' => 'nullable|exists:quotations,id',
         ]);
 
         try {
@@ -589,25 +587,25 @@ class QuotationController extends Controller
 
             if ($request->quotation_id) {
                 $quotation = Quotation::findOrFail($request->quotation_id);
-                
+
                 // Delete old logo
                 if ($quotation->client_logo) {
                     Storage::disk('public')->delete($quotation->client_logo);
                 }
-                
+
                 $quotation->update(['client_logo' => $path]);
             }
 
             return response()->json([
                 'success' => true,
                 'path' => $path,
-                'url' => Storage::url($path)
+                'url' => Storage::url($path),
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to upload logo: ' . $e->getMessage()
+                'message' => 'Failed to upload logo: '.$e->getMessage(),
             ], 500);
         }
     }

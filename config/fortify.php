@@ -1,7 +1,7 @@
 <?php
 
-use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Fortify\Features;
 
 return [
 
@@ -76,6 +76,7 @@ return [
 
     'home' => function () {
         $user = Auth::user();
+
         return match ($user->role) {
             'admin' => '/admin/dashboard',
             'manager' => '/dashboard',

@@ -12,8 +12,7 @@ return new class extends Migration
             $table->id();
 
             // Link to quotation that generated this job order
-             $table->unsignedBigInteger('quotation_id')->nullable();
-
+            $table->unsignedBigInteger('quotation_id')->nullable();
 
             // Technician assigned
             $table->foreignId('technician_id')
@@ -24,7 +23,7 @@ return new class extends Migration
             // Work control
             $table->date('start_date')->nullable();
             $table->date('expected_finish_date')->nullable();
-            
+
             // Timeline estimate (actual days worked)
             $table->unsignedInteger('timeline_min_days')->nullable();
             $table->unsignedInteger('timeline_max_days')->nullable();
@@ -35,7 +34,7 @@ return new class extends Migration
             // Workflow status
             $table->enum('status', ['scheduled', 'in_progress', 'review', 'completed', 'cancelled'])
                 ->default('scheduled');
-            
+
             $table->timestamp('completed_at')->nullable();
 
             // Completion signatures

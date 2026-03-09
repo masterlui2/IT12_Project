@@ -67,7 +67,8 @@ class FortifyServiceProvider extends ServiceProvider
                 'recaptchaEnabled' => $recaptchaEnabled,
                 'humanChallenge' => $humanChallenge,
             ]);
-        });        Fortify::resetPasswordView(fn () => view('livewire.auth.reset-password'));
+        });
+        Fortify::resetPasswordView(fn () => view('livewire.auth.reset-password'));
         Fortify::requestPasswordResetLinkView(fn () => view('livewire.auth.forgot-password'));
     }
 
@@ -83,7 +84,7 @@ class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
-                      return Limit::perMinutes(15, 5)->by($throttleKey);
+            return Limit::perMinutes(15, 5)->by($throttleKey);
         });
     }
 }

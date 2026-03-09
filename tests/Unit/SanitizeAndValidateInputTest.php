@@ -11,7 +11,7 @@ class SanitizeAndValidateInputTest extends TestCase
 {
     public function test_it_sanitizes_strings_recursively(): void
     {
-        $middleware = new SanitizeAndValidateInput();
+        $middleware = new SanitizeAndValidateInput;
 
         $request = Request::create('/test', 'POST', [
             'name' => '  <script>alert(1)</script>Alice  ',
@@ -24,7 +24,7 @@ class SanitizeAndValidateInputTest extends TestCase
             return response()->json($sanitizedRequest->all());
         });
         /** @var \Illuminate\Http\JsonResponse $response */
-            $payload = $response->getData(true);
+        $payload = $response->getData(true);
 
         $this->assertSame('alert(1)Alice', $payload['name']);
         $this->assertSame('Hello', $payload['nested']['comment']);
@@ -35,7 +35,7 @@ class SanitizeAndValidateInputTest extends TestCase
         $this->expectException(HttpException::class);
         $this->expectExceptionCode(422);
 
-        $middleware = new SanitizeAndValidateInput();
+        $middleware = new SanitizeAndValidateInput;
 
         $request = Request::create('/test', 'POST', [
             'query' => "admin' OR 1=1 --",

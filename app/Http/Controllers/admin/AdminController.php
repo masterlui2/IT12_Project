@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\BlockedIp;
 use App\Models\Inquiry;
 use App\Models\JobOrder;
 use App\Models\PasswordResetRequest;
 use App\Models\Quotation;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +22,7 @@ use Illuminate\Validation\Rules\Password;
 class AdminController extends Controller
 {
     private const MAX_EXPORT_DAYS = 31;
+
     private const MAX_EXPORT_ROWS = 5000;
 
     /**
@@ -63,12 +65,12 @@ class AdminController extends Controller
             ->groupBy('day')
             ->orderBy('day')
             ->get()
-            ->mapWithKeys(fn($item) => [$item->day => $item->total]);
+            ->mapWithKeys(fn ($item) => [$item->day => $item->total]);
 
         return view('admin.contents.dashboard', compact(
-            'userStats', 
-            'systemStats', 
-            'recentLogs', 
+            'userStats',
+            'systemStats',
+            'recentLogs',
             'activitySeries'
         ));
     }
@@ -79,6 +81,7 @@ class AdminController extends Controller
     public function systemManagement()
     {
         $this->ensureAdmin();
+
         return view('admin.contents.system-management');
     }
 
@@ -104,8 +107,8 @@ class AdminController extends Controller
             ->paginate(10, ['*'], 'requests_page');
 
         return view('admin.contents.users-access', compact(
-            'users', 
-            'roleCounts', 
+            'users',
+            'roleCounts',
             'passwordResetRequests'
         ));
     }
@@ -122,20 +125,18 @@ class AdminController extends Controller
             'admin_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $user = $passwordResetRequest->user 
+        $user = $passwordResetRequest->user
             ?? User::where('email', $passwordResetRequest->email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return back()->withErrors([
                 'password_reset' => __('No account was found for this request. Please verify identity details before resetting.'),
             ]);
         }
 
         DB::transaction(function () use ($user, $validated, $passwordResetRequest) {
-            // Update user password
             $user->forceFill(['password' => Hash::make($validated['password'])])->save();
 
-            // Update the reset request
             $passwordResetRequest->update([
                 'user_id' => $user->id,
                 'status' => 'reset_completed',
@@ -144,7 +145,6 @@ class AdminController extends Controller
                 'reviewed_at' => now(),
             ]);
 
-            // Log the action
             AuditLog::create([
                 'user_id' => Auth::id(),
                 'action' => 'admin.password.reset.approved',
@@ -157,7 +157,7 @@ class AdminController extends Controller
         });
 
         return back()->with('status', __('Password was reset successfully for :email.', [
-            'email' => $user->email
+            'email' => $user->email,
         ]));
     }
 
@@ -180,7 +180,6 @@ class AdminController extends Controller
                 'reviewed_at' => now(),
             ]);
 
-            // Log the action
             AuditLog::create([
                 'user_id' => Auth::id(),
                 'action' => 'admin.password.reset.rejected',
@@ -211,7 +210,6 @@ class AdminController extends Controller
             'date_to' => trim((string) $request->input('date_to', '')),
         ];
 
-        // Apply search filter
         if ($filters['search'] !== '') {
             $search = $filters['search'];
 
@@ -225,7 +223,6 @@ class AdminController extends Controller
             });
         }
 
-        // Apply level filter if column exists
         if ($filters['level'] !== '') {
             $level = strtolower($filters['level']);
 
@@ -239,7 +236,6 @@ class AdminController extends Controller
             }
         }
 
-        // Apply date filters
         if ($filters['date_from'] !== '') {
             $query->where('created_at', '>=', Carbon::parse($filters['date_from'])->startOfDay());
         }
@@ -257,11 +253,112 @@ class AdminController extends Controller
     }
 
     /**
+     * Display blocked IP management page.
+     */
+       public function ipBlocking(Request $request)
+    {
+        $this->ensureAdmin();
+                BlockedIp::query()
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<=', now())
+            ->delete();
+        $blockedIps = BlockedIp::query()
+            ->with('admin')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->latest('blocked_at')
+            ->paginate(12)
+            ->withQueryString();
+
+        $durationOptions = [
+            60 => '1 hour',
+            360 => '6 hours',
+            720 => '12 hours',
+            1440 => '24 hours',
+            4320 => '3 days',
+            10080 => '7 days',
+        ];
+
+         return view('admin.contents.ip-blocking', [
+            'blockedIps' => $blockedIps,
+            'durationOptions' => $durationOptions,
+            'requestIp' => (string) $request->ip(),
+        ]);
+    }
+
+    /**
+     * Store a blocked IP address.
+     */
+    public function storeBlockedIp(Request $request): RedirectResponse
+    {
+        $this->ensureAdmin();
+         BlockedIp::query()
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<=', now())
+            ->delete();
+        $validated = $request->validate([
+            'ip_address' => ['required', 'ip', 'max:45', 'unique:blocked_ips,ip_address'],
+            'duration_minutes' => ['required', 'integer', 'in:60,360,720,1440,4320,10080'],
+            'reason' => ['nullable', 'string', 'max:255'],
+        ]);
+            $blockedAt = now();
+        $expiresAt = (clone $blockedAt)->addMinutes((int) $validated['duration_minutes']);
+
+        BlockedIp::create([
+            'ip_address' => $validated['ip_address'],
+            'reason' => $validated['reason'] ?? null,
+            'duration_minutes' => (int) $validated['duration_minutes'],
+            'blocked_by' => Auth::id(),
+            'blocked_at' => $blockedAt,
+            'expires_at' => $expiresAt,
+        ]);
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'admin.ip.blocked',
+            'meta' => [
+                'ip_address' => $validated['ip_address'],
+                'reason' => $validated['reason'] ?? null,
+], 'duration_minutes' => (int) $validated['duration_minutes'],
+                'expires_at' => $expiresAt->toIso8601String(),
+        ]);
+
+       return back()->with('status', __('IP address :ip has been blocked for :minutes minutes.', [
+            'ip' => $validated['ip_address'],
+            'minutes' => (int) $validated['duration_minutes'],
+        ]));
+    }
+
+    /**
+     * Remove a blocked IP address.
+     */
+    public function destroyBlockedIp(BlockedIp $blockedIp): RedirectResponse
+    {
+        $this->ensureAdmin();
+
+        $ipAddress = $blockedIp->ip_address;
+        $blockedIp->delete();
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'admin.ip.unblocked',
+            'meta' => [
+                'ip_address' => $ipAddress,
+            ],
+        ]);
+
+        return back()->with('status', __('IP address :ip has been unblocked.', ['ip' => $ipAddress]));
+    }
+
+    /**
      * Display analytics page.
      */
     public function analytics()
     {
         $this->ensureAdmin();
+
         return view('admin.contents.analytics');
     }
 
@@ -271,6 +368,7 @@ class AdminController extends Controller
     public function developerTools()
     {
         $this->ensureAdmin();
+
         return view('admin.contents.developer-tools');
     }
 
@@ -280,6 +378,7 @@ class AdminController extends Controller
     public function documentation()
     {
         $this->ensureAdmin();
+
         return view('admin.contents.documentation');
     }
 }
